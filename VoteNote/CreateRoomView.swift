@@ -13,14 +13,18 @@ struct CreateRoomView: View {
   
   var body: some View {
     return NavigationView {
-      VStack {
-        Text("Create Room")
-        NavigationLink(
-          destination: Host_QueuePageView(),
-          label: {
-            Text("go to Host Queue Page")
-          })
+      ZStack {
+        Color.white
+        VStack {
+          Text("Create Room")
+          NavigationLink(
+            destination: Host_QueuePageView(),
+            label: {
+              Text("go to Host Queue Page")
+            })
+        }
       }
+      .navigationBarHidden(true)
     }
   }
 }

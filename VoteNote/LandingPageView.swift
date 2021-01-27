@@ -14,35 +14,41 @@ struct LandingPageView: View {
   var body: some View {
     return NavigationView {
       VStack {
+        HStack {
+          Spacer()
+            .frame(width: UIScreen.main.bounds.size.width / 4)
+          Picker(selection: self.$currentView, label: Text("I don't know what this label is for")) {
+                          Text("Join").tag(0)
+                          Text("Host").tag(1)
+          }.pickerStyle(SegmentedPickerStyle())
+          .frame(width: UIScreen.main.bounds.size.width / 2,  alignment: .center)
+          VStack {
+            NavigationLink(
+                                  destination: ProfileView(),
+                                  label: {
+                                    Image(systemName: "person")
+                                      .resizable()
+                                      .frame(width: 30, height: 30)
+                                  })
+              .frame(alignment: .trailing)
+          }
+          .frame(width: UIScreen.main.bounds.size.width/4)
+          
+        }
+        .frame(width: UIScreen.main.bounds.size.width, alignment: .top)
         
-        if (currentView == 1) {
+        if (currentView == 0) {
           JoinRoomView()
+            .animation(.default)
+            .transition(.move(edge: .leading))
         } else {
           CreateRoomView()
+            .animation(.default)
+            .transition(.move(edge: .trailing))
         }
       }
-      .navigationBarItems(trailing: HStack {
-        //TODO: THIS PICKER IS NOT WANTING TO CENTER ALIGN
-//        I JUST DID THIS HACK TEMPORARILY
-        Picker(selection: self.$currentView, label: Text("I don't know what this label is for")) {
-                        Text("Join").tag(0)
-                        Text("Host").tag(1)
-        }.pickerStyle(SegmentedPickerStyle())
-        .frame(width: UIScreen.main.bounds.size.width / 1.5)
-        .frame(alignment: .center)
-        Spacer()
-          .frame(width: UIScreen.main.bounds.size.width / 15)
-        NavigationLink(
-                              destination: ProfileView(),
-                              label: {
-                                Image(systemName: "person")
-                                  .resizable()
-                                  .frame(width: 30, height: 30)
-                              })
-          .frame(alignment: .topTrailing)
-        
-      }
-      .frame(minWidth: 0, maxWidth: .infinity, alignment: .top))
+      .navigationTitle("Lobby")
+      .navigationBarHidden(true)
     }
     .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
     

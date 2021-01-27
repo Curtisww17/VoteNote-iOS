@@ -13,14 +13,18 @@ struct JoinRoomView: View {
   
   var body: some View {
     return NavigationView {
-      VStack {
-        Text("Join Room")
-        NavigationLink(
-          destination: User_QueuePageView(),
-          label: {
-            Text("go to User Queue Page")
-          })
+      ZStack {
+        Color.white
+        VStack {
+          Text("Join Room")
+          NavigationLink(
+            destination: User_QueuePageView(),
+            label: {
+              Text("go to User Queue Page")
+            })
+        }
       }
+      .navigationBarHidden(true)
     }
   }
 }
