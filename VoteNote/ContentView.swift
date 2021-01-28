@@ -8,8 +8,13 @@
 import SwiftUI
 
 struct ContentView: View {
+  @State var isLoggedIn = false
     var body: some View {
+      if (!isLoggedIn) {
+        LoginWithSpotifyView(isLoggedIn: $isLoggedIn)
+      } else {
         LandingPageView()
+      }
     }
 }
 

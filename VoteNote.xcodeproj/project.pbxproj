@@ -12,7 +12,6 @@
 		448572B225BF421E006C5C07 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 448572B125BF421E006C5C07 /* ContentView.swift */; };
 		448572B425BF4220006C5C07 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 448572B325BF4220006C5C07 /* Assets.xcassets */; };
 		448572B725BF4220006C5C07 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 448572B625BF4220006C5C07 /* Preview Assets.xcassets */; };
-		448572BA25BF4220006C5C07 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 448572B825BF4220006C5C07 /* LaunchScreen.storyboard */; };
 		448572C525BF4220006C5C07 /* VoteNoteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 448572C425BF4220006C5C07 /* VoteNoteTests.swift */; };
 		448572D025BF4220006C5C07 /* VoteNoteUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 448572CF25BF4220006C5C07 /* VoteNoteUITests.swift */; };
 		448572E125BF7317006C5C07 /* LoginWithSpotifyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 448572E025BF7317006C5C07 /* LoginWithSpotifyView.swift */; };
@@ -24,6 +23,7 @@
 		448572FF25BF81D5006C5C07 /* User_QueuePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 448572FE25BF81D5006C5C07 /* User_QueuePageView.swift */; };
 		4485731025BF8390006C5C07 /* Host_RoomPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4485730F25BF8390006C5C07 /* Host_RoomPageView.swift */; };
 		4485731525BF8727006C5C07 /* User_RoomPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4485731425BF8727006C5C07 /* User_RoomPageView.swift */; };
+		4485733425C22F0E006C5C07 /* SpotifyiOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4485733325C22F0E006C5C07 /* SpotifyiOS.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,7 +50,6 @@
 		448572B125BF421E006C5C07 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		448572B325BF4220006C5C07 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		448572B625BF4220006C5C07 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		448572B925BF4220006C5C07 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		448572BB25BF4220006C5C07 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		448572C025BF4220006C5C07 /* VoteNoteTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VoteNoteTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		448572C425BF4220006C5C07 /* VoteNoteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoteNoteTests.swift; sourceTree = "<group>"; };
@@ -67,6 +66,8 @@
 		448572FE25BF81D5006C5C07 /* User_QueuePageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User_QueuePageView.swift; sourceTree = "<group>"; };
 		4485730F25BF8390006C5C07 /* Host_RoomPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Host_RoomPageView.swift; sourceTree = "<group>"; };
 		4485731425BF8727006C5C07 /* User_RoomPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User_RoomPageView.swift; sourceTree = "<group>"; };
+		4485731F25C225DD006C5C07 /* VoteNote-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "VoteNote-Bridging-Header.h"; sourceTree = "<group>"; };
+		4485733325C22F0E006C5C07 /* SpotifyiOS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpotifyiOS.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,6 +75,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4485733425C22F0E006C5C07 /* SpotifyiOS.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -97,10 +99,12 @@
 		448572A125BF421E006C5C07 = {
 			isa = PBXGroup;
 			children = (
+				4485731F25C225DD006C5C07 /* VoteNote-Bridging-Header.h */,
 				448572AC25BF421E006C5C07 /* VoteNote */,
 				448572C325BF4220006C5C07 /* VoteNoteTests */,
 				448572CE25BF4220006C5C07 /* VoteNoteUITests */,
 				448572AB25BF421E006C5C07 /* Products */,
+				4485731925C221A9006C5C07 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -121,7 +125,6 @@
 				448572AF25BF421E006C5C07 /* SceneDelegate.swift */,
 				448572B125BF421E006C5C07 /* ContentView.swift */,
 				448572B325BF4220006C5C07 /* Assets.xcassets */,
-				448572B825BF4220006C5C07 /* LaunchScreen.storyboard */,
 				448572BB25BF4220006C5C07 /* Info.plist */,
 				448572B525BF4220006C5C07 /* Preview Content */,
 				448572E025BF7317006C5C07 /* LoginWithSpotifyView.swift */,
@@ -161,6 +164,14 @@
 				448572D125BF4220006C5C07 /* Info.plist */,
 			);
 			path = VoteNoteUITests;
+			sourceTree = "<group>";
+		};
+		4485731925C221A9006C5C07 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				4485733325C22F0E006C5C07 /* SpotifyiOS.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -266,7 +277,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				448572BA25BF4220006C5C07 /* LaunchScreen.storyboard in Resources */,
 				448572B725BF4220006C5C07 /* Preview Assets.xcassets in Resources */,
 				448572B425BF4220006C5C07 /* Assets.xcassets in Resources */,
 			);
@@ -338,17 +348,6 @@
 			targetProxy = 448572CC25BF4220006C5C07 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
-
-/* Begin PBXVariantGroup section */
-		448572B825BF4220006C5C07 /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				448572B925BF4220006C5C07 /* Base */,
-			);
-			name = LaunchScreen.storyboard;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		448572D225BF4220006C5C07 /* Debug */ = {
@@ -476,13 +475,19 @@
 				DEVELOPMENT_ASSET_PATHS = "\"VoteNote/Preview Content\"";
 				DEVELOPMENT_TEAM = 74YMV2J9D7;
 				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = VoteNote/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = VoteNote.VoteNote;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "VoteNote-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -497,13 +502,19 @@
 				DEVELOPMENT_ASSET_PATHS = "\"VoteNote/Preview Content\"";
 				DEVELOPMENT_TEAM = 74YMV2J9D7;
 				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = VoteNote/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = VoteNote.VoteNote;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "VoteNote-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
