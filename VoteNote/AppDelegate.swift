@@ -6,6 +6,8 @@
 //
 
 import UIKit
+//firebase import, pretty sure this goes here
+import Firebase
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate {
