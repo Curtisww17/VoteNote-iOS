@@ -10,6 +10,7 @@ import SwiftUI
 
 
 struct LandingPageView: View {
+  @Binding var spotify: Spotify
   @State var currentView = 0
   var body: some View {
     return NavigationView {
@@ -52,11 +53,5 @@ struct LandingPageView: View {
     }
     .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
     
-  }
-}
-
-struct LandingPageView_Previews: PreviewProvider {
-  static var previews: some View {
-    LandingPageView()
   }
 }
