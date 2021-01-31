@@ -1,0 +1,6 @@
+framework module Pods_VoteNoteTests {
+  umbrella header "Pods-VoteNoteTests-umbrella.h"
+
+  export *
+  module * { export * }
+}
