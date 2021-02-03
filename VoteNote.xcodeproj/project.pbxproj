@@ -26,9 +26,13 @@
 		4485731025BF8390006C5C07 /* Host_RoomPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4485730F25BF8390006C5C07 /* Host_RoomPageView.swift */; };
 		4485731525BF8727006C5C07 /* User_RoomPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4485731425BF8727006C5C07 /* User_RoomPageView.swift */; };
 		4485733425C22F0E006C5C07 /* SpotifyiOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4485733325C22F0E006C5C07 /* SpotifyiOS.framework */; };
-		88FB562525C73562007114C7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 88FB562425C73562007114C7 /* GoogleService-Info.plist */; };
-		88FB562625C73562007114C7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 88FB562425C73562007114C7 /* GoogleService-Info.plist */; };
-		88FB562725C73562007114C7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 88FB562425C73562007114C7 /* GoogleService-Info.plist */; };
+		88FB562525C73562007114C7 /* (null) in Resources */ = {isa = PBXBuildFile; };
+		88FB562625C73562007114C7 /* (null) in Resources */ = {isa = PBXBuildFile; };
+		88FB562725C73562007114C7 /* (null) in Resources */ = {isa = PBXBuildFile; };
+		88FB569625CAF48B007114C7 /* Firestore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88FB569525CAF48A007114C7 /* Firestore.swift */; };
+		88FB56C125CB0B21007114C7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 88FB56C025CB0B21007114C7 /* GoogleService-Info.plist */; };
+		88FB56C225CB0B21007114C7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 88FB56C025CB0B21007114C7 /* GoogleService-Info.plist */; };
+		88FB56C325CB0B21007114C7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 88FB56C025CB0B21007114C7 /* GoogleService-Info.plist */; };
 		8CE5F4105CA1C11272900289 /* Pods_VoteNoteTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB22CA6C8F2536ED92127FC0 /* Pods_VoteNoteTests.framework */; };
 		D738F43F41913F7DF0F59E32 /* Pods_VoteNote.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 39AD64E6A738124428F8C23F /* Pods_VoteNote.framework */; };
 /* End PBXBuildFile section */
@@ -78,7 +82,8 @@
 		4485731425BF8727006C5C07 /* User_RoomPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User_RoomPageView.swift; sourceTree = "<group>"; };
 		4485731F25C225DD006C5C07 /* VoteNote-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "VoteNote-Bridging-Header.h"; sourceTree = "<group>"; };
 		4485733325C22F0E006C5C07 /* SpotifyiOS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpotifyiOS.framework; sourceTree = "<group>"; };
-		882AFB1325C7142600D78507 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; name = "GoogleService-Info.plist"; path = "../../Downloads/GoogleService-Info.plist"; sourceTree = SOURCE_ROOT; };
+		88FB569525CAF48A007114C7 /* Firestore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Firestore.swift; sourceTree = "<group>"; };
+		88FB56C025CB0B21007114C7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		8CF54284DFB6313ACFC903CD /* Pods-VoteNote-VoteNoteUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VoteNote-VoteNoteUITests.release.xcconfig"; path = "Target Support Files/Pods-VoteNote-VoteNoteUITests/Pods-VoteNote-VoteNoteUITests.release.xcconfig"; sourceTree = "<group>"; };
 		AB22CA6C8F2536ED92127FC0 /* Pods_VoteNoteTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_VoteNoteTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB019533ADD885C35A853F85 /* Pods-VoteNoteTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VoteNoteTests.debug.xcconfig"; path = "Target Support Files/Pods-VoteNoteTests/Pods-VoteNoteTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -143,8 +148,8 @@
 		448572AC25BF421E006C5C07 /* VoteNote */ = {
 			isa = PBXGroup;
 			children = (
-				88FB562425C73562007114C7 /* GoogleService-Info.plist */,
 				448572AD25BF421E006C5C07 /* AppDelegate.swift */,
+				88FB56C025CB0B21007114C7 /* GoogleService-Info.plist */,
 				448572AF25BF421E006C5C07 /* SceneDelegate.swift */,
 				448572B125BF421E006C5C07 /* ContentView.swift */,
 				448572B325BF4220006C5C07 /* Assets.xcassets */,
@@ -160,6 +165,7 @@
 				4485730F25BF8390006C5C07 /* Host_RoomPageView.swift */,
 				4485731425BF8727006C5C07 /* User_RoomPageView.swift */,
 				445F0AF225C72EE700EF80F5 /* Spotify.swift */,
+				88FB569525CAF48A007114C7 /* Firestore.swift */,
 			);
 			path = VoteNote;
 			sourceTree = "<group>";
@@ -323,8 +329,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				448572B725BF4220006C5C07 /* Preview Assets.xcassets in Resources */,
+				88FB56C125CB0B21007114C7 /* GoogleService-Info.plist in Resources */,
 				448572B425BF4220006C5C07 /* Assets.xcassets in Resources */,
-				88FB562525C73562007114C7 /* GoogleService-Info.plist in Resources */,
+				88FB562525C73562007114C7 /* (null) in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -332,7 +339,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				88FB562625C73562007114C7 /* GoogleService-Info.plist in Resources */,
+				88FB562625C73562007114C7 /* (null) in Resources */,
+				88FB56C225CB0B21007114C7 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -340,7 +348,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				88FB562725C73562007114C7 /* GoogleService-Info.plist in Resources */,
+				88FB562725C73562007114C7 /* (null) in Resources */,
+				88FB56C325CB0B21007114C7 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -457,6 +466,7 @@
 				448572FF25BF81D5006C5C07 /* User_QueuePageView.swift in Sources */,
 				445F0AF325C72EE700EF80F5 /* Spotify.swift in Sources */,
 				4485731525BF8727006C5C07 /* User_RoomPageView.swift in Sources */,
+				88FB569625CAF48B007114C7 /* Firestore.swift in Sources */,
 				448572F525BF7A61006C5C07 /* ProfileView.swift in Sources */,
 				448572AE25BF421E006C5C07 /* AppDelegate.swift in Sources */,
 				448572B025BF421E006C5C07 /* SceneDelegate.swift in Sources */,
