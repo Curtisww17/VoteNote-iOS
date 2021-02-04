@@ -10,6 +10,7 @@ import SwiftUI
 
 
 struct ProfileView: View {
+  @ObservedObject var spotify: Spotify
   
   var body: some View {
     return VStack {

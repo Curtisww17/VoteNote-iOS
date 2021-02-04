@@ -30,3 +30,9 @@ struct User_RoomPageView: View {
           UIApplication.shared.windows.first?.rootViewController?.present(av, animated: true, completion: nil)
       }
 }
+
+struct User_RoomPageView_Previews: PreviewProvider {
+  static var previews: some View {
+    User_RoomPageView()
+  }
+}

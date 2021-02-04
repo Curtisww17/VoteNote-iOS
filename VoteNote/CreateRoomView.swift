@@ -12,6 +12,7 @@ import SwiftUI
 struct CreateRoomView: View {
     //TODO: Send Room info to Database
     //TODO: Create second version of this view to take in info from an existing room
+  @Binding var isInRoom: Bool
     @State var showAlert: Bool = false
     
     @State var userCapacity: Int = 20 {
@@ -62,7 +63,7 @@ struct CreateRoomView: View {
             
             if self.roomName == "" || self.roomDescription == "" {
                 NavigationLink(
-                  destination: Host_QueuePageView(),
+                  destination: Host_QueuePageView(isInRoom: $isInRoom),
                   label: {
                     Text("Create Room")
                   })
@@ -81,9 +82,10 @@ struct CreateRoomView_PreviewContainer: View {
   
     @State var userCapacity: Int = 20
     @State var songsPerUser: Int = 4
+  @State var isInRoom = false
     
     var body: some View {
-        CreateRoomView(userCapacity: userCapacity, songsPerUser: songsPerUser)
+      CreateRoomView(isInRoom: $isInRoom, userCapacity: userCapacity, songsPerUser: songsPerUser)
     }
 }
 

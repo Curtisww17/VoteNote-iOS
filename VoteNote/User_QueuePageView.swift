@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 struct User_QueuePageView: View {
-  
+  @Binding var isInRoom: Bool
   var body: some View {
     return NavigationView {
       VStack {

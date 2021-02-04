@@ -10,6 +10,8 @@ import SwiftUI
 
 
 struct JoinRoomView: View {
+  @Binding var isInRoom: Bool
+  
   
   var body: some View {
     return NavigationView {
@@ -18,7 +20,7 @@ struct JoinRoomView: View {
         VStack {
           Text("Join Room")
           NavigationLink(
-            destination: User_QueuePageView(),
+            destination: User_QueuePageView(isInRoom: $isInRoom),
             label: {
               Text("go to User Queue Page")
             })
@@ -26,11 +28,5 @@ struct JoinRoomView: View {
       }
       .navigationBarHidden(true)
     }
-  }
-}
-
-struct JoinRoomView_Previews: PreviewProvider {
-  static var previews: some View {
-    JoinRoomView()
   }
 }
