@@ -77,23 +77,24 @@ struct CreateRoomView: View {
     }
   }
 }
-
-/*struct CreateRoomView_PreviewContainer: View {
   
-/*struct CreateRoomView_PreviewContainer: View {
-    @State var songsPerUser: Int = 4
-  @State var isInRoom = false
+struct CreateRoomView_PreviewContainer: View {
     
+  @State var songsPerUser: Int = 4
+  @State var userCapacity: Int = 20
   @State var isInRoom = false
-      CreateRoomView(isInRoom: $isInRoom, userCapacity: userCapacity, songsPerUser: songsPerUser)
+  @State var spotify: Spotify = Spotify()
+
+    var body: some View {
+        CreateRoomView(isInRoom: $isInRoom, spotify: spotify, userCapacity: userCapacity, songsPerUser: songsPerUser)
     }
-      CreateRoomView(isInRoom: $isInRoom, userCapacity: userCapacity, songsPerUser: songsPerUser)
+}
 
 struct CreateRoomView_Previews: PreviewProvider {
   static var previews: some View {
     
     CreateRoomView_PreviewContainer()
   }
-}*/
-}*/
+}
+//}
 //}*/
