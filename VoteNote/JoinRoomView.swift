@@ -10,7 +10,7 @@ import SwiftUI
 
 
 struct JoinRoomView: View {
-  
+  @ObservedObject var spotify: Spotify
   var body: some View {
     return NavigationView {
       ZStack {
@@ -29,8 +29,8 @@ struct JoinRoomView: View {
   }
 }
 
-struct JoinRoomView_Previews: PreviewProvider {
+/*struct JoinRoomView_Previews: PreviewProvider {
   static var previews: some View {
     JoinRoomView()
   }
-}
+}*/

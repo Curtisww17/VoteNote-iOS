@@ -44,4 +44,10 @@ class Spotify: ObservableObject {
     }
    // return loggedIn
   }
+    
+  func TestPlay() -> Bool {
+    //appDel.appRemoteDidEstablishConnection(appDel.appRemote)
+    appDel.appRemote.authorizeAndPlayURI("spotify:track:20I6sIOMTCkB6w7ryavxtO")
+    return true
+  }
 }

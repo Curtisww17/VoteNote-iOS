@@ -39,11 +39,11 @@ struct LandingPageView: View {
         .frame(width: UIScreen.main.bounds.size.width, alignment: .top)
         
         if (currentView == 0) {
-          JoinRoomView()
+            JoinRoomView(spotify: spotify)
             .animation(.default)
             .transition(.move(edge: .leading))
         } else {
-          CreateRoomView()
+          CreateRoomView(spotify: spotify)
             .animation(.default)
             .transition(.move(edge: .trailing))
         }

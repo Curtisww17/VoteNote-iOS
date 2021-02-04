@@ -13,6 +13,7 @@ struct CreateRoomView: View {
     //TODO: Send Room info to Database
     //TODO: Create second version of this view to take in info from an existing room
     @State var showAlert: Bool = false
+    @ObservedObject var spotify: Spotify
     
     @State var userCapacity: Int = 20 {
         didSet {
@@ -62,7 +63,7 @@ struct CreateRoomView: View {
             
             if self.roomName == "" || self.roomDescription == "" {
                 NavigationLink(
-                  destination: Host_QueuePageView(),
+                  destination: Host_QueuePageView(spotify: spotify),
                   label: {
                     Text("Create Room")
                   })
@@ -77,13 +78,13 @@ struct CreateRoomView: View {
   }
 }
 
-struct CreateRoomView_PreviewContainer: View {
+/*struct CreateRoomView_PreviewContainer: View {
   
     @State var userCapacity: Int = 20
     @State var songsPerUser: Int = 4
     
     var body: some View {
-        CreateRoomView(userCapacity: userCapacity, songsPerUser: songsPerUser)
+        CreateRoomView(userCapacity: userCapacity, spotify: spotify, songsPerUser: songsPerUser)
     }
 }
 
@@ -92,4 +93,4 @@ struct CreateRoomView_Previews: PreviewProvider {
     
     CreateRoomView_PreviewContainer()
   }
-}
+}*/

@@ -57,7 +57,7 @@
 /* Begin PBXFileReference section */
 		39AD64E6A738124428F8C23F /* Pods_VoteNote.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_VoteNote.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		41BEB690DF3619F4699E478F /* Pods_VoteNote_VoteNoteUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_VoteNote_VoteNoteUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		445F0AF225C72EE700EF80F5 /* Spotify.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spotify.swift; sourceTree = "<group>"; };
+		445F0AF225C72EE700EF80F5 /* Spotify.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = Spotify.swift; sourceTree = "<group>"; tabWidth = 2; };
 		448572AA25BF421E006C5C07 /* VoteNote.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VoteNote.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		448572AD25BF421E006C5C07 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		448572AF25BF421E006C5C07 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -74,7 +74,7 @@
 		448572E025BF7317006C5C07 /* LoginWithSpotifyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginWithSpotifyView.swift; sourceTree = "<group>"; };
 		448572E525BF737D006C5C07 /* LandingPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandingPageView.swift; sourceTree = "<group>"; };
 		448572EA25BF75CE006C5C07 /* CreateRoomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateRoomView.swift; sourceTree = "<group>"; };
-		448572EF25BF7603006C5C07 /* JoinRoomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinRoomView.swift; sourceTree = "<group>"; };
+		448572EF25BF7603006C5C07 /* JoinRoomView.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = JoinRoomView.swift; sourceTree = "<group>"; tabWidth = 2; };
 		448572F425BF7A61006C5C07 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		448572F925BF818F006C5C07 /* Host_QueuePageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Host_QueuePageView.swift; sourceTree = "<group>"; };
 		448572FE25BF81D5006C5C07 /* User_QueuePageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User_QueuePageView.swift; sourceTree = "<group>"; };
