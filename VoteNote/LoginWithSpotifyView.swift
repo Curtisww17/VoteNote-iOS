@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 struct LoginWithSpotifyView: View {
-  @Binding var spotify: Spotify
+  @ObservedObject var spotify: Spotify
   var body: some View {
     return HStack {
       Button(action: {

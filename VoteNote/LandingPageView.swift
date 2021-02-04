@@ -10,7 +10,7 @@ import SwiftUI
 
 
 struct LandingPageView: View {
-  @Binding var spotify: Spotify
+  @ObservedObject var spotify: Spotify
   @State var currentView = 0
   var body: some View {
     return NavigationView {

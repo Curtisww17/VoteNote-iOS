@@ -20,7 +20,7 @@ class Spotify: ObservableObject {
   
   init() {
     //constructor stuff goes here
-    loggedIn = false
+    self.loggedIn = false
   }
   
   func login() -> Bool {
@@ -36,7 +36,12 @@ class Spotify: ObservableObject {
     return true
   }
   
-  func isLoggedIn() -> Bool {
-    return loggedIn
+  func isLoggedIn() -> String {
+    if (loggedIn) {
+      return "true"
+    } else {
+      return "false"
+    }
+   // return loggedIn
   }
 }

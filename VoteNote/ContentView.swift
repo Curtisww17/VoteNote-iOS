@@ -8,14 +8,16 @@
 import SwiftUI
 
 struct ContentView: View {
-  @State var spotify = Spotify()
+  @ObservedObject var spotify = Spotify()
   var body: some View {
+    VStack {
     if (!spotify.loggedIn) {
-        LoginWithSpotifyView(spotify: $spotify)
+        LoginWithSpotifyView(spotify: spotify)
       } else {
-        LandingPageView(spotify: $spotify)
+        LandingPageView(spotify: spotify)
       }
     }
+  }
 }
 
 struct ContentView_Previews: PreviewProvider {

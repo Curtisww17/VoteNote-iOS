@@ -15,9 +15,18 @@ struct User_RoomPageView: View {
       ZStack {
         VStack {
           Text("User Room Page!")
+          Button(action: actionSheet) {
+            Text("Share")
+          }
         }
       }
       .navigationTitle("Room Name")
     }
   }
+  
+  func actionSheet() {
+          let data = "Room Code"
+          let av = UIActivityViewController(activityItems: [data], applicationActivities: nil)
+          UIApplication.shared.windows.first?.rootViewController?.present(av, animated: true, completion: nil)
+      }
 }
