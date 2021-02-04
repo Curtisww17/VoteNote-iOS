@@ -11,6 +11,7 @@ import SwiftUI
 struct Host_QueuePageView: View {
   @Binding var isInRoom: Bool
   
+@ObservedObject var spotify: Spotify
   var body: some View {
     OperationQueue.main.addOperation {
       isInRoom = true
@@ -18,6 +19,14 @@ struct Host_QueuePageView: View {
     return NavigationView {
       VStack {
         Text("Host Queue Page!")
+        
+        Button(action: {
+          //these are the scopes that our app requests
+            spotify.appDel.appRemoteDidEstablishConnection(spotify.appDel.appRemote)
+            spotify.TestPlay()
+        }) {
+          Text("play that one about falling down the stairs")
+        }
       }
       .navigationBarHidden(true)
     }

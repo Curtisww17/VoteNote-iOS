@@ -64,8 +64,6 @@ struct CreateRoomView: View {
             if self.roomName == "" || self.roomDescription == "" {
                 NavigationLink(
                   destination: Host_QueuePageView(isInRoom: $isInRoom),
-                  label: {
-                    Text("Create Room")
                   })
                   .padding(.vertical)
             }
@@ -78,20 +76,22 @@ struct CreateRoomView: View {
   }
 }
 
-struct CreateRoomView_PreviewContainer: View {
+/*struct CreateRoomView_PreviewContainer: View {
   
-    @State var userCapacity: Int = 20
+/*struct CreateRoomView_PreviewContainer: View {
     @State var songsPerUser: Int = 4
   @State var isInRoom = false
     
-    var body: some View {
+  @State var isInRoom = false
       CreateRoomView(isInRoom: $isInRoom, userCapacity: userCapacity, songsPerUser: songsPerUser)
     }
-}
+      CreateRoomView(isInRoom: $isInRoom, userCapacity: userCapacity, songsPerUser: songsPerUser)
 
 struct CreateRoomView_Previews: PreviewProvider {
   static var previews: some View {
     
     CreateRoomView_PreviewContainer()
   }
-}
+}*/
+}*/
+}*/

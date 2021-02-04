@@ -80,6 +80,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate
        // })
     }
     
+    
     func appRemote(_ appRemote: SPTAppRemote, didDisconnectWithError error: Error?) {
         print("disconnected")
     }

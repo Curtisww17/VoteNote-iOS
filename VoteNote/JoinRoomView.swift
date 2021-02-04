@@ -30,3 +30,9 @@ struct JoinRoomView: View {
     }
   }
 }
+
+/*struct JoinRoomView_Previews: PreviewProvider {
+  static var previews: some View {
+    JoinRoomView()
+  }
+}*/
