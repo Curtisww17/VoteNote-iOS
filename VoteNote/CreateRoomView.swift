@@ -13,6 +13,7 @@ struct CreateRoomView: View {
     //TODO: Send Room info to Database
     //TODO: Create second version of this view to take in info from an existing room
   @Binding var isInRoom: Bool
+  @ObservedObject var spotify: Spotify
     @State var showAlert: Bool = false
     
     @State var userCapacity: Int = 20 {
@@ -63,7 +64,8 @@ struct CreateRoomView: View {
             
             if self.roomName == "" || self.roomDescription == "" {
                 NavigationLink(
-                  destination: Host_QueuePageView(isInRoom: $isInRoom),
+                  destination: Host_QueuePageView(isInRoom: $isInRoom, spotify: spotify), label: {
+                    Text("Create")
                   })
                   .padding(.vertical)
             }
@@ -94,4 +96,4 @@ struct CreateRoomView_Previews: PreviewProvider {
   }
 }*/
 }*/
-}*/
+//}*/
