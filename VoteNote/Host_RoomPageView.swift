@@ -14,6 +14,7 @@ struct Host_RoomPageView: View {
     @Binding var roomDescription: String
     @Binding var roomCapacity: Int
     @Binding var songsPerUser: Int
+    //TODO- make the room capacity, songs per user actually do stuff
     
   var body: some View {
     return NavigationView {

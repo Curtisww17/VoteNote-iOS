@@ -9,7 +9,8 @@ import Foundation
 import SwiftUI
 
 struct Host_QueuePageView: View {
-  @Binding var isInRoom: Bool
+    @State var currentView = 0
+    @Binding var isInRoom: Bool
   @ObservedObject var spotify: Spotify
   
   var body: some View {
@@ -18,7 +19,32 @@ struct Host_QueuePageView: View {
     }
     return NavigationView {
       VStack {
-        Text("Host Queue Page!")
+        
+        HStack{
+            Spacer()
+              .frame(width: UIScreen.main.bounds.size.width / 4)
+            Picker(selection: self.$currentView, label: Text("I don't know what this label is for")) {
+              Text("Queue").tag(0)
+              Text("Room").tag(1)
+            }.pickerStyle(SegmentedPickerStyle())
+            .frame(width: UIScreen.main.bounds.size.width / 2,  alignment: .center)
+            
+            VStack {
+              NavigationLink(
+                destination: ProfileView(spotify: spotify),
+                label: {
+                  Text("Add")
+                })
+                .frame(alignment: .trailing)
+            }
+            .frame(width: UIScreen.main.bounds.size.width/4)
+        }
+        
+        List {
+            Text("Where Queue will go")
+        }
+        
+        //Text("Host Queue Page!")
         
         Button(action: {
           //these are the scopes that our app requests
@@ -30,5 +56,20 @@ struct Host_QueuePageView: View {
       }
       .navigationBarHidden(true)
     }
+  }
+}
+
+struct Host_QueuePageView_PreviewContainer: View {
+    @State var isInRoom: Bool = true
+    @State var spotify: Spotify = Spotify()
+
+    var body: some View {
+        Host_QueuePageView(isInRoom: $isInRoom, spotify: spotify)
+    }
+}
+
+struct Host_QueuePageView_Previews: PreviewProvider {
+  static var previews: some View {
+    Host_QueuePageView_PreviewContainer()
   }
 }

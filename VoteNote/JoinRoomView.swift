@@ -11,6 +11,7 @@ import SwiftUI
 
 struct JoinRoomView: View {
   @Binding var isInRoom: Bool
+  @State var spotify: Spotify = Spotify()
   
   
   var body: some View {
@@ -20,7 +21,7 @@ struct JoinRoomView: View {
         VStack {
           Text("Join Room")
           NavigationLink(
-            destination: User_QueuePageView(isInRoom: $isInRoom),
+            destination: User_QueuePageView(isInRoom: $isInRoom, spotify: spotify),
             label: {
               Text("go to User Queue Page")
             })
