@@ -14,7 +14,20 @@ struct Host_RoomPageView: View {
     return NavigationView {
       ZStack {
         VStack {
-          Text("Host Room Page!")
+            /*Picker(selection: self.$currentView, label: Text("I don't know what this label is for")) {
+              Text("Queue").tag(0)
+              Text("Room").tag(1)
+            }.pickerStyle(SegmentedPickerStyle())
+            .frame(width: UIScreen.main.bounds.size.width / 2,  alignment: .center)*/
+          //Text("Host Room Page!")
+            Form {
+                
+                Text("Room Description")
+                Section(header: Text("Room Settings")) {
+                    Text("Room Capacity")
+                    Text("Songs Per User")
+                }
+            }
         }
         .navigationTitle("Room Name")
       }
