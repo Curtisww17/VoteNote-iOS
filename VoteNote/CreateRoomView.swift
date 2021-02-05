@@ -65,7 +65,7 @@ struct CreateRoomView: View {
             if self.roomName == "" || self.roomDescription == "" {
                 NavigationLink(
                   destination: Host_QueuePageView(isInRoom: $isInRoom, spotify: spotify), label: {
-                    Text("Create")
+                    Text("Create Room")
                   })
                   .padding(.vertical)
             }

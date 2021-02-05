@@ -58,3 +58,18 @@ struct LandingPageView: View {
     
   }
 }
+
+struct LandingPageView_PreviewContainer: View {
+
+  @State var spotify: Spotify = Spotify()
+
+    var body: some View {
+        LandingPageView(spotify: spotify)
+    }
+}
+
+struct LandingPageView_Previews: PreviewProvider {
+  static var previews: some View {
+    LandingPageView_PreviewContainer()
+  }
+}
