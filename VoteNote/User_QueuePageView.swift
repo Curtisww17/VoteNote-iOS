@@ -43,10 +43,32 @@ struct User_QueuePageView: View {
         List {
             Text("Where Queue will go")
         }
+        
+        NowPlayingViewUser()
       }
       .navigationBarHidden(true)
     }
   }
+}
+
+struct NowPlayingViewUser: View {
+    //TODO- needs the title, artist, votes, and image of the current song
+
+    var body: some View {
+        ZStack {
+            HStack {
+                Spacer()
+                Image(systemName: "person.crop.square.fill").resizable().frame(width: 40.0, height: 40.0)
+                Text("Song Title")
+                        .padding(.leading)
+                Spacer()
+                Spacer()
+                Spacer()
+                Spacer()
+            }
+            .padding(.vertical)
+        }
+    }
 }
 
 struct User_QueuePageView_PreviewContainer: View {
