@@ -41,7 +41,7 @@ struct User_QueuePageView: View {
         }
         
         List {
-            Text("Where Queue will go")
+            QueueEntry()
         }
         
         NowPlayingViewUser()
