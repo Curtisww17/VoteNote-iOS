@@ -6,7 +6,9 @@ target 'VoteNote' do
   use_frameworks!
 
   # Pods for VoteNote
+  pod 'Firebase/Auth'
   pod 'Firebase/Firestore'
+  #pod 'FirebaseFirestoreSwift'
 
   target 'VoteNoteTests' do
     inherit! :search_paths
