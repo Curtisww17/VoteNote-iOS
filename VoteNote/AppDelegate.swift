@@ -8,6 +8,8 @@
 import UIKit
 //firebase import, pretty sure this goes here
 import Firebase
+import FirebaseCore
+import FirebaseFirestore
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate, SPTAppRemoteDelegate, SPTAppRemotePlayerStateDelegate {
