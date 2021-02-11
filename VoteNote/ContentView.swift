@@ -13,6 +13,7 @@ struct ContentView: View {
     VStack {
     if (!spotify.loggedIn) {
         LoginWithSpotifyView(spotify: spotify)
+          .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
       } else {
         LandingPageView(spotify: spotify)
       }
