@@ -10,7 +10,7 @@ import FirebaseFirestore
 
 class dbConnection: ObservableObject {
     
-    struct room{
+    class room{
         let name: String
         let desc: String?
         let anonUsr: Bool
@@ -28,7 +28,7 @@ class dbConnection: ObservableObject {
         }
     }
     
-    struct user{
+    class user{
         let name: String
         let profilePic: String
         
@@ -38,7 +38,7 @@ class dbConnection: ObservableObject {
         }
     }
     
-    struct song{
+    class song{
         let addedBy: String
         let artist: String
         let genres: [String]
