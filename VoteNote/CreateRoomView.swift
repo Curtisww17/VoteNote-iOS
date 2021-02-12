@@ -34,6 +34,11 @@ struct CreateRoomView: View {
   @State var roomName: String = ""
   @State var roomDescription: String = ""
     
+    func createRoom(){
+        //TO-DO- send info to room
+        //let testRoom: room = room(name: "Placeholder room", desc: "This room is a placeholder until we connect properly to the database", anonUsr: false, capacity: 0, explicit: true, voting: true)
+    }
+    
   var body: some View {
     return NavigationView {
       ZStack {
@@ -63,11 +68,13 @@ struct CreateRoomView: View {
             }
             
             if self.roomName == "" || self.roomDescription == "" {
-                NavigationLink(
-                  destination: Host_QueuePageView(isInRoom: $isInRoom, spotify: spotify), label: {
-                    Text("Create Room")
-                  })
-                  .padding(.vertical)
+                Button(action: {createRoom()}) {
+                    NavigationLink(
+                      destination: Host_QueuePageView(isInRoom: $isInRoom, spotify: spotify), label: {
+                        Text("Create Room")
+                      })
+                      .padding(.vertical)
+                }
             }
           
           Spacer()
