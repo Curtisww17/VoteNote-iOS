@@ -35,8 +35,9 @@ struct CreateRoomView: View {
   @State var roomDescription: String = ""
     
     func createRoom(){
-        //TO-DO- send info to room
-        //let testRoom: room = room(name: "Placeholder room", desc: "This room is a placeholder until we connect properly to the database", anonUsr: false, capacity: 0, explicit: true, voting: true)
+        //TO-DO- send info to room, songs per user
+        var newRoom: room = room(name: roomName, desc: roomDescription, anonUsr: false, capacity: userCapacity, explicit: false, voting: true)
+        makeRoom(newRoom: newRoom)
     }
     
   var body: some View {
