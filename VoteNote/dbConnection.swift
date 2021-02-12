@@ -8,7 +8,7 @@
 import Foundation
 import FirebaseFirestore
 
-class Firestore: ObservableObject {
+class dbConnection: ObservableObject {
     
     struct room{
         let name: String
