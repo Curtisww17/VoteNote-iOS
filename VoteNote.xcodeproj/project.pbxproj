@@ -27,6 +27,8 @@
 		4485731525BF8727006C5C07 /* User_RoomPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4485731425BF8727006C5C07 /* User_RoomPageView.swift */; };
 		4485733425C22F0E006C5C07 /* SpotifyiOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4485733325C22F0E006C5C07 /* SpotifyiOS.framework */; };
 		44F8D59A25D8BCD500D2B461 /* EnvironmentVariables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44F8D59925D8BCD500D2B461 /* EnvironmentVariables.swift */; };
+		44F8D59F25D9A61200D2B461 /* HostController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44F8D59E25D9A61200D2B461 /* HostController.swift */; };
+		44F8D5A425D9B66600D2B461 /* UserController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44F8D5A325D9B66600D2B461 /* UserController.swift */; };
 		671BABC925D895B500964AAF /* httpRequester.swift in Sources */ = {isa = PBXBuildFile; fileRef = 671BABC825D895B500964AAF /* httpRequester.swift */; };
 		88FB562525C73562007114C7 /* (null) in Resources */ = {isa = PBXBuildFile; };
 		88FB562625C73562007114C7 /* (null) in Resources */ = {isa = PBXBuildFile; };
@@ -85,6 +87,8 @@
 		4485731F25C225DD006C5C07 /* VoteNote-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "VoteNote-Bridging-Header.h"; sourceTree = "<group>"; };
 		4485733325C22F0E006C5C07 /* SpotifyiOS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpotifyiOS.framework; sourceTree = "<group>"; };
 		44F8D59925D8BCD500D2B461 /* EnvironmentVariables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnvironmentVariables.swift; sourceTree = "<group>"; };
+		44F8D59E25D9A61200D2B461 /* HostController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostController.swift; sourceTree = "<group>"; };
+		44F8D5A325D9B66600D2B461 /* UserController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserController.swift; sourceTree = "<group>"; };
 		671BABC825D895B500964AAF /* httpRequester.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = httpRequester.swift; sourceTree = "<group>"; };
 		88FB569525CAF48A007114C7 /* dbConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dbConnection.swift; sourceTree = "<group>"; };
 		88FB56C025CB0B21007114C7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -172,6 +176,8 @@
 				88FB569525CAF48A007114C7 /* dbConnection.swift */,
 				671BABC825D895B500964AAF /* httpRequester.swift */,
 				44F8D59925D8BCD500D2B461 /* EnvironmentVariables.swift */,
+				44F8D59E25D9A61200D2B461 /* HostController.swift */,
+				44F8D5A325D9B66600D2B461 /* UserController.swift */,
 			);
 			path = VoteNote;
 			sourceTree = "<group>";
@@ -469,9 +475,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				44F8D5A425D9B66600D2B461 /* UserController.swift in Sources */,
 				448572FF25BF81D5006C5C07 /* User_QueuePageView.swift in Sources */,
 				445F0AF325C72EE700EF80F5 /* Spotify.swift in Sources */,
 				4485731525BF8727006C5C07 /* User_RoomPageView.swift in Sources */,
+				44F8D59F25D9A61200D2B461 /* HostController.swift in Sources */,
 				44F8D59A25D8BCD500D2B461 /* EnvironmentVariables.swift in Sources */,
 				671BABC925D895B500964AAF /* httpRequester.swift in Sources */,
 				88FB569625CAF48B007114C7 /* dbConnection.swift in Sources */,

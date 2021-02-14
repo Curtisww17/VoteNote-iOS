@@ -15,6 +15,7 @@ class Spotify: ObservableObject {
   let SpotifyRedirectURL = URL(string: "VoteNote://SpotifyAuthentication")!
   let SpotifyRedirectURLString = "VoteNote://SpotifyAuthentication"
   let scopes = "user-read-private playlist-read-private user-read-playback-state"
+  private let kAccessTokenKey = "access-token-key"
   
   @Published var canLogin: Bool
   
@@ -26,6 +27,15 @@ class Spotify: ObservableObject {
   var appRemote: SPTAppRemote? {
     didSet {
       //print("app remote set")
+    }
+  }
+  
+  lazy var accessToken = UserDefaults.standard.string(forKey: kAccessTokenKey) {
+    didSet {
+      let defaults = UserDefaults.standard
+      defaults.set(accessToken, forKey: kAccessTokenKey)
+      //print(appRemote.connectionParameters.accessToken ?? "access token")
+      sharedSpotify.appRemote = self.appRemote
     }
   }
   
@@ -54,6 +64,9 @@ class Spotify: ObservableObject {
   func logout() -> Bool {
     self.appRemote?.playerAPI?.pause(nil)
     self.appRemote?.disconnect()
+    print(self.accessToken)
+    self.accessToken = ""
+    self.loggedIn = false
     return true
   }
   

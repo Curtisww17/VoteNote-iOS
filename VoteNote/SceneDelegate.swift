@@ -109,7 +109,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate,
   func sceneDidBecomeActive(_ scene: UIScene) {
     // Called when the scene has moved from an inactive state to an active state.
     // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
-    if let _ = self.appRemote.connectionParameters.accessToken {
+//    if let _ = self.appRemote.connectionParameters.accessToken {
+//      self.appRemote.connect()
+//    }
+    if sharedSpotify.loggedIn {
       self.appRemote.connect()
     }
   }
@@ -156,7 +159,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate,
   
   func appRemote(_ appRemote: SPTAppRemote, didFailConnectionAttemptWithError error: Error?) {
     print("didFailConnectionAttemptWithError")
-    print(error)
+    //print(error)
   }
   
   func appRemote(_ appRemote: SPTAppRemote, didDisconnectWithError error: Error?) {
@@ -172,12 +175,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate,
   
   func sessionManager(manager: SPTSessionManager, didFailWith error: Error) {
     print("error")
-    print(error)
+    //print(error)
   }
   
   func sessionManager(manager: SPTSessionManager, didRenew session: SPTSession) {
     print("renew")
-    print(session)
+    //print(session)
   }
   
   func connect() {

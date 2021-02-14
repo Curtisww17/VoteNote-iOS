@@ -11,11 +11,6 @@ struct ContentView: View {
     @ObservedObject var spotify = sharedSpotify
     var body: some View {
         VStack {
-          if (spotify.loggedIn) {
-            Text("logged in")
-          } else {
-            Text("not logged in")
-          }
           if (!(spotify.loggedIn)) {
                 LoginWithSpotifyView(spotify: spotify)
                   .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)

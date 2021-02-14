@@ -14,16 +14,26 @@ struct ProfileView: View {
   
   var body: some View {
     return VStack {
-      if(spotify.isLoggedIn()) {
-      Text("logged in")
-      } else {
-        Text("not logged in")
+      List {
+        if(spotify.loggedIn) {
+          Text("logged in")
+        } else {
+          Text("not logged in")
+        }
+        Button(action: {
+          spotify.pause()
+        }, label: {
+          Text("pause")
+        })
+        if (spotify.loggedIn) {
+          Button(action: {
+            spotify.logout()
+          }, label: {
+            Text("Log out of Spotify")
+          })
+        }
       }
-      Button(action: {
-        spotify.pause()
-      }, label: {
-        Text("pause")
-      })
+      
     }
   }
 }
