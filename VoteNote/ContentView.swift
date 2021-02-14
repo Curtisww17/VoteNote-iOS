@@ -21,10 +21,11 @@ struct ContentView: View {
             //
             //TEST BUTTON FOR EASY TESTING RANDOM BACKEND STUFF
             //
-            /*
-            Button(action: {
+            
+            /*Button(action: {
               //these are the scopes that our app requests
-                httpRequester.GET(url: "https://google.com")
+                //spotify.enqueue(songID: "")
+                spotify.userPlaylists(limit: "2")
             }) {
               Text("http Test")
             }*/

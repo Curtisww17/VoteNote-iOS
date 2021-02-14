@@ -14,7 +14,7 @@ class HttpRequester: ObservableObject {
         
     }
     
-    func GET(url: String){
+    func GET(url: String) -> HTTP{
         HTTP.GET(url) { response in
             if let err = response.error {
               print("url failed")
@@ -23,17 +23,27 @@ class HttpRequester: ObservableObject {
             }
             print("opt finished: \(response.description)")
             //print("data is: \(response.data)") access the response of the data with response.data
-        }
+        }!
     }
     
-    func paramGet(url: String, params: [(name:String, value:String)]){
-        HTTP.GET(url, parameters: params) { response in
+    func headerParamGet(url: String, header: [String: String], param: [String: String]) -> HTTP{
+        HTTP.GET(url, parameters: param, headers: header) { response in
             if let err = response.error {
                 print("error: \(err.localizedDescription)")
                 return //also notify app of failure as needed
             }
             print("opt finished: \(response.description)")
-        }
+        }!
+    }
+    
+    func headerGet(url: String, header: [String: String]) -> HTTP{
+        HTTP.GET(url, headers: header) { response in
+            if let err = response.error {
+                print("error: \(err.localizedDescription)")
+                return //also notify app of failure as needed
+            }
+            print("opt finished: \(response.description)")
+        }!
     }
     
     //not done dont use
@@ -41,6 +51,7 @@ class HttpRequester: ObservableObject {
         
         HTTP.POST(url, parameters: params) { response in
         //do things...
+            
         // no idea what to do here
         }
     }

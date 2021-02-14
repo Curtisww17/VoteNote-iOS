@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftHTTP
 
 let sharedSpotify = Spotify()
 
@@ -18,6 +19,7 @@ class Spotify: ObservableObject {
   private let kAccessTokenKey = "access-token-key"
   
   @Published var canLogin: Bool
+  private var httpRequester: HttpRequester
   
   var sessionManager: SPTSessionManager? {
     didSet {
@@ -52,6 +54,7 @@ class Spotify: ObservableObject {
     //constructor stuff goes here
     self.loggedIn = false
     self.canLogin = false
+    httpRequester = HttpRequester()
   }
   
   func login() -> Bool {
@@ -71,7 +74,43 @@ class Spotify: ObservableObject {
   }
   
   func pause() {
-    self.appRemote?.playerAPI?.pause()
+    self.appRemote?.playerAPI?.pause({ (_, error) in
+      print(error)
+    })
+  }
+  
+  func resume(){
+    self.appRemote?.playerAPI?.resume({ (_, error) in
+      print(error)
+    })
+  }
+  
+  func enqueue(songID: String){
+    self.appRemote?.playerAPI?.enqueueTrackUri(songID, callback: { (_, error) in
+      print(error)
+    })
+  }
+  
+  func skip(){
+    self.appRemote?.playerAPI?.skip(toNext: { (_, error) in
+      print(error)
+    })
+  }
+  
+  //need to add call back(?)
+  func getPlayerState(){
+    self.appRemote?.playerAPI?.getPlayerState({ (_, error) in
+      print(error)
+    })
+  }
+  
+  func searchSong(Query: String, limit: String, offset:String) -> HTTP{
+    
+    return self.httpRequester.headerParamGet(url: "https://api.spotify.com/v1/search", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ], param: ["q" : Query, "type": "track,artist", "limit": limit])
+  }
+  
+  func userPlaylists(limit: String) -> HTTP{
+    return self.httpRequester.headerGet(url: "https://api.spotify.com/v1/me/playlists", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ])
   }
   
   func isLoggedIn() -> Bool {
