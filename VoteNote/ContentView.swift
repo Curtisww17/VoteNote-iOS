@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @ObservedObject var spotify = Spotify()
+    @ObservedObject var httpRequester = HttpRequester()
     var body: some View {
         VStack {
             if (!spotify.loggedIn) {
@@ -17,6 +18,17 @@ struct ContentView: View {
             } else {
                 LandingPageView(spotify: spotify)
             }
+            
+            //
+            //TEST BUTTON FOR EASY TESTING RANDOM BACKEND STUFF
+            //
+            /*
+            Button(action: {
+              //these are the scopes that our app requests
+                httpRequester.GET(url: "https://google.com")
+            }) {
+              Text("http Test")
+            }*/
         }
     }
     
