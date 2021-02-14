@@ -17,6 +17,7 @@ class HttpRequester: ObservableObject {
     func GET(url: String){
         HTTP.GET(url) { response in
             if let err = response.error {
+              print("url failed")
                 print("error: \(err.localizedDescription)")
                 return //also notify app of failure as needed
             }

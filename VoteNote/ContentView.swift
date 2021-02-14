@@ -8,13 +8,17 @@
 import SwiftUI
 
 struct ContentView: View {
-    @ObservedObject var spotify = Spotify()
-    @ObservedObject var httpRequester = HttpRequester()
+    @ObservedObject var spotify = sharedSpotify
     var body: some View {
         VStack {
-            if (!spotify.loggedIn) {
+          if (spotify.loggedIn) {
+            Text("logged in")
+          } else {
+            Text("not logged in")
+          }
+          if (!(spotify.loggedIn)) {
                 LoginWithSpotifyView(spotify: spotify)
-                    .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+                  .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
             } else {
                 LandingPageView(spotify: spotify)
             }

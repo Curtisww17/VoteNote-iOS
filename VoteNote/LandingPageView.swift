@@ -10,7 +10,7 @@ import SwiftUI
 
 
 struct LandingPageView: View {
-  @ObservedObject var spotify: Spotify
+  @ObservedObject var spotify = sharedSpotify
   @State var currentView = 0
   @State var isInRoom = false
   var body: some View {
@@ -33,7 +33,6 @@ struct LandingPageView: View {
                     .resizable()
                     .frame(width: 30, height: 30)
                 })
-                .frame(alignment: .trailing)
             }
             .frame(width: UIScreen.main.bounds.size.width/4)
             
@@ -54,7 +53,7 @@ struct LandingPageView: View {
       .navigationTitle("Lobby")
       .navigationBarHidden(true)
     }
-    .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
+    //.frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
     
   }
 }
