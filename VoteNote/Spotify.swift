@@ -32,14 +32,6 @@ class Spotify: ObservableObject {
     }
   }
   
-  lazy var accessToken = UserDefaults.standard.string(forKey: kAccessTokenKey) {
-    didSet {
-      let defaults = UserDefaults.standard
-      defaults.set(accessToken, forKey: kAccessTokenKey)
-      //print(appRemote.connectionParameters.accessToken ?? "access token")
-      sharedSpotify.appRemote = self.appRemote
-    }
-  }
   
   //scopes that we request access for, add more as needed
   let SCOPES: SPTScope = [ .userReadRecentlyPlayed, .userTopRead, .streaming, .userReadEmail, .appRemoteControl, .playlistModifyPrivate, .playlistModifyPublic, .playlistReadPrivate, .userModifyPlaybackState, .userReadPlaybackState, .userReadCurrentlyPlaying]
@@ -67,8 +59,6 @@ class Spotify: ObservableObject {
   func logout() -> Bool {
     self.appRemote?.playerAPI?.pause(nil)
     self.appRemote?.disconnect()
-    print(self.accessToken)
-    self.accessToken = ""
     self.loggedIn = false
     return true
   }
@@ -109,9 +99,9 @@ class Spotify: ObservableObject {
     return self.httpRequester.headerParamGet(url: "https://api.spotify.com/v1/search", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ], param: ["q" : Query, "type": "track,artist", "limit": limit])
   }
   
-  func userPlaylists(limit: String) -> HTTP{
-    return self.httpRequester.headerGet(url: "https://api.spotify.com/v1/me/playlists", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ])
-  }
+    func userPlaylists(limit: String) -> HTTP{
+      return self.httpRequester.headerGet(url: "https://api.spotify.com/v1/me/playlists", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ])
+    }
   
   func isLoggedIn() -> Bool {
     if let rem: SPTAppRemote = self.appRemote {
@@ -121,9 +111,29 @@ class Spotify: ObservableObject {
     // return loggedIn
   }
   
-  func TestPlay() -> Bool {
-    //appDel.appRemoteDidEstablishConnection(appDel.appRemote)
-    //appDel.appRemote.authorizeAndPlayURI("spotify:track:20I6sIOMTCkB6w7ryavxtO")
-    return true
+  func getCurrentUser(completion: @escaping (SpotifyUser?) -> ()) {
+    self.httpRequester.headerGet(url: "https://api.spotify.com/v1/me", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? "")" ]).onFinish = { (response) in
+      do {
+        let decoder = JSONDecoder()
+        try completion( decoder.decode(SpotifyUser.self, from: response.data))
+      } catch {
+        fatalError("Couldn't parse \(response.description)")
+      }
+    }
   }
+}
+
+struct SpotifyUser: Codable {
+  var country: String?
+  var display_name: String?
+  var email: String?
+  var product: String?
+  var uri: String?
+  var images: [SpotifyImage]?
+}
+
+struct SpotifyImage: Codable {
+  var height: Int?
+  var width: Int?
+  var url: URL?
 }

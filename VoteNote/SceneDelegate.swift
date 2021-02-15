@@ -159,7 +159,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate,
   
   func appRemote(_ appRemote: SPTAppRemote, didFailConnectionAttemptWithError error: Error?) {
     print("didFailConnectionAttemptWithError")
-    //print(error)
+    print(error)
   }
   
   func appRemote(_ appRemote: SPTAppRemote, didDisconnectWithError error: Error?) {

@@ -250,6 +250,8 @@
 			dependencies = (
 			);
 			name = VoteNote;
+			packageProductDependencies = (
+			);
 			productName = VoteNote;
 			productReference = 448572AA25BF421E006C5C07 /* VoteNote.app */;
 			productType = "com.apple.product-type.application";
@@ -324,6 +326,8 @@
 				Base,
 			);
 			mainGroup = 448572A125BF421E006C5C07;
+			packageReferences = (
+			);
 			productRefGroup = 448572AB25BF421E006C5C07 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";

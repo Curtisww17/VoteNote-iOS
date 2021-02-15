@@ -11,14 +11,16 @@ import SwiftUI
 
 struct ProfileView: View {
   @ObservedObject var spotify: Spotify = sharedSpotify
+  @State var currentUser: SpotifyUser?
   
   var body: some View {
+    spotify.getCurrentUser(completion: { user in
+      self.currentUser = user
+    })
     return VStack {
       List {
         if(spotify.loggedIn) {
-          Text("logged in")
-        } else {
-          Text("not logged in")
+          Text("logged in as \(currentUser?.display_name ?? "")")
         }
         Button(action: {
           spotify.pause()
