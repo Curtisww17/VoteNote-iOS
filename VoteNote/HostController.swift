@@ -40,18 +40,6 @@ struct HostController: View {
                         .frame(width: 30, height: 30)
                   })
             }
-          NavigationLink(
-            destination: ProfileView(),
-            label: {
-              if (currentView == 0) {
-                Text("Add")
-              } else {
-                Image(systemName: "person")
-                  .resizable()
-                  
-                  .frame(width: 30, height: 30)
-              }
-            })
             
         }
         .frame(width: UIScreen.main.bounds.size.width/4)
