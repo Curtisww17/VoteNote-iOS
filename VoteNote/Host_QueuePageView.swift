@@ -11,7 +11,7 @@ import SwiftUI
 struct Host_QueuePageView: View {
     @State var currentView = 0
     @Binding var isInRoom: Bool
-  @ObservedObject var spotify: Spotify
+    @ObservedObject var spotify = sharedSpotify
     @State var musicQueue: [song] = getQueue()
   
   var body: some View {
@@ -20,26 +20,6 @@ struct Host_QueuePageView: View {
     }
     return NavigationView {
       VStack {
-        
-        HStack{
-            Spacer()
-              .frame(width: UIScreen.main.bounds.size.width / 4)
-            Picker(selection: self.$currentView, label: Text("I don't know what this label is for")) {
-              Text("Queue").tag(0)
-              Text("Room").tag(1)
-            }.pickerStyle(SegmentedPickerStyle())
-            .frame(width: UIScreen.main.bounds.size.width / 2,  alignment: .center)
-            
-            VStack {
-              NavigationLink(
-                destination: ProfileView(spotify: spotify),
-                label: {
-                  Text("Add")
-                })
-                .frame(alignment: .trailing)
-            }
-            .frame(width: UIScreen.main.bounds.size.width/4)
-        }
         
         List {
             QueueEntry()

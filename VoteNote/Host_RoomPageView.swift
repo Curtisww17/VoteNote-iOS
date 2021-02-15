@@ -10,22 +10,16 @@ import SwiftUI
 
 struct Host_RoomPageView: View {
     @State var currentView = 1
-    @Binding var roomName: String
-    @Binding var roomDescription: String
-    @Binding var roomCapacity: Int
-    @Binding var songsPerUser: Int
+    var roomName: String
+    var roomDescription: String
+    var roomCapacity: Int
+    var songsPerUser: Int
     //TODO- make the room capacity, songs per user actually do stuff
     
   var body: some View {
     return NavigationView {
       ZStack {
         VStack {
-            
-            Picker(selection: self.$currentView, label: Text("I don't know what this label is for")) {
-              Text("Queue").tag(0)
-              Text("Room").tag(1)
-            }.pickerStyle(SegmentedPickerStyle())
-            .frame(width: UIScreen.main.bounds.size.width / 2,  alignment: .center)
 
             Form {
                 Section(header: Text(roomName)
@@ -51,22 +45,39 @@ struct Host_RoomPageView: View {
                         Text("\(songsPerUser)")
                     }
                 }
+              Button(action: {
+                actionSheet()
+              }, label: {
+                HStack {
+                  Spacer()
+                Text("Share Room Code")
+                  .foregroundColor(Color.accentColor)
+                  Spacer()
+                }
+              })
             }
         }.navigationBarHidden(true)
       }
     }
   }
+  
+  
+  func actionSheet() {
+          let data = "Room Code"
+          let av = UIActivityViewController(activityItems: [data], applicationActivities: nil)
+          UIApplication.shared.windows.first?.rootViewController?.present(av, animated: true, completion: nil)
+      }
 }
 
 struct Host_RoomPageView_PreviewContainer: View {
     
-    @State var roomName: String = "Room Name"
-    @State var roomDescription: String = "This is an example room"
-    @State var roomCapacity: Int = 20
-    @State var songsPerUser: Int = 4
+    var roomName: String = "Room Name"
+    var roomDescription: String = "This is an example room"
+    var roomCapacity: Int = 20
+    var songsPerUser: Int = 4
 
     var body: some View {
-        Host_RoomPageView(roomName: $roomName, roomDescription: $roomDescription, roomCapacity: $roomCapacity, songsPerUser: $songsPerUser)
+        Host_RoomPageView(roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser)
     }
 }
 

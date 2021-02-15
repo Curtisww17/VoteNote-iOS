@@ -8,15 +8,27 @@
 import SwiftUI
 
 struct ContentView: View {
-    @ObservedObject var spotify = Spotify()
+    @ObservedObject var spotify = sharedSpotify
     var body: some View {
         VStack {
-            if (!spotify.loggedIn) {
+          if (!(spotify.loggedIn)) {
                 LoginWithSpotifyView(spotify: spotify)
-                    .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+                  .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
             } else {
                 LandingPageView(spotify: spotify)
             }
+            
+            //
+            //TEST BUTTON FOR EASY TESTING RANDOM BACKEND STUFF
+            //
+            
+            /*Button(action: {
+              //these are the scopes that our app requests
+                //spotify.enqueue(songID: "")
+                spotify.userPlaylists(limit: "2")
+            }) {
+              Text("http Test")
+            }*/
         }
     }
     

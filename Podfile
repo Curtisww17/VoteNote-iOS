@@ -2,12 +2,19 @@
 # platform :ios, '9.0'
 
 target 'VoteNote' do
+  
+  # pod for http requests
+  pod 'SwiftHTTP', '~> 3.0'
+  
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
 
   # Pods for VoteNote
   pod 'Firebase/Auth'
   pod 'Firebase/Firestore'
+  
+  
+  
   #pod 'FirebaseFirestoreSwift'
 
   target 'VoteNoteTests' do
@@ -18,5 +25,8 @@ target 'VoteNote' do
   target 'VoteNoteUITests' do
     # Pods for testing
   end
+  
+  
+    
 
 end
