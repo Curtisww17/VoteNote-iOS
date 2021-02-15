@@ -171,12 +171,6 @@ struct NowPlayingViewHost: View {
     }
 }
 
-struct AddMusicToQueue: View {
-    var body: some View {
-        Text("Add Music")
-    }
-}
-
 struct Host_QueuePageView_PreviewContainer: View {
     @State var isInRoom: Bool = true
     @State var spotify: Spotify = Spotify()

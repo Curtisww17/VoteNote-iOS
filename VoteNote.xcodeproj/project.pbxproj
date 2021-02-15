@@ -30,6 +30,7 @@
 		44F8D59F25D9A61200D2B461 /* HostController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44F8D59E25D9A61200D2B461 /* HostController.swift */; };
 		44F8D5A425D9B66600D2B461 /* UserController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44F8D5A325D9B66600D2B461 /* UserController.swift */; };
 		671BABC925D895B500964AAF /* httpRequester.swift in Sources */ = {isa = PBXBuildFile; fileRef = 671BABC825D895B500964AAF /* httpRequester.swift */; };
+		67DC8DA625DB3F63008C07F8 /* AddMusicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67DC8DA525DB3F63008C07F8 /* AddMusicView.swift */; };
 		88FB562525C73562007114C7 /* (null) in Resources */ = {isa = PBXBuildFile; };
 		88FB562625C73562007114C7 /* (null) in Resources */ = {isa = PBXBuildFile; };
 		88FB562725C73562007114C7 /* (null) in Resources */ = {isa = PBXBuildFile; };
@@ -90,6 +91,7 @@
 		44F8D59E25D9A61200D2B461 /* HostController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostController.swift; sourceTree = "<group>"; };
 		44F8D5A325D9B66600D2B461 /* UserController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserController.swift; sourceTree = "<group>"; };
 		671BABC825D895B500964AAF /* httpRequester.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = httpRequester.swift; sourceTree = "<group>"; };
+		67DC8DA525DB3F63008C07F8 /* AddMusicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddMusicView.swift; sourceTree = "<group>"; };
 		88FB569525CAF48A007114C7 /* dbConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dbConnection.swift; sourceTree = "<group>"; };
 		88FB56C025CB0B21007114C7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		8CF54284DFB6313ACFC903CD /* Pods-VoteNote-VoteNoteUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VoteNote-VoteNoteUITests.release.xcconfig"; path = "Target Support Files/Pods-VoteNote-VoteNoteUITests/Pods-VoteNote-VoteNoteUITests.release.xcconfig"; sourceTree = "<group>"; };
@@ -168,6 +170,7 @@
 				448572EA25BF75CE006C5C07 /* CreateRoomView.swift */,
 				448572EF25BF7603006C5C07 /* JoinRoomView.swift */,
 				448572F425BF7A61006C5C07 /* ProfileView.swift */,
+				67DC8DA525DB3F63008C07F8 /* AddMusicView.swift */,
 				448572F925BF818F006C5C07 /* Host_QueuePageView.swift */,
 				448572FE25BF81D5006C5C07 /* User_QueuePageView.swift */,
 				4485730F25BF8390006C5C07 /* Host_RoomPageView.swift */,
@@ -486,6 +489,7 @@
 				44F8D59F25D9A61200D2B461 /* HostController.swift in Sources */,
 				44F8D59A25D8BCD500D2B461 /* EnvironmentVariables.swift in Sources */,
 				671BABC925D895B500964AAF /* httpRequester.swift in Sources */,
+				67DC8DA625DB3F63008C07F8 /* AddMusicView.swift in Sources */,
 				88FB569625CAF48B007114C7 /* dbConnection.swift in Sources */,
 				448572F525BF7A61006C5C07 /* ProfileView.swift in Sources */,
 				448572AE25BF421E006C5C07 /* AppDelegate.swift in Sources */,
