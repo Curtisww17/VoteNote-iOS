@@ -24,6 +24,22 @@ struct HostController: View {
         }.pickerStyle(SegmentedPickerStyle())
         .frame(width: UIScreen.main.bounds.size.width / 2,  alignment: .center)
         VStack {
+            if (currentView == 0) {
+                NavigationLink(
+                  destination: AddMusicToQueue(),
+                  label: {
+                  Text("Add")
+                  })
+            } else {
+                NavigationLink(
+                  destination: ProfileView(),
+                  label: {
+                      Image(systemName: "person")
+                        .resizable()
+                        
+                        .frame(width: 30, height: 30)
+                  })
+            }
           NavigationLink(
             destination: ProfileView(),
             label: {
@@ -36,6 +52,7 @@ struct HostController: View {
                   .frame(width: 30, height: 30)
               }
             })
+            
         }
         .frame(width: UIScreen.main.bounds.size.width/4)
         
