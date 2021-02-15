@@ -12,6 +12,7 @@ struct Host_QueuePageView: View {
     @State var currentView = 0
     @Binding var isInRoom: Bool
   @ObservedObject var spotify: Spotify
+    @State var musicQueue: [song] = getQueue()
   
   var body: some View {
     OperationQueue.main.addOperation {
@@ -42,6 +43,9 @@ struct Host_QueuePageView: View {
         
         List {
             QueueEntry()
+            ForEach(musicQueue) { song in
+                
+            }
         }
         
         NowPlayingViewHost()

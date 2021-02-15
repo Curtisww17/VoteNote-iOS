@@ -43,7 +43,7 @@ class user{
     }
 }
 
-class song{
+class song: Identifiable, ObservableObject{
     let addedBy: String
     let artist: String
     let genres: [String]
