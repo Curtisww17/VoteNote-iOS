@@ -12,9 +12,6 @@ struct LoginWithSpotifyView: View {
   @ObservedObject var spotify: Spotify
   @ObservedObject var httpRequester = HttpRequester()
   var body: some View {
-    let scopes = spotify.scopes.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
-    let redirect_url = spotify.SpotifyRedirectURLString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
-    let urlString = "https://accounts.spotify.com/authorize?response_type=code&client_id=\(spotify.SpotifyClientID)&scope=\(scopes)&redirect_uri=\(redirect_url)"
     return VStack {
       Spacer()
       Image("Logo")
