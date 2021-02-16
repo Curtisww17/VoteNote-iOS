@@ -84,7 +84,7 @@ func makeRoom(newRoom: room) -> Bool{
 }
 
 func getQueue() -> [song]{
-    let song1 = song(addedBy: "kki2j39jd", artist: "Toto", genres: ["Pop", "Rock"], id: "j288dm7", length: 760, numVotes: 10, title: "Africa")
+    let song1 = song(addedBy: "kki2j39jd", artist: "Toto", genres: ["Pop", "Rock"], id: "20I6sIOMTCkB6w7ryavxtO", length: 760, numVotes: 10, title: "Africa")
     
     let song2 = song(addedBy: "jid984je", artist: "AC/DC", genres: ["Classic Rock", "Rock"], id: "jj3877dhe73h", length: 940, numVotes: 3, title: "Thunderstruck")
     

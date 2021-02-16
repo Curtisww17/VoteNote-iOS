@@ -14,7 +14,7 @@ struct LandingPageView: View {
   @State var currentView = 0
   @State var isInRoom = false
   var body: some View {
-    return NavigationView {
+    //return NavigationView {
       VStack {
         if (!isInRoom) {
           HStack {
@@ -55,7 +55,7 @@ struct LandingPageView: View {
     }
     //.frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
     
-  }
+  //}
 }
 
 struct LandingPageView_PreviewContainer: View {

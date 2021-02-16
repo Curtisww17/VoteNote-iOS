@@ -67,7 +67,7 @@ struct CreateRoomView: View {
                 }
             }
             
-            if self.roomName == "" || self.roomDescription == "" {
+            if self.roomName != "" && self.roomDescription != "" {
                 Button(action: {createRoom()}) {
                     NavigationLink(
                       destination: HostController(isInRoom: $isInRoom), label: {
