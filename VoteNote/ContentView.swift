@@ -33,7 +33,6 @@ struct ContentView: View {
         }
     }
     
-    var db = dbConnection()
 }
 
 struct ContentView_Previews: PreviewProvider {

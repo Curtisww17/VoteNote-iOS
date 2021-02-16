@@ -14,19 +14,11 @@ struct ProfileView: View {
   @State var currentUser: SpotifyUser?
   
   var body: some View {
-    //    spotify.getCurrentUser(completion: { user in
-    //      self.currentUser = user
-    //    })
     return VStack {
       Form {
         if(spotify.loggedIn) {
           Text("logged in as \(sharedSpotify.currentUser?.display_name ?? "Unknown")")
         }
-        Button(action: {
-          spotify.pause()
-        }, label: {
-          Text("pause")
-        })
         if (spotify.loggedIn) {
           HStack {
             Spacer()

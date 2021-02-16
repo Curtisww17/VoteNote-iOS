@@ -14,13 +14,9 @@ var isPlaying: Bool = true //should be false by default
 
 struct Host_QueuePageView: View {
     @State var currentView = 0
-    @Binding var isInRoom: Bool
     @ObservedObject var spotify = sharedSpotify
   
   var body: some View {
-    OperationQueue.main.addOperation {
-      isInRoom = true
-    }
     //return NavigationView {
     return ZStack {
       VStack {
@@ -251,11 +247,9 @@ struct NowPlayingViewHost: View {
 }
 
 struct Host_QueuePageView_PreviewContainer: View {
-    @State var isInRoom: Bool = true
-    @State var spotify: Spotify = Spotify()
 
     var body: some View {
-        Host_QueuePageView(isInRoom: $isInRoom, spotify: spotify)
+        Host_QueuePageView()
     }
 }
 
