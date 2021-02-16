@@ -82,6 +82,11 @@ class user: Identifiable {
         self.name = name
         self.profilePic = profilePic
     }
+    
+    init(usr: [String: Any]){
+        name = usr["name"] as! String
+        profilePic = usr["profilePic"] as! String
+    }
 }
 
 class song: Identifiable, ObservableObject{
@@ -213,13 +218,40 @@ func getQueue() -> [song]{
 
 //get all the users for a room
 func getUsers() -> [user]{
+    /*
     let usr1 = user(name: "Wesley Curtis", profilePic: "www.picture.com")
     
     let usr2 = user(name: "Obama", profilePic: "www.usa.gov")
     
     let usr3 = user(name: "Joe Mama", profilePic: "www.gotcha.com")
+    */
+ 
+    var users: [user] = []
     
-    return [usr1, usr2, usr3]
+    var currRoom = ""
+    db.collection("users").document(FAuth.currentUser!.uid).getDocument { (res, err) in
+        currRoom = res?.data()!["currentroom"] as! String
+    }
+    
+    let usrQuery = db.collection("users").whereField("currentroom", isEqualTo: currRoom)
+    
+    usrQuery.getDocuments() { (query, err) in
+        
+        if let err = err{
+            print("err gerring documents \(err)")
+        }
+        else{
+            for usr in query!.documents{
+                let newusr = user(usr: usr.data())
+                
+                users.append(newusr)
+            }
+        }
+        
+    }
+    
+    
+    return users
 }
 
 //get individual user
@@ -231,7 +263,7 @@ func getUser(uid: String) -> user{
 
 //return 1 for success, 0 for song already in queue, and -1 for fail
 func addsong(id: String) -> Int{
-    
+    //this will need spotify integration in order to get data
     return 1
 }
 
