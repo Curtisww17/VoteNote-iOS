@@ -13,13 +13,25 @@ var selectedSongs: [song] = [song]()
 struct AddMusicView: View {
     @State var currentSearch: String = ""
     @State private var isEditing = false
-    //@State var musicAvailable: [song]
+    @ObservedObject var spotify = sharedSpotify
+    
+    @Environment(\.presentationMode) var presentationMode
     
     //TO-DO: Have songs filtered by search
     
     func addMusic(){
         //TO-DO: Implement Adding Music
-        //add music from selectedSongs array to queue
+        
+        //select the first song if nothing is playing
+        if nowPlaying == nil && selectedSongs.count > 0 {
+            nowPlaying = selectedSongs[0]
+            sharedSpotify.enqueue(songID: selectedSongs[0].id)
+            selectedSongs.remove(at: 0)
+        }
+        
+        //TO-DO: add music from selectedSongs array to queue, remove after added
+        
+        self.presentationMode.wrappedValue.dismiss()
     }
     
     var body: some View {
@@ -134,8 +146,16 @@ struct SearchEntry: View {
     }
 }
 
+/*struct AddMusicView_PreviewsContainer: View {
+    @State var spotify: Spotify = Spotify()
+
+    var body: some View {
+        AddMusicView(spotify: spotify)
+    }
+}
+
 struct AddMusicView_Previews: PreviewProvider {
   static var previews: some View {
-    AddMusicView()
+    AddMusicView_PreviewsContainer()
   }
-}
+}*/

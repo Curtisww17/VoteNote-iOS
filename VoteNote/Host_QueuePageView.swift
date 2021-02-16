@@ -8,18 +8,25 @@
 import Foundation
 import SwiftUI
 
+var nowPlaying: song?
+var isPlaying: Bool = false
+
 struct Host_QueuePageView: View {
     @State var currentView = 0
+    @Binding var isInRoom: Bool
     @ObservedObject var spotify = sharedSpotify
-    @State var musicQueue: [song] = getQueue()
+    //@State var musicQueue: [song] = getQueue()
   
   var body: some View {
+    OperationQueue.main.addOperation {
+      isInRoom = true
+    }
     return NavigationView {
       VStack {
         
         List {
             QueueEntry()
-            ForEach(musicQueue) { song in
+            ForEach(getQueue()) { song in
                 
             }
         }
@@ -79,19 +86,33 @@ struct QueueEntry: View {
 
 struct NowPlayingViewHost: View {
     @State var isMinimized: Bool = true //should start as true
-    @State var isPlaying: Bool = false
     //TODO- needs the title, artist, votes, and image of the current song, as well as the song itself
     
     func playSong(){
-        //TODO- implement play button
+        //TODO- check remaining time in song
+        if nowPlaying != nil {
+            sharedSpotify.resume()
+            isPlaying = true
+        }
     }
     
+    //TO-DO: Test
     func pauseSong(){
-        //TODO- implement pause button
+        if nowPlaying != nil {
+            sharedSpotify.pause()
+            isPlaying = false
+        }
     }
     
+    //TO-DO: Add based on number of votes
+    //TO-DO: Test
     func skipSong(){
-        //TODO- implement skipping song
+        if nowPlaying != nil && getQueue().count > 0 {
+            sharedSpotify.enqueue(songID: getQueue()[0].id)
+            sharedSpotify.skip()
+            nowPlaying = getQueue()[0]
+            vetoSong(id: getQueue()[0].id)
+        }
     }
     
     func previousSong(){
@@ -108,8 +129,13 @@ struct NowPlayingViewHost: View {
                 HStack {
                     Spacer()
                     Image(systemName: "person.crop.square.fill").resizable().frame(width: 40.0, height: 40.0)
-                    Text("Song Title")
-                        .padding(.leading)
+                    if nowPlaying == nil {
+                        Text("None Selected")
+                            .padding(.leading)
+                    } else {
+                        Text(nowPlaying!.title)
+                            .padding(.leading)
+                    }
                     Spacer()
                     Spacer()
                     Spacer()
@@ -121,12 +147,25 @@ struct NowPlayingViewHost: View {
             } else {
                 VStack {
                     Image(systemName: "person.crop.square.fill").resizable().frame(width: 160.0, height: 160.0)
-                    Text("Song Title")
-                    Text("Artist Name")
-                        .font(.caption)
+                    if nowPlaying == nil {
+                        Text("None Selected")
+                            .padding(.leading)
+                    } else {
+                        Text(nowPlaying!.title)
+                            .padding(.leading)
+                    }
+                    if nowPlaying != nil {
+                        Text(nowPlaying!.artist)
+                            .font(.caption)
+                    }
                     
                     HStack {
-                        Text("+4")
+                        if nowPlaying != nil {
+                            Text("\(nowPlaying!.numVotes!)")
+                        } else {
+                            Text("0")
+                        }
+                        
                         Spacer()
                         Button(action: {previousSong()}) {
                             Image(systemName: "backward").resizable().frame(width: 25.0, height: 20.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
@@ -138,18 +177,20 @@ struct NowPlayingViewHost: View {
                             playSong()
                         }}) {
                             if isPlaying {
-                                Image(systemName: "pause").resizable().frame(width: 20.0, height: 25.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
+                                Image(systemName: "pause").resizable().frame(width: 20.0, height: 25.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/).onTapGesture {
+                                    isPlaying = !isPlaying
+                                }
                             } else {
                                 Image(systemName: "play")
-                                    .resizable().frame(width: 20.0, height: 25.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
+                                    .resizable().frame(width: 20.0, height: 25.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/).onTapGesture {
+                                        isPlaying = !isPlaying
+                                    }
                             }
                         }
                         Spacer()
                         Button(action: {skipSong()}) {
                             Image(systemName: "forward").resizable().frame(width: 25.0, height: 20.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
                             
-                        }.onTapGesture {
-                            isPlaying = !isPlaying
                         }
                         Spacer()
                         Button(action: {favoriteSong()}) {
@@ -173,7 +214,7 @@ struct Host_QueuePageView_PreviewContainer: View {
     @State var spotify: Spotify = Spotify()
 
     var body: some View {
-        Host_QueuePageView(spotify: spotify)
+        Host_QueuePageView(isInRoom: $isInRoom, spotify: spotify)
     }
 }
 
