@@ -10,6 +10,7 @@ import SwiftUI
 
 var nowPlaying: song?
 var isPlaying: Bool = true //should be false by default
+//TO-DO: enqueue next song when only so much time is left
 
 struct Host_QueuePageView: View {
     @State var currentView = 0
@@ -57,7 +58,9 @@ struct Host_QueuePageView: View {
 struct QueueEntry: View {
     //TODO- Get current song info
     //TODO- swiping for vetoing songs and viewing the user
+    //SWIPING NOT DONE
     @State var curSong: song
+    @State var showingExtras: Bool = false
     
     func upVoteSong(){
         //TODO- Implement Upvoting
@@ -68,28 +71,41 @@ struct QueueEntry: View {
     }
     
     var body: some View {
+        
+        let swipeGesture = DragGesture().onEnded {_ in
+            showingExtras = !showingExtras
+        }
         ZStack{
-            HStack {
-                Image(systemName: "person.crop.square.fill").resizable().frame(width: 35.0, height: 35.0)
-                VStack {
-                    HStack {
-                        Text(curSong.title)
-                        Spacer()
+            VStack {
+                HStack {
+                    Image(systemName: "person.crop.square.fill").resizable().frame(width: 35.0, height: 35.0)
+                    VStack {
+                        HStack {
+                            Text(curSong.title)
+                            Spacer()
+                        }
+                        HStack {
+                            Text(curSong.artist).font(.caption)
+                                .foregroundColor(Color.gray)
+                            Spacer()
+                        }
                     }
-                    HStack {
-                        Text(curSong.artist).font(.caption)
-                            .foregroundColor(Color.gray)
-                        Spacer()
+                    
+                    Spacer()
+                    Text("\(curSong.numVotes!)")
+                    Button(action: {upVoteSong()}) {
+                        Image(systemName: "hand.thumbsup").resizable().frame(width: 30.0, height: 30.0)
                     }
-                }
-                
-                Spacer()
-                Text("\(curSong.numVotes!)")
-                Button(action: {upVoteSong()}) {
-                    Image(systemName: "hand.thumbsup").resizable().frame(width: 30.0, height: 30.0)
-                }
-                Button(action: {downVoteSong()}) {
-                    Image(systemName: "hand.thumbsdown").resizable().frame(width: 30.0, height: 30.0)
+                    Button(action: {downVoteSong()}) {
+                        Image(systemName: "hand.thumbsdown").resizable().frame(width: 30.0, height: 30.0)
+                    }
+                    
+                    if showingExtras {
+                        Button(action: {vetoSong(id: curSong.id)}) {
+                            Text("Veto")
+                        }
+                        .foregroundColor(/*@START_MENU_TOKEN@*/.red/*@END_MENU_TOKEN@*/)
+                    }
                 }
             }
         }
@@ -103,15 +119,12 @@ struct NowPlayingViewHost: View {
     
     func playSong(){
         //TODO- check remaining time in song
-        print("Pressed Play")
         if nowPlaying != nil {
-            print("Play")
             sharedSpotify.resume()
             isPlaying = true
         }
     }
     
-    //TO-DO: Test
     func pauseSong(){
         if nowPlaying != nil {
             sharedSpotify.pause()
@@ -209,18 +222,12 @@ struct NowPlayingViewHost: View {
                             playSong()
                         }}) {
                             if isPlaying {
-                                Image(systemName: "pause").resizable().frame(width: 20.0, height: 25.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)//.onTapGesture {
-                                    //isPlaying = !isPlaying
-                                //}
+                                Image(systemName: "pause").resizable().frame(width: 20.0, height: 25.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
                             } else {
                                 Image(systemName: "play")
-                                    .resizable().frame(width: 20.0, height: 25.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)//.onTapGesture {
-                                        //isPlaying = !isPlaying
-                                    //}
+                                    .resizable().frame(width: 20.0, height: 25.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
                             }
-                        }//.onTapGesture {
-                            //sharedSpotify.pause()
-                        //}
+                        }
                         Spacer()
                         Button(action: {skipSong()}) {
                             Image(systemName: "forward").resizable().frame(width: 25.0, height: 20.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)

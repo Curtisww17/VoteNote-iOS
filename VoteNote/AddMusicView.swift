@@ -11,7 +11,11 @@ import SwiftUI
 var selectedSongs: [song] = [song]()
 
 struct AddMusicView: View {
-    @State var currentSearch: String = ""
+    @State var currentSearch: String = "" {
+        didSet {
+            sharedSpotify.searchSong(Query: currentSearch, limit: "20", offset: "0")
+        }
+    }
     @State private var isEditing = false
     @ObservedObject var spotify = sharedSpotify
     
@@ -20,7 +24,6 @@ struct AddMusicView: View {
     //TO-DO: Have songs filtered by search
     
     func addMusic(){
-        //TO-DO: Implement Adding Music
         
         //select the first song if nothing is playing
         if nowPlaying == nil && selectedSongs.count > 0 {
@@ -29,9 +32,11 @@ struct AddMusicView: View {
             selectedSongs.remove(at: 0)
         }
         
-        //sharedSpotify.enqueue(songID: "20I6sIOMTCkB6w7ryavxtO")
+        for i in selectedSongs {
+            addsong(id: i.id)
+        }
         
-        //TO-DO: add music from selectedSongs array to queue, remove after added
+        selectedSongs.removeAll()
         
         self.presentationMode.wrappedValue.dismiss()
     }
@@ -93,12 +98,15 @@ struct AddMusicView: View {
                     }
                     
                     List {
-                        SearchEntry()
+                        ForEach(allSongs) { song in
+                            SearchEntry(curSong: song)
+                        }
+                        //list of search results
                     }
                 }
                 
             }
-        }.onAppear(perform: {
+        }.navigationBarHidden(true).onAppear(perform: {
             selectedSongs.removeAll()
         })
     }
@@ -108,15 +116,15 @@ struct SearchEntry: View {
     //TODO- Get current song info
     //TODO- swiping for vetoing songs and viewing the user
     @State var selectedSong: Bool = false
-    //@State var curSong: song
+    @State var curSong: song
     
     var body: some View {
         ZStack{
             HStack {
                 Image(systemName: "person.crop.square.fill").resizable().frame(width: 35.0, height: 35.0)
                 VStack {
-                    Text("Song Title")
-                    Text("Artist Name")
+                    Text(curSong.title)
+                    Text(curSong.artist)
                         .font(.caption)
                         .foregroundColor(Color.gray)
                 }
