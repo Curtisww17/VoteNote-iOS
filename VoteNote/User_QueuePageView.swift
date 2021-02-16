@@ -14,14 +14,13 @@ struct User_QueuePageView: View {
   @ObservedObject var spotify = sharedSpotify
   
   var body: some View {
-    OperationQueue.main.addOperation {
-      isInRoom = true
-    }
     return NavigationView {
       VStack {
         
         List {
-            QueueEntry()
+            ForEach(getQueue()) { song in
+                QueueEntry(curSong: song)
+            }
         }
         
         NowPlayingViewUser()
@@ -38,11 +37,29 @@ struct NowPlayingViewUser: View {
         ZStack {
             HStack {
                 Spacer()
+                Spacer()
+                Spacer()
+                Spacer()
+                Spacer()
+                Spacer()
                 Image(systemName: "person.crop.square.fill").resizable().frame(width: 40.0, height: 40.0)
-                Text("Song Title")
-                        .padding(.leading)
-                Spacer()
-                Spacer()
+                VStack {
+                    HStack {
+                        if nowPlaying == nil {
+                            Text("None Selected").padding(.leading)
+                        } else {
+                            Text(nowPlaying!.title).padding(.leading)
+                        }
+                        Spacer()
+                    }
+                    HStack {
+                        if nowPlaying != nil {
+                            Text(nowPlaying!.artist).font(.caption)
+                                .foregroundColor(Color.gray).padding(.leading)
+                        }
+                        Spacer()
+                    }
+                }
                 Spacer()
                 Spacer()
             }

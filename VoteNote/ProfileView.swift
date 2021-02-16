@@ -11,14 +11,16 @@ import SwiftUI
 
 struct ProfileView: View {
   @ObservedObject var spotify: Spotify = sharedSpotify
+  @State var currentUser: SpotifyUser?
   
   var body: some View {
+    //    spotify.getCurrentUser(completion: { user in
+    //      self.currentUser = user
+    //    })
     return VStack {
-      List {
+      Form {
         if(spotify.loggedIn) {
-          Text("logged in")
-        } else {
-          Text("not logged in")
+          Text("logged in as \(sharedSpotify.currentUser?.display_name ?? "Unknown")")
         }
         Button(action: {
           spotify.pause()
@@ -26,11 +28,15 @@ struct ProfileView: View {
           Text("pause")
         })
         if (spotify.loggedIn) {
-          Button(action: {
-            spotify.logout()
-          }, label: {
-            Text("Log out of Spotify")
-          })
+          HStack {
+            Spacer()
+            Button(action: {
+              spotify.logout()
+            }, label: {
+              Text("Log out of Spotify")
+            })
+            Spacer()
+          }
         }
       }
       

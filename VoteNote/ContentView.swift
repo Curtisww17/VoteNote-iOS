@@ -21,13 +21,15 @@ struct ContentView: View {
             //
             //TEST BUTTON FOR EASY TESTING RANDOM BACKEND STUFF
             //
-            /*
+            
             Button(action: {
               //these are the scopes that our app requests
-                httpRequester.GET(url: "https://google.com")
+                //spotify.enqueue(songID: "0E7AHMdJL4XMOuRShGs23D")
+                //var json = spotify.userPlaylists(limit: "2").description
+                spotify.searchSong(Query: "hips dont lie", limit: "3", offset: "0")
             }) {
               Text("http Test")
-            }*/
+            }
         }
     }
     

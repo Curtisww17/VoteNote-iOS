@@ -27,7 +27,7 @@ struct LandingPageView: View {
             .frame(width: UIScreen.main.bounds.size.width / 2,  alignment: .center)
             VStack {
               NavigationLink(
-                destination: ProfileView(spotify: spotify),
+                destination: ProfileView(),
                 label: {
                   Image(systemName: "person")
                     .resizable()
@@ -53,7 +53,7 @@ struct LandingPageView: View {
       .navigationTitle("Lobby")
       .navigationBarHidden(true)
     }
-    //.frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
+    .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
     
   }
 }

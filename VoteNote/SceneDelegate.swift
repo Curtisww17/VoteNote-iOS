@@ -146,6 +146,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate,
     OperationQueue.main.addOperation {
       sharedSpotify.loggedIn = true
       sharedSpotify.appRemote = self.appRemote
+      sharedSpotify.getCurrentUser(completion: { user in
+        sharedSpotify.currentUser = user
+      })
     }
     
     //self.appRemote = appRemote
@@ -159,7 +162,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate,
   
   func appRemote(_ appRemote: SPTAppRemote, didFailConnectionAttemptWithError error: Error?) {
     print("didFailConnectionAttemptWithError")
-    //print(error)
+    print(error)
   }
   
   func appRemote(_ appRemote: SPTAppRemote, didDisconnectWithError error: Error?) {
@@ -174,7 +177,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate,
   }
   
   func sessionManager(manager: SPTSessionManager, didFailWith error: Error) {
-    print("error")
+    print(error)
     //print(error)
   }
   

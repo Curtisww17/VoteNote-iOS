@@ -10,7 +10,6 @@ import SwiftUI
 
 
 struct CreateRoomView: View {
-    //TODO: Send Room info to Database
     //TODO: Create second version of this view to take in info from an existing room
   @Binding var isInRoom: Bool
   @ObservedObject var spotify: Spotify
@@ -68,7 +67,7 @@ struct CreateRoomView: View {
                 }
             }
             
-            if self.roomName == "" || self.roomDescription == "" {
+            if self.roomName != "" && self.roomDescription != "" {
                 Button(action: {createRoom()}) {
                     NavigationLink(
                       destination: HostController(isInRoom: $isInRoom), label: {
