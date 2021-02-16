@@ -98,21 +98,21 @@ struct NowPlayingViewHost: View {
     
     //TO-DO: Test
     func pauseSong(){
-        if nowPlaying != nil {
+        //if nowPlaying != nil {
             sharedSpotify.pause()
             isPlaying = false
-        }
+        //}
     }
     
     //TO-DO: Add based on number of votes
     //TO-DO: Test
     func skipSong(){
-        if nowPlaying != nil && getQueue().count > 0 {
+        //if nowPlaying != nil && getQueue().count > 0 {
             sharedSpotify.enqueue(songID: getQueue()[0].id)
             sharedSpotify.skip()
             nowPlaying = getQueue()[0]
             vetoSong(id: getQueue()[0].id)
-        }
+        //}
     }
     
     func previousSong(){
