@@ -106,8 +106,26 @@ class song: Identifiable, ObservableObject{
 }
 
 //MARK: API Calls
+/*
 func login(uid: String){
-    FAuth.signIn(withCustomToken: "HBD*76JNBH8yhyg7yhgT^^ubhyttf") { (result, err) in
+    FAuth.signIn(withCustomToken: uid) { (result, err) in
+        if let err = err {
+            //there was an error making the user
+            print(err.localizedDescription)
+        }
+        else{
+            //user created successfully
+            db.collection("users").document(result!.user.uid).setData( [
+                "name": "test user",
+                "profilePic": "https://i.pinimg.com/474x/be/80/75/be8075c3043965030d69e8bccf2b5c5c.jpg",
+                "currentRoom": ""
+            ])
+        }
+    }
+}*/
+
+func login(){
+    FAuth.signInAnonymously { (result, err) in
         if let err = err {
             //there was an error making the user
             print(err.localizedDescription)
