@@ -33,7 +33,7 @@ class room{
     }
 }
 
-class user{
+class user: Identifiable {
     let name: String
     let profilePic: String
     

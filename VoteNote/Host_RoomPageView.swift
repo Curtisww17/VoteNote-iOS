@@ -14,6 +14,7 @@ struct Host_RoomPageView: View {
     var roomDescription: String
     var roomCapacity: Int
     var songsPerUser: Int
+  @Binding var showNav: Bool
     //TODO- make the room capacity, songs per user actually do stuff
     
   var body: some View {
@@ -30,6 +31,23 @@ struct Host_RoomPageView: View {
                     //Other Buttons will be added here
                  
                 }
+              
+              Section() {
+                NavigationLink(destination: UsersListView()
+                                .onAppear(perform: {
+                                  showNav = false
+                                })
+                                .onDisappear(perform: {
+                  showNav = true
+                }), label: {
+                  HStack {
+                    Image(systemName: "person.3")
+                      .foregroundColor(Color.accentColor)
+                      .padding()
+                    Text("Users")
+                  }
+                })
+              }
                 
                 Section(header: Text("Room Settings")) {
                     Text(roomDescription)
@@ -56,7 +74,9 @@ struct Host_RoomPageView: View {
                 }
               })
             }
-        }.navigationBarHidden(true)
+        }
+        .navigationTitle("Room")
+        .navigationBarHidden(true)
       }
     }
   }
@@ -75,9 +95,10 @@ struct Host_RoomPageView_PreviewContainer: View {
     var roomDescription: String = "This is an example room"
     var roomCapacity: Int = 20
     var songsPerUser: Int = 4
+  @State var showNav = true
 
     var body: some View {
-        Host_RoomPageView(roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser)
+      Host_RoomPageView(roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser, showNav: $showNav)
     }
 }
 

@@ -14,7 +14,10 @@ struct UserController: View {
   
   @State var currentView = 0
   var body: some View {
-    VStack {
+    OperationQueue.main.addOperation {
+      isInRoom = true
+    }
+    return VStack {
       HStack {
         Spacer()
           .frame(width: UIScreen.main.bounds.size.width / 4)
@@ -26,7 +29,7 @@ struct UserController: View {
         VStack {
             if (currentView == 0) {
                 NavigationLink(
-                  destination: AddMusicView(),
+                  destination: AddMusicView().navigationBarTitle("Browse"),
                   label: {
                   Text("Add")
                   })
@@ -56,7 +59,6 @@ struct UserController: View {
           .transition(.move(edge: .trailing))
       }
     }
-    .navigationTitle("Lobby")
     .navigationBarHidden(true)
   }
 }
