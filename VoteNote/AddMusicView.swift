@@ -8,13 +8,18 @@
 import Foundation
 import SwiftUI
 
+var selectedSongs: [song] = [song]()
+
 struct AddMusicView: View {
     @State var currentSearch: String = ""
     @State private var isEditing = false
     //@State var musicAvailable: [song]
     
+    //TO-DO: Have songs filtered by search
+    
     func addMusic(){
         //TO-DO: Implement Adding Music
+        //add music from selectedSongs array to queue
     }
     
     var body: some View {
@@ -79,7 +84,9 @@ struct AddMusicView: View {
                 }
                 
             }
-        }
+        }.onAppear(perform: {
+            selectedSongs.removeAll()
+        })
     }
 }
 
@@ -87,6 +94,7 @@ struct SearchEntry: View {
     //TODO- Get current song info
     //TODO- swiping for vetoing songs and viewing the user
     @State var selectedSong: Bool = false
+    //@State var curSong: song
     
     var body: some View {
         ZStack{
@@ -111,6 +119,17 @@ struct SearchEntry: View {
             }
         }.onTapGesture {
             selectedSong = !selectedSong
+            if selectedSong {
+                //selectedSongs.append(curSong:song)
+            } else {
+                var songIndex: Int = 0
+                while songIndex < selectedSongs.count {
+                    //if selectedSongs[songIndex].id == curSong.id {
+                    selectedSongs.remove(at: songIndex)
+                    //}
+                    songIndex = songIndex + 1
+                }
+            }
         }
     }
 }
