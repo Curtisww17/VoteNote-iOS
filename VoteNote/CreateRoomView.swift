@@ -32,11 +32,17 @@ struct CreateRoomView: View {
     
   @State var roomName: String = ""
   @State var roomDescription: String = ""
+    @State var madeRoom: Bool = false
+    
+    @Environment(\.presentationMode) var presentationMode
     
     func createRoom(){
         //TO-DO- send info to room, songs per user
+        print("Room")
         var newRoom: room = room(name: roomName, desc: roomDescription, anonUsr: false, capacity: userCapacity, explicit: false, voting: true)
         makeRoom(newRoom: newRoom)
+        madeRoom = true
+        self.presentationMode.wrappedValue.dismiss()
     }
     
   var body: some View {
@@ -67,21 +73,20 @@ struct CreateRoomView: View {
                 }
             }
             
-            if self.roomName != "" && self.roomDescription != "" {
+            if self.roomName != "" {
                 Button(action: {createRoom()}) {
-                    NavigationLink(
-                      destination: HostController(isInRoom: $isInRoom), label: {
-                        Text("Create Room")
-                      })
-                      .padding(.vertical)
-                }
+                    Text("Create Room")
+                        
+                }.padding()
             }
           
           Spacer()
         }
       }
-      .navigationBarHidden(true)
-    }
+      .navigationBarHidden(true).onDisappear(perform: {
+        createRoom()
+      })
+    }.navigate(to: HostController( isInRoom: $isInRoom), when: $madeRoom)
   }
 }
   
@@ -102,4 +107,32 @@ struct CreateRoomView_Previews: PreviewProvider {
     
     CreateRoomView_PreviewContainer()
   }
+}
+
+//Derived from George_E on Stack Overflow
+//Available at: https://stackoverflow.com/questions/56437335/go-to-a-new-view-using-swiftui
+extension View {
+
+    /// Navigate to a new view.
+    /// - Parameters:
+    ///   - view: View to navigate to.
+    ///   - binding: Only navigates when this condition is `true`.
+    func navigate<NewView: View>(to view: NewView, when binding: Binding<Bool>) -> some View {
+        NavigationView {
+            ZStack {
+                self
+                    .navigationBarTitle("")
+                    .navigationBarHidden(true)
+
+                NavigationLink(
+                    destination: view
+                        .navigationBarTitle("")
+                        .navigationBarHidden(true),
+                    isActive: binding
+                ) {
+                    EmptyView()
+                }
+            }
+        }
+    }
 }
