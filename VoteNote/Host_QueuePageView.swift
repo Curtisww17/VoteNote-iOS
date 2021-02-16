@@ -10,14 +10,10 @@ import SwiftUI
 
 struct Host_QueuePageView: View {
     @State var currentView = 0
-    @Binding var isInRoom: Bool
     @ObservedObject var spotify = sharedSpotify
     @State var musicQueue: [song] = getQueue()
   
   var body: some View {
-    OperationQueue.main.addOperation {
-      isInRoom = true
-    }
     return NavigationView {
       VStack {
         
@@ -177,7 +173,7 @@ struct Host_QueuePageView_PreviewContainer: View {
     @State var spotify: Spotify = Spotify()
 
     var body: some View {
-        Host_QueuePageView(isInRoom: $isInRoom, spotify: spotify)
+        Host_QueuePageView(spotify: spotify)
     }
 }
 

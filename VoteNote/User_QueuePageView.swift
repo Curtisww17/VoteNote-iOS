@@ -14,9 +14,6 @@ struct User_QueuePageView: View {
   @ObservedObject var spotify = sharedSpotify
   
   var body: some View {
-    OperationQueue.main.addOperation {
-      isInRoom = true
-    }
     return NavigationView {
       VStack {
         

@@ -56,7 +56,9 @@ struct User_RoomPageView: View {
               }
             })
           }
-        }.navigationBarHidden(true)
+        }
+        .navigationTitle("Room")
+        .navigationBarHidden(true)
       }
     }
   }
