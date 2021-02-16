@@ -14,6 +14,7 @@ struct JoinRoomView: View {
   @ObservedObject var spotify: Spotify = sharedSpotify
   
   
+  
   var body: some View {
     return NavigationView {
       ZStack {
@@ -37,3 +38,21 @@ struct JoinRoomView: View {
     JoinRoomView()
   }
 }*/
+
+struct JoinRoomView_PreviewContainer: View {
+    
+  @State var isInRoom = false
+  @State var spotify: Spotify = Spotify()
+
+    var body: some View {
+      JoinRoomView(isInRoom: $isInRoom, spotify: spotify)
+    }
+}
+
+
+struct JoinRoomView_Previews: PreviewProvider {
+  static var previews: some View {
+    
+    JoinRoomView_PreviewContainer()
+  }
+}
