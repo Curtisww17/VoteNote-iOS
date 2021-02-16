@@ -7,14 +7,38 @@
 
 import Foundation
 import FirebaseFirestore
+import FirebaseAuth
 
 class dbConnection: ObservableObject {
-    //MARK: API Calls
+    
     init() {
         
     }
 }
 
+//credit for this function to https://stackoverflow.com/a/26845710
+func randomString(length: Int) -> String {
+
+    let letters : NSString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    let len = UInt32(letters.length)
+
+    var randomString = ""
+
+    for _ in 0 ..< length {
+        let rand = arc4random_uniform(len)
+        var nextChar = letters.character(at: Int(rand))
+        randomString += NSString(characters: &nextChar, length: 1) as String
+    }
+
+    return randomString
+}
+
+
+//we should probably bring this all back under one class
+let db = Firestore.firestore()
+let FAuth = Auth.auth()
+
+//MARK: data objects
 class room{
     let name: String
     let desc: String?
@@ -22,6 +46,10 @@ class room{
     let capacity: Int
     let explicit: Bool
     let voting: Bool
+    let queue: [song]
+    let code: String
+    //need to add songs per user and allowed genres
+    
     
     init(name: String, desc: String? = "", anonUsr: Bool, capacity: Int, explicit: Bool, voting: Bool) {
         self.name = name
@@ -30,6 +58,19 @@ class room{
         self.capacity = capacity
         self.explicit = explicit
         self.voting = voting
+        queue = []
+        code = ""
+    }
+    
+    init(rm: [String: Any]) {
+        self.name = rm["name"] as! String
+        self.desc = rm["desc"] as? String
+        self.anonUsr = rm["anonUsr"] as! Bool
+        self.capacity = rm["capacity"] as! Int
+        self.explicit = rm["explicit"] as! Bool
+        self.voting = rm["voting"] as! Bool
+        queue = [] //need to grab this as well once properly implemented
+        code = rm["code"] as! String
     }
 }
 
@@ -64,22 +105,80 @@ class song{
     }
 }
 
-func joinRoom(code: String) -> room{
+//MARK: API Calls
+func login(uid: String){
+    FAuth.signIn(withCustomToken: "HBD*76JNBH8yhyg7yhgT^^ubhyttf") { (result, err) in
+        if let err = err {
+            //there was an error making the user
+            print(err.localizedDescription)
+        }
+        else{
+            //user created successfully
+            db.collection("users").document(result!.user.uid).setData( [
+                "name": "test user",
+                "profilePic": "https://i.pinimg.com/474x/be/80/75/be8075c3043965030d69e8bccf2b5c5c.jpg",
+                "currentRoom": ""
+            ])
+        }
+    }
+}
+
+func joinRoom(code: String) -> room?{
     //put the user in the correct roomm
-    let testRoom: room = room(name: "Placeholder room", desc: "This room is a placeholder until we connect properly to the database", anonUsr: false, capacity: 0, explicit: true, voting: true)
-    //check if allowed in room
-    //increase count of people in room
+   // let testRoom: room = room(name: "Placeholder room", desc: "This room is a placeholder until we connect properly to the database", anonUsr: false, capacity: 0, explicit: true, voting: true)
+    let usr = FAuth.currentUser
     
-    return testRoom
+    //let currUsr = db.collection("users").document(usr!.uid)
+    
+    var joinedRoom: room? = nil
+    
+    let joiningQuery = db.collection("room").whereField("code", isEqualTo: code)
+    
+    joiningQuery.getDocuments() { (query, err) in
+        if let err = err{
+            print("err gerring documents \(err)")
+        }
+        else{
+            db.collection("users").document(usr!.uid).updateData(["currentroom": code])
+            //check if allowed in room
+            //increase count of people in room
+            
+            let rm = query?.documents[0].data()
+            //joinedRoom = room(name: rm!["name"] as! String, desc: rm!["desc"] as! String, anonUsr: rm!["anonUsr"] as! Bool, capacity: rm!["capacity"] as! Int, explicit: rm!["explicit"] as! Bool, voting: rm!["voting"] as! Bool)
+            joinedRoom = room(rm: rm!)
+        }
+        
+    }
+    
+    return joinedRoom
 }
 
 func leaveRoom() -> Bool{
     //take the user out of the room
+    let usr = FAuth.currentUser
+    db.collection("users").document(usr!.uid).updateData(["currentroom": ""])
+    
     return true
 }
 
 func makeRoom(newRoom: room) -> Bool{
+    let code: String
     
+    if newRoom.code == "" {
+        code = randomString(length: 5)
+    } else{
+        code = newRoom.code
+    }
+    
+    db.collection("room").addDocument(data: [
+        "name": newRoom.name,
+        "desc": newRoom.desc,
+        "anonUsr": newRoom.anonUsr,
+        "capacity": newRoom.capacity,
+        "explicit": newRoom.explicit,
+        "voting": newRoom.voting,
+        "code": code])
+    //this will need to be modified to allow for adding a room with a queue
     return true
 }
 
@@ -114,6 +213,7 @@ func getUser(uid: String) -> user{
 
 //return 1 for success, 0 for song already in queue, and -1 for fail
 func addsong(id: String) -> Int{
+    
     return 1
 }
 
