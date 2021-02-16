@@ -18,8 +18,8 @@ struct Host_RoomPageView: View {
     //TODO- make the room capacity, songs per user actually do stuff
     
   var body: some View {
-    return NavigationView {
-      ZStack {
+    //return NavigationView {
+      return ZStack {
         VStack {
 
             Form {
@@ -78,7 +78,7 @@ struct Host_RoomPageView: View {
         .navigationTitle("Room")
         .navigationBarHidden(true)
       }
-    }
+    //}
   }
   
   

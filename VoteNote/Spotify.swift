@@ -81,7 +81,7 @@ class Spotify: ObservableObject {
   }
   
   func enqueue(songID: String){
-    self.appRemote?.playerAPI?.enqueueTrackUri(songID, callback: { (_, error) in
+    self.appRemote?.playerAPI?.enqueueTrackUri("spotify:track:"+songID, callback: { (_, error) in
       print(error)
     })
   }
@@ -100,7 +100,6 @@ class Spotify: ObservableObject {
   }
   
   func searchSong(Query: String, limit: String, offset:String) -> HTTP{
-    
     return self.httpRequester.headerParamGet(url: "https://api.spotify.com/v1/search", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ], param: ["q" : Query, "type": "track,artist", "limit": limit])
   }
   

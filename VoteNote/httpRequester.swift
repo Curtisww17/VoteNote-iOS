@@ -29,7 +29,7 @@ class HttpRequester: ObservableObject {
   func headerParamGet(url: String, header: [String: String], param: [String: String]) -> HTTP{
     HTTP.GET(url, parameters: param, headers: header) { response in
       if let err = response.error {
-        print("error: \(err.localizedDescription)")
+        //print("error: \(err.localizedDescription)")
         return //also notify app of failure as needed
       }
       print("opt finished: \(response.description)")
@@ -43,6 +43,7 @@ class HttpRequester: ObservableObject {
         print("got an error: \(error)")
         return
       }
+      //print("opt finished: \(response.description)")
     }!
     
     
