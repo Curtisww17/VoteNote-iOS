@@ -23,11 +23,13 @@ struct AddMusicView: View {
         //TO-DO: Implement Adding Music
         
         //select the first song if nothing is playing
-        if nowPlaying == nil && selectedSongs.count > 0 {
+        /*if nowPlaying == nil && selectedSongs.count > 0 {
             nowPlaying = selectedSongs[0]
             sharedSpotify.enqueue(songID: selectedSongs[0].id)
             selectedSongs.remove(at: 0)
-        }
+        }*/
+        
+        sharedSpotify.enqueue(songID: "spotify:track:20I6sIOMTCkB6w7ryavxtO")
         
         //TO-DO: add music from selectedSongs array to queue, remove after added
         
