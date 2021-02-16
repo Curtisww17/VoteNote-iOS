@@ -65,6 +65,7 @@ struct QueueEntry: View {
                     Text("Song Title")
                     Text("Artist Name")
                         .font(.caption)
+                        .foregroundColor(Color.gray)
                 }
                 
                 Spacer()
