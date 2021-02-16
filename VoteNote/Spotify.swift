@@ -125,6 +125,17 @@ class Spotify: ObservableObject {
       }
     }
   }
+  
+  func getTrackInfo(track_uri: String, completion: @escaping (SpotifyTrack?) -> ()) {
+    self.httpRequester.headerGet(url: "https://api.spotify.com/v1/tracks/\(track_uri)", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? "")" ]).onFinish = { (response) in
+      do {
+        let decoder = JSONDecoder()
+        try completion( decoder.decode(SpotifyTrack.self, from: response.data))
+      } catch {
+        fatalError("Couldn't parse \(response.description)")
+      }
+    }
+  }
 }
 
 struct SpotifyUser: Codable {
@@ -140,4 +151,24 @@ struct SpotifyImage: Codable {
   var height: Int?
   var width: Int?
   var url: URL?
+}
+
+struct SpotifyTrack: Codable, Identifiable {
+  let artists: [SpotifyArtist]?
+  let disc_number: Int?
+  let duration_ms: Int?
+  let explicit: Bool?
+  let id: String
+  let name: String
+  let popularity: Int?
+  let track_number: Int?
+  let type: String?
+  let uri: String
+}
+
+struct SpotifyArtist: Codable, Identifiable {
+  let id: String
+  let name: String
+  let uri: String
+  let type: String?
 }
