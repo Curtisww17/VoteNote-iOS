@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftHTTP
+import SwiftUI
 
 let sharedSpotify = Spotify()
 
@@ -20,6 +21,8 @@ class Spotify: ObservableObject {
   private var httpRequester: HttpRequester
   
   var currentUser: SpotifyUser?
+  var recentSearch: SearchResults?
+  var userPlaylists: playlistStub?
   
   var sessionManager: SPTSessionManager? {
     didSet {
@@ -99,12 +102,37 @@ class Spotify: ObservableObject {
     })
   }
   
-  func searchSong(Query: String, limit: String, offset:String) -> HTTP{
-    return self.httpRequester.headerParamGet(url: "https://api.spotify.com/v1/search", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ], param: ["q" : Query, "type": "track,artist", "limit": limit])
+  func searchSong(completion: @escaping (SearchResults?) -> (), Query: String, limit: String, offset:String){
+    self.httpRequester.headerParamGet(url: "https://api.spotify.com/v1/search", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ], param: ["q" : Query, "type": "track,artist", "limit": limit]).onFinish = {
+      (response) in
+        do {
+          let decoder = JSONDecoder()
+          try completion( decoder.decode(SearchResults.self, from: response.data))
+        } catch {
+          fatalError("Couldn't parse \(response.description)")
+        }
+    }
+    
+    RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+    
+    print("!!!!"+(self.recentSearch?.tracks?.items?[0].name ?? ""))
+
   }
   
-    func userPlaylists(limit: String) -> HTTP{
-      return self.httpRequester.headerGet(url: "https://api.spotify.com/v1/me/playlists", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ])
+    func userPlaylists(completion: @escaping (playlistStub?) -> (), limit: String){
+      self.httpRequester.headerGet(url: "https://api.spotify.com/v1/me/playlists", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ]).onFinish = {
+        (response) in
+          do {
+            let decoder = JSONDecoder()
+            try completion( decoder.decode(playlistStub.self, from: response.data))
+          } catch {
+            fatalError("Couldn't parse \(response.description)")
+          }
+
+      }
+      RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+      
+      print("!!!!"+(self.userPlaylists?.items?[0].name ?? ""))
     }
   
   func isLoggedIn() -> Bool {
@@ -153,22 +181,65 @@ struct SpotifyImage: Codable {
   var url: URL?
 }
 
-struct SpotifyTrack: Codable, Identifiable {
-  let artists: [SpotifyArtist]?
-  let disc_number: Int?
-  let duration_ms: Int?
-  let explicit: Bool?
-  let id: String
-  let name: String
-  let popularity: Int?
-  let track_number: Int?
-  let type: String?
-  let uri: String
+struct SearchResults: Codable{
+    //let artists: [artistStub]?
+  var tracks: trackStub?
 }
 
-struct SpotifyArtist: Codable, Identifiable {
-  let id: String
-  let name: String
-  let uri: String
-  let type: String?
+struct trackStub: Codable {
+  var href: String?
+  var items: [songStub]?
+  var limit: Int?
+  var next: String?
+  var offset: Int?
+  var previous: String?
+  var total: Int?
+}
+
+struct songStub: Codable{
+    //let album: [album]
+  var artists: [artistStub]?
+  var available_markets : [String]?
+  var disc_number : Int?
+  var duration_ms : Int?
+  var explicit: Bool?
+  var href: String?
+  var id: String
+  var is_local: Bool?
+  var name: String
+  var popularity: Int?
+  var preview_url: String?
+  var track_number: Int?
+  var type: String?
+  var uri: String?
+}
+
+struct artistStub: Codable{
+    //let external_ids: String // object with string maybe can do this
+  var href: String?
+  var id: String
+  var name: String
+  var type: String?
+  var uri: String?
+}
+
+struct playlistStub: Codable{
+  var items: [Playlist]?
+  var total: Int?
+}
+
+struct Playlist: Codable{
+  var collaborative: Bool?
+  var description: String?
+  var id: String?
+  var images: [SpotifyImage]?
+  var name: String?
+  //var tracks: SpotifyTracks?
+  var type: String?
+  var uri: String?
+}
+
+struct SpotifyTracks {
+  var href: String?
+  var total: Int?
 }

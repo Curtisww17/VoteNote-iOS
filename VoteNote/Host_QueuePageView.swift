@@ -124,6 +124,7 @@ struct NowPlayingViewHost: View {
     func pauseSong(){
         if nowPlaying != nil {
             sharedSpotify.pause()
+            print("Pause")
             isPlaying = false
         }
     }
