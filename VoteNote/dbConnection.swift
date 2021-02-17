@@ -108,6 +108,24 @@ class song: Identifiable, ObservableObject{
         self.numVotes = numVotes
         self.title = title
     }
+    
+    init(sng: [String: Any], id: String){
+        addedBy = sng["addedBy"] as! String
+        artist = sng["artist"] as! String
+        genres = []
+        self.id = id
+        length = sng["length"] as! Int
+        numVotes = sng["numVotes"] as? Int
+        title = sng["title"] as! String
+    }
+}
+
+func getCurrRoom() -> String {
+    var currRoom = ""
+    db.collection("users").document(FAuth.currentUser!.uid).getDocument { (res, err) in
+        currRoom = res?.data()!["currentroom"] as! String
+    }
+    return currRoom
 }
 
 //MARK: API Calls
@@ -228,10 +246,7 @@ func getUsers() -> [user]{
  
     var users: [user] = []
     
-    var currRoom = ""
-    db.collection("users").document(FAuth.currentUser!.uid).getDocument { (res, err) in
-        currRoom = res?.data()!["currentroom"] as! String
-    }
+    var currRoom = getCurrRoom()
     
     let usrQuery = db.collection("users").whereField("currentroom", isEqualTo: currRoom)
     
@@ -264,14 +279,75 @@ func getUser(uid: String) -> user{
 //return 1 for success, 0 for song already in queue, and -1 for fail
 func addsong(id: String) -> Int{
     //this will need spotify integration in order to get data
+    let addedBy = FAuth.currentUser!.uid
+    var length = 0
+    var title = ""
+    var artist = ""
+    
+    //find current room
+    var currRoom = getCurrRoom()
+    
+    //get the track deets
+    sharedSpotify.getTrackInfo(track_uri: id) { (track) in
+        if track != nil{
+            for art in track!.artists! {
+                artist += art.name
+            }
+            length = (track?.duration_ms)!
+            title = track!.name
+        }
+    }
+    
+    //add the song to the queue
+    db.collection("room").whereField("code", isEqualTo: currRoom).getDocuments { (query, err) in
+        if let err = err {
+            print("Error getting room \(err)")
+        }else {
+            let docid = query?.documents[0].documentID
+            let sng = ["title": title,
+                       "artist": artist,
+                       "length": length,
+                       "addedBy": addedBy,
+                       "numvotes": 0] as [String : Any]
+            
+            
+            if( query?.documents[0].data()["queue"] == nil ){ //the queue doesnt exist in this room yet
+                db.collection("room").document(docid!).updateData([
+                    "queue": [id: sng ]
+                ])
+            } else {
+                db.collection("room").document(docid!).updateData([
+                    "queue.id": sng
+                ])
+            }
+        }
+    }
+    
     return 1
 }
 
 //used to get details like who posted the song
-func getSong(id: String) -> song{
-    let song1 = song(addedBy: "kki2j39jd", artist: "Toto", genres: ["Pop", "Rock"], id: "j288dm7", length: 760, numVotes: 10, title: "Africa")
+func getSong(id: String) -> song?{
+    //let song1 = song(addedBy: "kki2j39jd", artist: "Toto", genres: ["Pop", "Rock"], id: "j288dm7", length: 760, numVotes: 10, title: "Africa")
     
-    return song1
+    let currRoom = getCurrRoom()
+    
+    var songout: song? = nil
+    
+    db.collection("room").document(currRoom).getDocument { (doc, err) in
+        if let err = err {
+            print("Error getting song \(err)")
+        } else{
+            let queue: Dictionary = doc?.data()?["queue"] as! Dictionary<String, Any?>
+            if queue != nil {
+                let sng: Dictionary = queue[id] as! Dictionary<String, Any?>
+                
+                songout = song(sng: sng, id: id)
+            }
+        }
+    }
+    
+    return songout
 }
 
 //need to make sure user is allowed at some point
