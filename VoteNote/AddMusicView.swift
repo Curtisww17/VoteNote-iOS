@@ -13,7 +13,9 @@ var selectedSongs: [song] = [song]()
 struct AddMusicView: View {
     @State var currentSearch: String = "" {
         didSet {
-            sharedSpotify.searchSong(Query: currentSearch, limit: "20", offset: "0")
+            sharedSpotify.searchSong(completion: { search in
+                sharedSpotify.recentSearch = search
+              },Query: currentSearch, limit: "20", offset: "0")
         }
     }
     @State private var isEditing = false
@@ -97,12 +99,12 @@ struct AddMusicView: View {
                         .padding(.trailing)
                     }
                     
-                    List {
+                    /*List {
                         ForEach(allSongs) { song in
                             SearchEntry(curSong: song)
                         }
                         //list of search results
-                    }
+                    }*/
                 }
                 
             }

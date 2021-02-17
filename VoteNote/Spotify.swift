@@ -175,6 +175,26 @@ struct SpotifyUser: Codable {
   var images: [SpotifyImage]?
 }
 
+struct SpotifyTrack: Codable, Identifiable {
+  let artists: [SpotifyArtist]?
+  let disc_number: Int?
+  let duration_ms: Int?
+  let explicit: Bool?
+  let id: String
+  let name: String
+  let popularity: Int?
+  let track_number: Int?
+  let type: String?
+  let uri: String
+}
+
+struct SpotifyArtist: Codable, Identifiable {
+  let id: String
+  let name: String
+  let uri: String
+  let type: String?
+}
+
 struct SpotifyImage: Codable {
   var height: Int?
   var width: Int?
@@ -234,12 +254,12 @@ struct Playlist: Codable{
   var id: String?
   var images: [SpotifyImage]?
   var name: String?
-  //var tracks: SpotifyTracks?
+  //var tracks: trackStub?
   var type: String?
   var uri: String?
 }
 
-struct SpotifyTracks {
+/*struct trackStub {
   var href: String?
   var total: Int?
-}
+}*/
