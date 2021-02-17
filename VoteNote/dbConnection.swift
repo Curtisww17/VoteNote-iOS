@@ -147,7 +147,7 @@ func login(uid: String){
     }
 }*/
 
-func login(){
+func login(name: String){
     FAuth.signInAnonymously { (result, err) in
         if let err = err {
             //there was an error making the user
@@ -156,7 +156,7 @@ func login(){
         else{
             //user created successfully
             db.collection("users").document(result!.user.uid).setData( [
-                "name": "test user",
+                "name":  name,
                 "profilePic": "https://i.pinimg.com/474x/be/80/75/be8075c3043965030d69e8bccf2b5c5c.jpg",
                 "currentRoom": ""
             ])
@@ -204,6 +204,7 @@ func leaveRoom() -> Bool{
 
 func makeRoom(newRoom: room) -> Bool{
     let code: String
+    let usr = FAuth.currentUser
     
     if newRoom.code == "" {
         code = randomString(length: 5)
@@ -219,6 +220,8 @@ func makeRoom(newRoom: room) -> Bool{
         "explicit": newRoom.explicit,
         "voting": newRoom.voting,
         "code": code])
+    
+    db.collection("users").document(usr!.uid).updateData(["currentroom": code])
     //this will need to be modified to allow for adding a room with a queue
     return true
 }
