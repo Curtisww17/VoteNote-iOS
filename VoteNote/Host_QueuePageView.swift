@@ -21,6 +21,13 @@ struct Host_QueuePageView: View {
     return ZStack {
       VStack {
         
+        //temporary button for testing
+        NavigationLink(
+          destination: AddMusicView().navigationBarTitle("Browse"),
+          label: {
+          Text("Add")
+          })
+        
         List {
             ForEach(getQueue()) { song in
                 QueueEntry(curSong: song)

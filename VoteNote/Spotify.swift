@@ -216,7 +216,7 @@ struct trackStub: Codable {
   var total: Int?
 }
 
-struct songStub: Codable{
+struct songStub: Codable, Identifiable{
     //let album: [album]
   var artists: [artistStub]?
   var available_markets : [String]?

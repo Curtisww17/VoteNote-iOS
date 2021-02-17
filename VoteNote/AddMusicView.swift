@@ -11,15 +11,17 @@ import SwiftUI
 var selectedSongs: [song] = [song]()
 
 struct AddMusicView: View {
-    @State var currentSearch: String = "" {
+    @State var currentSearch: String = "" { //iOS 13 and earlier uses observer
         didSet {
-            sharedSpotify.searchSong(completion: { search in
-                sharedSpotify.recentSearch = search
-              },Query: currentSearch, limit: "20", offset: "0")
+            if currentSearch != "" {
+                sharedSpotify.searchSong(completion: { search in
+                    sharedSpotify.recentSearch = search
+                  },Query: currentSearch, limit: "20", offset: "0")
+            }
         }
     }
     @State private var isEditing = false
-    @ObservedObject var spotify = sharedSpotify
+    //@ObservedObject var spotify = sharedSpotify
     
     @Environment(\.presentationMode) var presentationMode
     
@@ -35,7 +37,9 @@ struct AddMusicView: View {
         }
         
         for i in selectedSongs {
-            addsong(id: i.id)
+            print("Added")
+            //addsong(id: i.id) //there's an issue here
+            print("Done")
         }
         
         selectedSongs.removeAll()
@@ -49,7 +53,11 @@ struct AddMusicView: View {
                 VStack {
                     
                     HStack {
-                        TextField("Search Music", text: $currentSearch)
+                        TextField("Search Music", text: $currentSearch).onChange(of: self.currentSearch, perform: { value in
+                            sharedSpotify.searchSong(completion: { search in
+                                sharedSpotify.recentSearch = search
+                              },Query: currentSearch, limit: "20", offset: "0")
+                        })
                             .padding(7)
                             .padding(.horizontal, 25)
                             .background(Color(.systemGray6))
@@ -99,12 +107,15 @@ struct AddMusicView: View {
                         .padding(.trailing)
                     }
                     
-                    /*List {
-                        ForEach(allSongs) { song in
-                            SearchEntry(curSong: song)
-                        }
+                    List {
                         //list of search results
-                    }*/
+                        //TO-DO: have a function to print all artist names
+                        if currentSearch != "" {
+                            ForEach((sharedSpotify.recentSearch?.tracks?.items ?? [songStub(artists: [artistStub(href: "", id: "", name: "", type: "", uri: "")], available_markets: nil, disc_number: 0, duration_ms: 0, explicit: false, href: "", id: "", is_local: false, name: "Searching...", popularity: 0, preview_url: "", track_number: 0, type: "", uri: "")])) { song in
+                                SearchEntry(songTitle: song.name, songArtist: (song.artists?[0].name)!, songID: song.id)
+                            }
+                        }
+                    }
                 }
                 
             }
@@ -118,17 +129,33 @@ struct SearchEntry: View {
     //TODO- Get current song info
     //TODO- swiping for vetoing songs and viewing the user
     @State var selectedSong: Bool = false
-    @State var curSong: song
+    
+    @State var songTitle: String
+    @State var songArtist: String
+    @State var songID: String
+    
+    //TO-DO: Use actual values
+    @State var addedBy: String = ""
+    @State var genres: [String] = ["Placeholder"]
+    @State var length: Int = 0
+    @State var numVotes: Int? = 0
     
     var body: some View {
         ZStack{
             HStack {
                 Image(systemName: "person.crop.square.fill").resizable().frame(width: 35.0, height: 35.0)
                 VStack {
-                    Text(curSong.title)
-                    Text(curSong.artist)
-                        .font(.caption)
-                        .foregroundColor(Color.gray)
+                    HStack {
+                        Text(songTitle)
+                        Spacer()
+                    }
+                    
+                    HStack {
+                        Text(songArtist)
+                            .font(.caption)
+                            .foregroundColor(Color.gray)
+                        Spacer()
+                    }
                 }
                 
                 Spacer()
@@ -144,13 +171,14 @@ struct SearchEntry: View {
         }.onTapGesture {
             selectedSong = !selectedSong
             if selectedSong {
-                //selectedSongs.append(curSong:song)
+                selectedSongs.append(song(addedBy: self.addedBy, artist: self.songArtist, genres: self.genres, id: self.songID, length: self.length, numVotes: self.numVotes, title: self.songTitle))
             } else {
                 var songIndex: Int = 0
                 while songIndex < selectedSongs.count {
-                    //if selectedSongs[songIndex].id == curSong.id {
-                    selectedSongs.remove(at: songIndex)
-                    //}
+                    if selectedSongs[songIndex].id == songID
+                    {
+                        selectedSongs.remove(at: songIndex)
+                    }
                     songIndex = songIndex + 1
                 }
             }
