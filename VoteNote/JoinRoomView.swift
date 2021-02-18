@@ -53,7 +53,7 @@ struct JoinRoomView: View {
         }
       }
       .navigationBarHidden(true)
-    }.navigate(to: UserController( isInRoom: $isInRoom), when: $joined)
+    }.navigate(to: UserController( isInRoom: $isInRoom), when: $joined).onAppear(perform: {sharedSpotify.pause()})
   }
 }
 

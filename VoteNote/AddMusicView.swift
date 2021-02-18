@@ -31,6 +31,7 @@ struct AddMusicView: View {
         
         //select the first song if nothing is playing
         if nowPlaying == nil && selectedSongs.count > 0 {
+            print("Song Added")
             nowPlaying = selectedSongs[0]
             sharedSpotify.enqueue(songID: selectedSongs[0].id)
             selectedSongs.remove(at: 0)

@@ -86,7 +86,7 @@ struct CreateRoomView: View {
       .navigationBarHidden(true).onDisappear(perform: {
         createRoom()
       })
-    }.navigate(to: HostController( isInRoom: $isInRoom), when: $madeRoom)
+    }.navigate(to: HostController( isInRoom: $isInRoom), when: $madeRoom).onAppear(perform: {sharedSpotify.pause()})
   }
 }
   
