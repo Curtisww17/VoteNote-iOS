@@ -13,9 +13,7 @@ struct UsersListView: View {
   
   
   var body: some View {
-    getUsers(completion: {usersOut, err in
-      self.users = usersOut
-    })
+    
     return NavigationView {
       List {
         ForEach (users ?? []) { user in
@@ -26,6 +24,10 @@ struct UsersListView: View {
       .frame(width: UIScreen.main.bounds.width)
       .navigationTitle("Users")
       
+    }.onAppear() {
+      getUsers(completion: {usersOut, err in
+        self.users = usersOut
+      })
     }
   }
   
