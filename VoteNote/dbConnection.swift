@@ -215,7 +215,8 @@ func getQueue(completion: @escaping ([song]?, Error?) -> Void){
     
     getCurrRoom { (currRoom, err) in
     
-        db.collection("room").document(currRoom).getDocument { (doc, err) in
+        let docref = db.collection("room").document(currRoom)
+        docref.getDocument { (doc, err) in
         if let err = err {
             print("Error getting song \(err)")
             completion(nil, err)
