@@ -38,7 +38,7 @@ struct AddMusicView: View {
         
         for i in selectedSongs {
             print("Added")
-            //addsong(id: i.id) //there's an issue here
+            addsong(id: i.id) //there's an issue here
             print("Done")
         }
         
