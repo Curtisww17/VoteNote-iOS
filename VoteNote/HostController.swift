@@ -12,6 +12,8 @@ struct HostController: View {
   @ObservedObject var spotify = sharedSpotify
   @Binding var isInRoom: Bool
   @State var showNav = true
+    @State var roomName: String
+    @State var roomDescription: String
   
   
   @State var currentView = 1
@@ -57,7 +59,7 @@ struct HostController: View {
           .animation(.default)
           .transition(.move(edge: .leading))
       } else {
-        Host_RoomPageView(roomName: "Primanti Bros.", roomDescription: "Description goes here", roomCapacity: 5, songsPerUser: 5, showNav: $showNav)
+        Host_RoomPageView(roomName: roomName, roomDescription: roomDescription, roomCapacity: 5, songsPerUser: 5, showNav: $showNav)
           .animation(.default)
           .transition(.move(edge: .trailing))
       }
@@ -71,7 +73,7 @@ struct HostController_PreviewContainer: View {
     @State var isInRoom: Bool = true
 
     var body: some View {
-        HostController(isInRoom: $isInRoom)
+        HostController(isInRoom: $isInRoom, roomName: "Primanti Bros", roomDescription: "Description Goes Here")
     }
 }
 
