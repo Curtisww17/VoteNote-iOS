@@ -306,7 +306,7 @@ func addsong(id: String) -> Int{
             length = (track?.duration_ms)!
             title = track!.name
         }
-    }
+    
     
     //add the song to the queue
     db.collection("room").whereField("code", isEqualTo: currRoom).getDocuments { (query, err) in
@@ -332,6 +332,7 @@ func addsong(id: String) -> Int{
             }
         }
     }
+    }//end sharedSpotify
     }//end currRoom
     
     return 1
