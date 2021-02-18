@@ -211,14 +211,28 @@ func makeRoom(newRoom: room) -> Bool{
     return true
 }
 
-func getQueue() -> [song]{
-    let song1 = song(addedBy: "kki2j39jd", artist: "Toto", genres: ["Pop", "Rock"], id: "20I6sIOMTCkB6w7ryavxtO", length: 760, numVotes: 10, title: "Africa")
+func getQueue(completion: @escaping ([song]?, Error?) -> Void){
     
-    let song2 = song(addedBy: "jid984je", artist: "AC/DC", genres: ["Classic Rock", "Rock"], id: "jj3877dhe73h", length: 940, numVotes: 3, title: "Thunderstruck")
+    getCurrRoom { (currRoom, err) in
     
-    let song3 = song(addedBy: "hfbve74n", artist: "Imagine Dragons", genres: ["Pop", "Electronic"], id: "88vb49m3", length: 340, numVotes: -2, title: "Believer")
+        db.collection("room").document(currRoom).getDocument { (doc, err) in
+        if let err = err {
+            print("Error getting song \(err)")
+            completion(nil, err)
+        } else{
+            let queue: Dictionary = doc?.data()?["queue"] as! Dictionary<String, Any?>
+            if queue != nil {
+                var songs: [song] = []
+                for (id, s) in queue {
+                    songs.append(song(sng: s as! [String : Any], id: id))
+                }
+                completion(songs, nil)
+            }
+            completion(nil, nil)
+        }
+    }
+    }//end getCurrRoom
     
-    return [song1, song2, song3]
     
 }
 
