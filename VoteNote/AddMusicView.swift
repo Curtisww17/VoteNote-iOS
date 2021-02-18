@@ -140,48 +140,54 @@ struct SearchEntry: View {
     @State var length: Int = 0
     @State var numVotes: Int? = 0
     
+    func selectSong() {
+        selectedSong = !selectedSong
+        if selectedSong {
+            selectedSongs.append(song(addedBy: self.addedBy, artist: self.songArtist, genres: self.genres, id: self.songID, length: self.length, numVotes: self.numVotes, title: self.songTitle))
+            print("Selected Song. Currently Selected this many songs: \(selectedSongs.count)")
+        } else {
+            var songIndex: Int = 0
+            while songIndex < selectedSongs.count {
+                if selectedSongs[songIndex].id == songID
+                {
+                    selectedSongs.remove(at: songIndex)
+                }
+                songIndex = songIndex + 1
+            }
+        }
+    }
+    
     var body: some View {
         ZStack{
-            HStack {
-                Image(systemName: "person.crop.square.fill").resizable().frame(width: 35.0, height: 35.0)
-                VStack {
-                    HStack {
-                        Text(songTitle)
-                        Spacer()
+            Button(action: {selectSong()}) {
+                HStack {
+                    Image(systemName: "person.crop.square.fill").resizable().frame(width: 35.0, height: 35.0)
+                    VStack {
+                        HStack {
+                            Text(songTitle)
+                            Spacer()
+                        }
+                        
+                        HStack {
+                            Text(songArtist)
+                                .font(.caption)
+                                .foregroundColor(Color.gray)
+                            Spacer()
+                        }
                     }
                     
-                    HStack {
-                        Text(songArtist)
-                            .font(.caption)
-                            .foregroundColor(Color.gray)
-                        Spacer()
+                    Spacer()
+                    if !selectedSong {
+                        Image(systemName: "plus.circle")
+                            .padding(.trailing)
+                    } else {
+                        Image(systemName: "checkmark")
+                            .padding(.trailing)
+                            .foregroundColor(/*@START_MENU_TOKEN@*/.blue/*@END_MENU_TOKEN@*/)
                     }
                 }
-                
-                Spacer()
-                if !selectedSong {
-                    Image(systemName: "plus.circle")
-                        .padding(.trailing)
-                } else {
-                    Image(systemName: "checkmark")
-                        .padding(.trailing)
-                        .foregroundColor(/*@START_MENU_TOKEN@*/.blue/*@END_MENU_TOKEN@*/)
-                }
             }
-        }.onTapGesture {
-            selectedSong = !selectedSong
-            if selectedSong {
-                selectedSongs.append(song(addedBy: self.addedBy, artist: self.songArtist, genres: self.genres, id: self.songID, length: self.length, numVotes: self.numVotes, title: self.songTitle))
-            } else {
-                var songIndex: Int = 0
-                while songIndex < selectedSongs.count {
-                    if selectedSongs[songIndex].id == songID
-                    {
-                        selectedSongs.remove(at: songIndex)
-                    }
-                    songIndex = songIndex + 1
-                }
-            }
+            
         }
     }
 }
