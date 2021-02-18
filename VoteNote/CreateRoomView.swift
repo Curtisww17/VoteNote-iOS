@@ -83,9 +83,6 @@ struct CreateRoomView: View {
           Spacer()
         }
       }
-      .navigationBarHidden(true).onDisappear(perform: {
-        createRoom()
-      })
     }.navigate(to: HostController( isInRoom: $isInRoom), when: $madeRoom)
   }
 }
