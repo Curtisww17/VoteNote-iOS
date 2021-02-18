@@ -10,7 +10,6 @@ import SwiftUI
 
 struct User_QueuePageView: View {
     @State var currentView = 0
-    @Binding var isInRoom: Bool
   @ObservedObject var spotify = sharedSpotify
   @State var songsList: [song]?
   
@@ -78,7 +77,7 @@ struct User_QueuePageView_PreviewContainer: View {
     @State var isInRoom: Bool = true
 
     var body: some View {
-        User_QueuePageView(isInRoom: $isInRoom)
+        User_QueuePageView()
     }
 }
 

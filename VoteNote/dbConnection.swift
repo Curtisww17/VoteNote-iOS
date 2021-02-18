@@ -153,19 +153,21 @@ func login(name: String){
 func joinRoom(code: String) -> room?{
     //put the user in the correct roomm
    
+    let upperCode = code.uppercased()
+    
     let usr = FAuth.currentUser
     
     
     var joinedRoom: room? = nil
     
-    let joiningQuery = db.collection("room").whereField("code", isEqualTo: code)
+    let joiningQuery = db.collection("room").whereField("code", isEqualTo: upperCode)
     
     joiningQuery.getDocuments() { (query, err) in
         if let err = err{
             print("err gerring documents \(err)")
         }
         else{
-            db.collection("users").document(usr!.uid).updateData(["currentRoom": code])
+            db.collection("users").document(usr!.uid).updateData(["currentRoom": upperCode])
             //check if allowed in room
             //increase count of people in room
             

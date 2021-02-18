@@ -15,7 +15,6 @@ struct HostController: View {
     @State var roomName: String
     @State var roomDescription: String
   
-  
   @State var currentView = 1
   var body: some View {
     OperationQueue.main.addOperation {
@@ -47,7 +46,6 @@ struct HostController: View {
                         .frame(width: 30, height: 30)
                   })
             }
-            
         }
         .frame(width: UIScreen.main.bounds.size.width/4)
         
