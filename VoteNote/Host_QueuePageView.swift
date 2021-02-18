@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 var nowPlaying: song?
-var isPlaying: Bool = true //should be false by default
+var isPlaying: Bool = false //should be false by default
 //TO-DO: enqueue next song when only so much time is left
 
 struct Host_QueuePageView: View {
@@ -18,11 +18,11 @@ struct Host_QueuePageView: View {
   @State var songsList: [song]?
   
   var body: some View {
-    getQueue(completion: {songs, err in
-      self.songsList = songs
-    })
+    //getQueue(completion: {songs, err in
+      //self.songsList = songs
+    //})
     //return NavigationView {
-    return ZStack {
+    ZStack {
       VStack {
         
         //temporary button for testing
@@ -58,6 +58,10 @@ struct Host_QueuePageView: View {
             sharedSpotify.enqueue(songID: songsList![0].id)
             vetoSong(id: songsList![0].id)
         }
+        getQueue(){(songs, err) in
+            songsList = songs
+        }
+        
     })
   }
 }
@@ -127,28 +131,28 @@ struct NowPlayingViewHost: View {
     
     func playSong(){
         //TODO- check remaining time in song
-        if nowPlaying != nil {
+        //if nowPlaying != nil {
             sharedSpotify.resume()
             isPlaying = true
-        }
+        //}
     }
     
     func pauseSong(){
-        if nowPlaying != nil {
+        //if nowPlaying != nil {
             sharedSpotify.pause()
             print("Pause")
             isPlaying = false
-        }
+        //}
     }
     
     //TO-DO: Add based on number of votes
     func skipSong(){
-        if nowPlaying != nil && (songsList ?? []).count > 0 {
-            sharedSpotify.enqueue(songID: songsList![0].id)
+        //if /*nowPlaying != nil &&*/ (songsList ?? []).count > 0 {
+            sharedSpotify.enqueue(songID: songsList![0].id) //borked
             sharedSpotify.skip()
             nowPlaying = songsList![0]
             vetoSong(id: songsList![0].id)
-        }
+        //}
     }
     
     func previousSong(){
@@ -160,10 +164,7 @@ struct NowPlayingViewHost: View {
     }
 
     var body: some View {
-      getQueue(completion: {songs, err in
-        songsList = songs
-      })
-        return ZStack {
+        ZStack {
             if isMinimized {
                 HStack {
                     Spacer()
@@ -258,7 +259,12 @@ struct NowPlayingViewHost: View {
                 //}
                 
             }
-        }
+        }.onAppear(perform: {
+            getQueue(){(songs, err) in
+                print(songs)
+                songsList = songs
+            }
+        })
     }
 }
 

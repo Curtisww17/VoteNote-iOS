@@ -36,7 +36,7 @@ struct LoginWithSpotifyView: View {
       .frame(alignment: .bottom)
       Spacer()
       
-    }
+    }.onAppear(perform: {sharedSpotify.pause()})
     //.frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
   }
 }

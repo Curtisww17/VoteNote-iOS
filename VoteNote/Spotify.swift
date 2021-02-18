@@ -115,7 +115,7 @@ class Spotify: ObservableObject {
     
     RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
     
-    print("!!!!"+(self.recentSearch?.tracks?.items?[0].name ?? ""))
+    //print("!!!!"+(self.recentSearch?.tracks?.items?[0].name ?? ""))
 
   }
   
@@ -132,7 +132,7 @@ class Spotify: ObservableObject {
       }
       RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
       
-      print("!!!!"+(self.userPlaylists?.items?[0].name ?? ""))
+      //print("!!!!"+(self.userPlaylists?.items?[0].name ?? ""))
     }
   
   func isLoggedIn() -> Bool {
