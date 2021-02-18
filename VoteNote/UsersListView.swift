@@ -9,10 +9,16 @@ import Foundation
 import SwiftUI
 
 struct UsersListView: View {
+  @State var users: [user]?
+  
+  
   var body: some View {
-    NavigationView {
+    getUsers(completion: {usersOut, err in
+      self.users = usersOut
+    })
+    return NavigationView {
       List {
-        ForEach (getUsers()) { user in
+        ForEach (users ?? []) { user in
           UserListItem(user: user)
             .frame(height: 60)
         }

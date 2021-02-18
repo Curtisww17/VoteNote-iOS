@@ -14,7 +14,7 @@ struct HostController: View {
   @State var showNav = true
   
   
-  @State var currentView = 0
+  @State var currentView = 1
   var body: some View {
     OperationQueue.main.addOperation {
       isInRoom = true

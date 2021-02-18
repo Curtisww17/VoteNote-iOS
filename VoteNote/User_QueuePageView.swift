@@ -12,13 +12,19 @@ struct User_QueuePageView: View {
     @State var currentView = 0
     @Binding var isInRoom: Bool
   @ObservedObject var spotify = sharedSpotify
+  @State var songsList: [song]?
+  
+  
   
   var body: some View {
+    getQueue(completion: {songs, err in
+      self.songsList = songs
+    })
     return NavigationView {
       VStack {
         
         List {
-            ForEach(getQueue()) { song in
+            ForEach(songsList ?? []) { song in
                 QueueEntry(curSong: song)
             }
         }
