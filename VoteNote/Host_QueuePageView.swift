@@ -26,11 +26,11 @@ struct Host_QueuePageView: View {
       VStack {
         
         //temporary button for testing
-        NavigationLink(
+        /*NavigationLink(
           destination: AddMusicView().navigationBarTitle("Browse"),
           label: {
           Text("Add")
-          })
+          })*/
         
         List {
             ForEach(songsList ?? []) { song in
