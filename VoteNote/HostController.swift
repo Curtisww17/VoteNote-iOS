@@ -13,7 +13,6 @@ struct HostController: View {
   @Binding var isInRoom: Bool
   @State var showNav = true
   
-  
   @State var currentView = 1
   var body: some View {
     OperationQueue.main.addOperation {
@@ -45,7 +44,6 @@ struct HostController: View {
                         .frame(width: 30, height: 30)
                   })
             }
-            
         }
         .frame(width: UIScreen.main.bounds.size.width/4)
         
@@ -64,19 +62,5 @@ struct HostController: View {
     }
     .navigationTitle("Lobby")
     .navigationBarHidden(true)
-  }
-}
-
-struct HostController_PreviewContainer: View {
-    @State var isInRoom: Bool = true
-
-    var body: some View {
-        HostController(isInRoom: $isInRoom)
-    }
-}
-
-struct HostController_Previews: PreviewProvider {
-  static var previews: some View {
-    HostController_PreviewContainer()
   }
 }

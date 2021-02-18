@@ -78,36 +78,14 @@ struct Host_RoomPageView: View {
       .navigationTitle("Room")
       .navigationBarHidden(true)
     }
-    //}
   }
   
-  
   func actionSheet() {
-    
     getCurrRoom(completion: { code, err in
       let data = code ?? " No Code Found"
       let av = UIActivityViewController(activityItems: [data], applicationActivities: nil)
       UIApplication.shared.windows.first?.rootViewController?.present(av, animated: true, completion: nil)
     })
     
-  }
-}
-
-struct Host_RoomPageView_PreviewContainer: View {
-  
-  var roomName: String = "Room Name"
-  var roomDescription: String = "This is an example room"
-  var roomCapacity: Int = 20
-  var songsPerUser: Int = 4
-  @State var showNav = true
-  
-  var body: some View {
-    Host_RoomPageView(roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser, showNav: $showNav)
-  }
-}
-
-struct Host_RoomPageView_Previews: PreviewProvider {
-  static var previews: some View {
-    Host_RoomPageView_PreviewContainer()
   }
 }

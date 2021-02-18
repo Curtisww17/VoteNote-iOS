@@ -11,6 +11,7 @@ import SwiftUI
 struct UserController: View {
   @ObservedObject var spotify = sharedSpotify
   @Binding var isInRoom: Bool
+  @State var showNav = true;
   
   @State var currentView = 0
   var body: some View {
@@ -50,11 +51,11 @@ struct UserController: View {
       .frame(width: UIScreen.main.bounds.size.width, alignment: .top)
       
       if (currentView == 0) {
-        User_QueuePageView(isInRoom: $isInRoom)
+        User_QueuePageView()
           .animation(.default)
           .transition(.move(edge: .leading))
       } else {
-        User_RoomPageView(roomName: "Primanti Bros.", roomDescription: "Description goes here", roomCapacity: 5, songsPerUser: 5)
+        User_RoomPageView(roomName: "Primanti Bros.", roomDescription: "Description goes here", roomCapacity: 5, songsPerUser: 5, showNav: $showNav)
           .animation(.default)
           .transition(.move(edge: .trailing))
       }
