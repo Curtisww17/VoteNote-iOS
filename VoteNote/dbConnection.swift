@@ -120,32 +120,17 @@ class song: Identifiable, ObservableObject{
     }
 }
 
-func getCurrRoom() -> String {
+func getCurrRoom(completion: @escaping (String, Error?) -> Void){
     var currRoom = ""
     db.collection("users").document(FAuth.currentUser!.uid).getDocument { (res, err) in
-        currRoom = res?.data()!["currentroom"] as! String
+        currRoom = res?.data()!["currentRoom"] as! String
+        print("\n\n\n\n\n\(currRoom)")
+        completion(currRoom, nil)
     }
-    return currRoom
+    //return currRoom
 }
 
 //MARK: API Calls
-/*
-func login(uid: String){
-    FAuth.signIn(withCustomToken: uid) { (result, err) in
-        if let err = err {
-            //there was an error making the user
-            print(err.localizedDescription)
-        }
-        else{
-            //user created successfully
-            db.collection("users").document(result!.user.uid).setData( [
-                "name": "test user",
-                "profilePic": "https://i.pinimg.com/474x/be/80/75/be8075c3043965030d69e8bccf2b5c5c.jpg",
-                "currentRoom": ""
-            ])
-        }
-    }
-}*/
 
 func login(name: String){
     FAuth.signInAnonymously { (result, err) in
@@ -166,10 +151,9 @@ func login(name: String){
 
 func joinRoom(code: String) -> room?{
     //put the user in the correct roomm
-   // let testRoom: room = room(name: "Placeholder room", desc: "This room is a placeholder until we connect properly to the database", anonUsr: false, capacity: 0, explicit: true, voting: true)
+   
     let usr = FAuth.currentUser
     
-    //let currUsr = db.collection("users").document(usr!.uid)
     
     var joinedRoom: room? = nil
     
@@ -180,7 +164,7 @@ func joinRoom(code: String) -> room?{
             print("err gerring documents \(err)")
         }
         else{
-            db.collection("users").document(usr!.uid).updateData(["currentroom": code])
+            db.collection("users").document(usr!.uid).updateData(["currentRoom": code])
             //check if allowed in room
             //increase count of people in room
             
@@ -191,13 +175,14 @@ func joinRoom(code: String) -> room?{
         
     }
     
+    //this will likely always return nil, we need to change the return type
     return joinedRoom
 }
 
 func leaveRoom() -> Bool{
     //take the user out of the room
     let usr = FAuth.currentUser
-    db.collection("users").document(usr!.uid).updateData(["currentroom": ""])
+    db.collection("users").document(usr!.uid).updateData(["currentRoom": ""])
     
     return true
 }
@@ -221,7 +206,7 @@ func makeRoom(newRoom: room) -> Bool{
         "voting": newRoom.voting,
         "code": code])
     
-    db.collection("users").document(usr!.uid).updateData(["currentroom": code])
+    db.collection("users").document(usr!.uid).updateData(["currentRoom": code])
     //this will need to be modified to allow for adding a room with a queue
     return true
 }
@@ -238,7 +223,7 @@ func getQueue() -> [song]{
 }
 
 //get all the users for a room
-func getUsers() -> [user]{
+func getUsers(completion: @escaping ([user]?, Error?) -> Void){
     /*
     let usr1 = user(name: "Wesley Curtis", profilePic: "www.picture.com")
     
@@ -249,14 +234,17 @@ func getUsers() -> [user]{
  
     var users: [user] = []
     
-    var currRoom = getCurrRoom()
+    //let currRoom = getCurrRoom()
+    getCurrRoom { (currRoom, err) in
     
-    let usrQuery = db.collection("users").whereField("currentroom", isEqualTo: currRoom)
+    
+    let usrQuery = db.collection("users").whereField("currentRoom", isEqualTo: currRoom)
     
     usrQuery.getDocuments() { (query, err) in
         
         if let err = err{
             print("err gerring documents \(err)")
+            completion(nil, err)
         }
         else{
             for usr in query!.documents{
@@ -264,12 +252,12 @@ func getUsers() -> [user]{
                 
                 users.append(newusr)
             }
+            completion(users, nil)
         }
         
     }
     
-    
-    return users
+    }//end getCurrRoom
 }
 
 //get individual user
@@ -288,7 +276,11 @@ func addsong(id: String) -> Int{
     var artist = ""
     
     //find current room
-    var currRoom = getCurrRoom()
+    //var currRoom = getCurrRoom()
+    
+    getCurrRoom { (currRoom, err) in
+        
+    
     
     //get the track deets
     sharedSpotify.getTrackInfo(track_uri: id) { (track) in
@@ -325,32 +317,40 @@ func addsong(id: String) -> Int{
             }
         }
     }
+    }//end currRoom
     
     return 1
 }
 
 //used to get details like who posted the song
-func getSong(id: String) -> song?{
+func getSong(id: String, completion: @escaping (song?, Error?) -> Void){
     //let song1 = song(addedBy: "kki2j39jd", artist: "Toto", genres: ["Pop", "Rock"], id: "j288dm7", length: 760, numVotes: 10, title: "Africa")
     
-    let currRoom = getCurrRoom()
+    //let currRoom = getCurrRoom()
+    
+    getCurrRoom { (currRoom, err) in
+        
     
     var songout: song? = nil
     
-    db.collection("room").document(currRoom).getDocument { (doc, err) in
+        db.collection("room").document(currRoom).getDocument { (doc, err) in
         if let err = err {
             print("Error getting song \(err)")
+            completion(nil, err)
         } else{
             let queue: Dictionary = doc?.data()?["queue"] as! Dictionary<String, Any?>
             if queue != nil {
                 let sng: Dictionary = queue[id] as! Dictionary<String, Any?>
                 
                 songout = song(sng: sng, id: id)
+                completion(songout, nil)
             }
+            completion(nil, nil)
         }
     }
+    }//end getCurrRoom
     
-    return songout
+    //return songout
 }
 
 //need to make sure user is allowed at some point
