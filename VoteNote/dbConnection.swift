@@ -220,10 +220,10 @@ func getQueue(completion: @escaping ([song]?, Error?) -> Void){
             print("Error getting song \(err)")
             completion(nil, err)
         } else{
-            let queue: Dictionary = doc?.data()?["queue"] as! Dictionary<String, Any?>
+            let queue: Dictionary? = doc?.data()?["queue"] as? Dictionary<String, Any?>
             if queue != nil {
                 var songs: [song] = []
-                for (id, s) in queue {
+                for (id, s) in queue!{
                     songs.append(song(sng: s as! [String : Any], id: id))
                 }
                 completion(songs, nil)
