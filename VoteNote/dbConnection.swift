@@ -140,10 +140,11 @@ func login(name: String){
         }
         else{
             //user created successfully
-            db.collection("users").document(result!.user.uid).setData( [
+            
+            db.collection("users").document(result!.user.uid).updateData( [
                 "name":  name,
                 "profilePic": "https://i.pinimg.com/474x/be/80/75/be8075c3043965030d69e8bccf2b5c5c.jpg",
-                "currentRoom": ""
+                //"currentRoom": ""
             ])
         }
     }
