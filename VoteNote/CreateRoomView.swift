@@ -83,10 +83,7 @@ struct CreateRoomView: View {
           Spacer()
         }
       }
-      .navigationBarHidden(true).onDisappear(perform: {
-        createRoom()
-      })
-    }.navigate(to: HostController( isInRoom: $isInRoom), when: $madeRoom).onAppear(perform: {sharedSpotify.pause()})
+    }.navigate(to: HostController( isInRoom: $isInRoom), when: $madeRoom)
   }
 }
   
