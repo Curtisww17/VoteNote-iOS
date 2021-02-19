@@ -12,7 +12,16 @@ struct HostController: View {
   @ObservedObject var spotify = sharedSpotify
   @Binding var isInRoom: Bool
   @State var showNav = true
+    @State var roomName: String
+    @State var roomDescription: String
+    @State var notExited: Bool = false
   
+    func exitRoom() {
+        print("Left Room")
+        leaveRoom()
+        notExited = true
+    }
+    
   @State var currentView = 1
   var body: some View {
     OperationQueue.main.addOperation {
@@ -55,12 +64,40 @@ struct HostController: View {
           .animation(.default)
           .transition(.move(edge: .leading))
       } else {
-        Host_RoomPageView(roomName: "Primanti Bros.", roomDescription: "Description goes here", roomCapacity: 5, songsPerUser: 5, showNav: $showNav)
+        Host_RoomPageView(roomName: roomName, roomDescription: roomDescription, roomCapacity: 5, songsPerUser: 5, showNav: $showNav)
           .animation(.default)
           .transition(.move(edge: .trailing))
+        
+        Button(action: {
+            exitRoom()
+        }, label: {
+          HStack {
+            Spacer()
+            Text("Leave Room")
+                .foregroundColor(Color.red)
+            Spacer()
+          }
+        })
+        .padding(.vertical)
       }
     }
     .navigationTitle("Lobby")
-    .navigationBarHidden(true)
+    .navigationBarHidden(true).onAppear(perform: {
+        notExited = false
+    }).navigate(to: LandingPageView(), when: $notExited)
+  }
+}
+
+struct HostController_PreviewContainer: View {
+    @State var isInRoom: Bool = true
+
+    var body: some View {
+        HostController(isInRoom: $isInRoom, roomName: "Primanti Bros", roomDescription: "Description Goes Here")
+    }
+}
+
+struct HostController_Previews: PreviewProvider {
+  static var previews: some View {
+    HostController_PreviewContainer()
   }
 }

@@ -124,7 +124,7 @@ struct QueueEntry: View {
 }
 
 struct NowPlayingViewHost: View {
-    @State var isMinimized: Bool = false //should start as true
+    @State var isMinimized: Bool = true //should start as true
     @State var isPlaying: Bool
   @State var songsList: [song]?
     //TODO- needs the title, artist, votes, and image of the current song, as well as the song itself
@@ -254,9 +254,9 @@ struct NowPlayingViewHost: View {
                     }
                     .padding(.all)
                 }
-                .padding(.top)//.onTapGesture {
-                    //isMinimized = !isMinimized
-                //}
+                .padding(.top).onTapGesture {
+                    isMinimized = !isMinimized
+                }
                 
             }
         }.onAppear(perform: {

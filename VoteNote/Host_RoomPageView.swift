@@ -73,10 +73,13 @@ struct Host_RoomPageView: View {
               Spacer()
             }
           })
+            
+            
         }
       }
       .navigationTitle("Room")
       .navigationBarHidden(true)
+        
     }
   }
   
