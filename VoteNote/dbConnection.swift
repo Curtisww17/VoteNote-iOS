@@ -124,7 +124,6 @@ func getCurrRoom(completion: @escaping (String, Error?) -> Void){
     var currRoom = ""
     db.collection("users").document(FAuth.currentUser!.uid).getDocument { (res, err) in
         currRoom = res?.data()!["currentRoom"] as! String
-        print("\n\n\n\n\n\(currRoom)")
         completion(currRoom, nil)
     }
     //return currRoom
@@ -217,24 +216,26 @@ func makeRoom(newRoom: room) -> Bool{
 func getQueue(completion: @escaping ([song]?, Error?) -> Void){
     
     getCurrRoom { (currRoom, err) in
-    
-        let docref = db.collection("room").document(currRoom)
-        docref.getDocument { (doc, err) in
-        if let err = err {
-            print("Error getting song \(err)")
-            completion(nil, err)
-        } else{
-            let queue: Dictionary? = doc?.data()?["queue"] as? Dictionary<String, Any?>
-            if queue != nil {
+
+        let joiningQuery = db.collection("room").whereField("code", isEqualTo: currRoom)
+        
+        joiningQuery.getDocuments { (docs, err) in
+            if let err = err {
+                print("\n\n\n Error Getting Queue \(err)")
+                completion(nil, err)
+            } else {
+                let queue = docs?.documents[0].data()["queue"] as? [String: Any]
                 var songs: [song] = []
-                for (id, s) in queue!{
-                    songs.append(song(sng: s as! [String : Any], id: id))
+                if queue != nil {
+                    for (id, s) in queue!{
+                        print("\n\n\n\n\(id), \(s)")
+                        songs.append(song(sng: s as! [String: Any], id: id))
+                    }
                 }
                 completion(songs, nil)
             }
             completion(nil, nil)
         }
-    }
     }//end getCurrRoom
     
     
