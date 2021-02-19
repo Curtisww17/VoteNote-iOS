@@ -14,7 +14,14 @@ struct HostController: View {
   @State var showNav = true
     @State var roomName: String
     @State var roomDescription: String
+    @State var notExited: Bool = false
   
+    func exitRoom() {
+        print("Left Room")
+        leaveRoom()
+        notExited = true
+    }
+    
   @State var currentView = 1
   var body: some View {
     OperationQueue.main.addOperation {
@@ -60,10 +67,24 @@ struct HostController: View {
         Host_RoomPageView(roomName: roomName, roomDescription: roomDescription, roomCapacity: 5, songsPerUser: 5, showNav: $showNav)
           .animation(.default)
           .transition(.move(edge: .trailing))
+        
+        Button(action: {
+            exitRoom()
+        }, label: {
+          HStack {
+            Spacer()
+            Text("Leave Room")
+                .foregroundColor(Color.red)
+            Spacer()
+          }
+        })
+        .padding(.vertical)
       }
     }
     .navigationTitle("Lobby")
-    .navigationBarHidden(true)
+    .navigationBarHidden(true).onAppear(perform: {
+        notExited = false
+    }).navigate(to: LandingPageView(), when: $notExited)
   }
 }
 
