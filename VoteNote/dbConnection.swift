@@ -305,7 +305,7 @@ func addsong(id: String) -> Int{
     sharedSpotify.getTrackInfo(track_uri: id) { (track) in
         if track != nil{
             for art in track!.artists! {
-                artist += art.name
+                artist += art.name + " "
             }
             length = (track?.duration_ms)!
             title = track!.name
@@ -325,15 +325,9 @@ func addsong(id: String) -> Int{
                        "numvotes": 0] as [String : Any]
             
             
-            if( query?.documents[0].data()["queue"] == nil ){ //the queue doesnt exist in this room yet
-                db.collection("room").document(docid!).updateData([
-                    "queue": [id: sng ]
-                ])
-            } else {
-                db.collection("room").document(docid!).updateData([
-                    "queue.id": sng
-                ])
-            }
+            db.collection("room").document(docid!).updateData([
+                "queue.\(id)": sng
+            ])
         }
     }
     }//end sharedSpotify
