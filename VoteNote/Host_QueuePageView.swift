@@ -259,12 +259,12 @@ struct NowPlayingViewHost: View {
                 }
                 
             }
-        }.onAppear(perform: {
+        }/*.onAppear(perform: {
             getQueue(){(songs, err) in
                 print(songs)
                 songsList = songs
             }
-        })
+        })*/
     }
 }
 
