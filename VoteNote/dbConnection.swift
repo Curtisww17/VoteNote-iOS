@@ -149,6 +149,7 @@ func login(name: String){
     }
 }
 
+//to leave the room, send this method ""
 func joinRoom(code: String) -> room?{
     //put the user in the correct roomm
    
