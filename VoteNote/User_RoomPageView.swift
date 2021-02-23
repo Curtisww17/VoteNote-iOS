@@ -14,6 +14,7 @@ struct User_RoomPageView: View {
   var roomDescription: String = "Description goes here"
   var roomCapacity: Int = 5
   var songsPerUser: Int = 5
+  @ObservedObject var currentRoom: CurrentRoom = CurrentRoom()
   
   @Binding var showNav: Bool
   
@@ -47,6 +48,20 @@ struct User_RoomPageView: View {
                                 Text("Users")
                               }
                             })
+            NavigationLink(destination: RoomCodeView(currentRoom: currentRoom)
+                            .onAppear(perform: {
+                              showNav = false
+                            })
+                            .onDisappear(perform: {
+                              showNav = true
+                            }), label: {
+                              HStack {
+                                Image(systemName: "qrcode")
+                                  .foregroundColor(Color.accentColor)
+                                  .padding()
+                                Text("Code")
+                              }
+                            })
           }
           
           Section(header: Text("Room Settings")) {
@@ -63,16 +78,6 @@ struct User_RoomPageView: View {
               Text("\(songsPerUser)")
             }
           }
-          Button(action: {
-            actionSheet()
-          }, label: {
-            HStack {
-              Spacer()
-              Text("Share Room Code")
-                .foregroundColor(Color.accentColor)
-              Spacer()
-            }
-          })
         }
       }
       .navigationTitle("Room")
@@ -80,13 +85,6 @@ struct User_RoomPageView: View {
     }
   }
   
-  func actionSheet() {
-    getCurrRoom(completion: { code, err in
-      let data = code ?? " No Code Found"
-      let av = UIActivityViewController(activityItems: [data], applicationActivities: nil)
-      UIApplication.shared.windows.first?.rootViewController?.present(av, animated: true, completion: nil)
-    })
-  }
 }
 
 

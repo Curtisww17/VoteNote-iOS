@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import CodeScanner
 
 
 struct JoinRoomView: View {
@@ -15,6 +16,7 @@ struct JoinRoomView: View {
   
   @State var code = ""
   @State var joined = false
+  @State private var isShowingScanner = false
   
   func join(c: String) {
     let ret = joinRoom(code: c)
@@ -29,48 +31,69 @@ struct JoinRoomView: View {
   
   var body: some View {
     //return NavigationView {
-      ZStack {
-        //Color.white
-        VStack {
-          Text("Join Room")
-          /*
-          NavigationLink(
-            destination: UserController(isInRoom: $isInRoom),
-            label: {
-              Text("go to User Queue Page")
-            })*/
-          TextField("Room Code", text: $code).multilineTextAlignment(.center)
-          
-          if self.code != "" {
-              Button(action: {
-                join(c: code)
-                //print("\n\n\n\n\n\n\n\n\n\n\n\\n\(code)")
-              }) {
-                  Text("Join Room")
-                      
-              }.padding()
-          }
+    ZStack {
+      //Color.white
+      VStack {
+        Text("Join Room")
+        /*
+         NavigationLink(
+         destination: UserController(isInRoom: $isInRoom),
+         label: {
+         Text("go to User Queue Page")
+         })*/
+        TextField("Room Code", text: $code).multilineTextAlignment(.center)
+        Button(action: {
+          self.isShowingScanner = true
+        }, label: {
+          Text("Join with QR")
+        })
+        
+        if self.code != "" {
+          Button(action: {
+            join(c: code)
+            //print("\n\n\n\n\n\n\n\n\n\n\n\\n\(code)")
+          }) {
+            Text("Join Room")
+            
+          }.padding()
         }
       }
-      .navigationBarHidden(true)
+    }
+    .navigationBarHidden(true)
+    .sheet(isPresented: $isShowingScanner) {
+      CodeScannerView(codeTypes: [.qr], simulatedData: "1QCXT", completion: self.handleScan)
+    }
     /*}*/.navigate(to: UserController( isInRoom: $isInRoom), when: $joined).onAppear(perform: {sharedSpotify.pause()}).navigationViewStyle(StackNavigationViewStyle())
+  }
+  
+  func handleScan(result: Result<String, CodeScannerView.ScanError>) {
+    self.isShowingScanner = false
+    // Handle the scan
+    
+    switch result {
+    case .success(let code):
+      join(c: code)
+    case .failure(let error):
+      print("Scanning failed")
+    }
+    
   }
 }
 
 /*struct JoinRoomView_Previews: PreviewProvider {
-  static var previews: some View {
-    JoinRoomView()
-  }
-}*/
+ static var previews: some View {
+ JoinRoomView()
+ }
+ }*/
 
 struct JoinRoomView_PreviewContainer: View {
-    
+  
   @State var isInRoom = false
   //@State var spotify: Spotify = Spotify()
-
-    var body: some View {
-      JoinRoomView(isInRoom: $isInRoom)
-    }
+  
+  var body: some View {
+    JoinRoomView(isInRoom: $isInRoom)
+  }
 }
 
 
