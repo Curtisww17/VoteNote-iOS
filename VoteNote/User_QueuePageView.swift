@@ -16,10 +16,10 @@ struct User_QueuePageView: View {
   
   
   var body: some View {
-    getQueue(completion: {songs, err in
+    /*getQueue(completion: {songs, err in
       self.songsList = songs
     })
-    return NavigationView {
+    return NavigationView {*/
       VStack {
         
         List {
@@ -32,7 +32,7 @@ struct User_QueuePageView: View {
       }
       .navigationBarHidden(true)
     }
-  }
+  //}
 }
 
 struct NowPlayingViewUser: View {

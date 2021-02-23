@@ -11,7 +11,7 @@ import SwiftUI
 
 struct JoinRoomView: View {
   @Binding var isInRoom: Bool
-  @ObservedObject var spotify: Spotify = sharedSpotify
+  //@ObservedObject var spotify: Spotify = sharedSpotify
   
   @State var code = ""
   @State var joined = false
@@ -28,7 +28,7 @@ struct JoinRoomView: View {
   
   
   var body: some View {
-    return NavigationView {
+    //return NavigationView {
       ZStack {
         //Color.white
         VStack {
@@ -53,7 +53,7 @@ struct JoinRoomView: View {
         }
       }
       .navigationBarHidden(true)
-    }.navigate(to: UserController( isInRoom: $isInRoom), when: $joined).onAppear(perform: {sharedSpotify.pause()})
+    /*}*/.navigate(to: UserController( isInRoom: $isInRoom), when: $joined).onAppear(perform: {sharedSpotify.pause()}).navigationViewStyle(StackNavigationViewStyle())
   }
 }
 
@@ -66,10 +66,10 @@ struct JoinRoomView: View {
 struct JoinRoomView_PreviewContainer: View {
     
   @State var isInRoom = false
-  @State var spotify: Spotify = Spotify()
+  //@State var spotify: Spotify = Spotify()
 
     var body: some View {
-      JoinRoomView(isInRoom: $isInRoom, spotify: spotify)
+      JoinRoomView(isInRoom: $isInRoom)
     }
 }
 

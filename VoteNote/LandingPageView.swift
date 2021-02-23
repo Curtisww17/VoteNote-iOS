@@ -53,7 +53,7 @@ struct LandingPageView: View {
       .navigationTitle("Lobby")
       .navigationBarHidden(true)
     }
-    .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading).onAppear(perform: {sharedSpotify.pause()})
+    .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading).onAppear(perform: {sharedSpotify.pause()}).navigationViewStyle(StackNavigationViewStyle())
     
   }
 }

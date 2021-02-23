@@ -15,11 +15,12 @@ struct Host_RoomPageView: View {
   var roomCapacity: Int
   var songsPerUser: Int
   @Binding var showNav: Bool
+    //@State var notExited: Bool = true
   //TODO- make the room capacity, songs per user actually do stuff
   
   var body: some View {
     //return NavigationView {
-    return ZStack {
+    /*return*/ ZStack {
       VStack {
         
         Form {
@@ -78,9 +79,11 @@ struct Host_RoomPageView: View {
         }
       }
       .navigationTitle("Room")
-      .navigationBarHidden(true)
+      .navigationBarHidden(true).navigationViewStyle(StackNavigationViewStyle())
         
-    }
+    }/*.onAppear(perform: {
+        notExited = false
+    }).navigate(to: LandingPageView(), when: $notExited)*/.navigationViewStyle(StackNavigationViewStyle())
   }
   
   func actionSheet() {
