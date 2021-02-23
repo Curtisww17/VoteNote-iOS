@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 var selectedSongs: [song] = [song]()
-var tempSongs: [song] = [song]()
+
 struct AddMusicView: View {
     @State var currentSearch: String = "" { //iOS 13 and earlier uses observer
         didSet {
@@ -21,7 +21,6 @@ struct AddMusicView: View {
         }
     }
     @State private var isEditing = false
-    
     //@ObservedObject var spotify = sharedSpotify
     
     @Environment(\.presentationMode) var presentationMode
@@ -40,9 +39,7 @@ struct AddMusicView: View {
         
         for i in selectedSongs {
             print("Added")
-            //addsong(id: i.id) //there's an issue here
-            tempSongs.append(i)
-            sharedSpotify.enqueue(songID: i.id)
+            addsong(id: i.id) //there's an issue here
             print("Done")
         }
         
