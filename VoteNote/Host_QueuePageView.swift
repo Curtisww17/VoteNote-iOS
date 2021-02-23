@@ -55,6 +55,7 @@ struct Host_QueuePageView: View {
             ForEach(songQueue.musicList) { song in
                 QueueEntry(curSong: song)
             }
+            
         }
         
         NowPlayingViewHost(isPlaying: isPlaying, songsList: songQueue.musicList)
