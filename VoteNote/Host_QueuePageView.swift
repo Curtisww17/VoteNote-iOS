@@ -170,14 +170,18 @@ struct NowPlayingViewHost: View {
     func playSong(){
         //TODO- check remaining time in song
         //if nowPlaying != nil {
-            sharedSpotify.resume()
+        sharedSpotify.appRemote?.playerAPI?.resume({ (_, error) in
+          print(error)
+        })
             isPlaying = true
         //}
     }
     
     func pauseSong(){
         //if nowPlaying != nil {
-            sharedSpotify.pause()
+        sharedSpotify.appRemote?.playerAPI?.pause({ (_, error) in
+          print(error)
+        })
             print("Pause")
             isPlaying = false
         //}
@@ -185,9 +189,14 @@ struct NowPlayingViewHost: View {
     
     //TO-DO: Add based on number of votes
     func skipSong(){
+        print(songsList)
         if /*nowPlaying != nil &&*/ songsList.count > 0 {
+            print("skip")
             sharedSpotify.enqueue(songID: songsList[0].id) //borked
-            sharedSpotify.skip()
+            
+            sharedSpotify.appRemote?.playerAPI?.skip(toNext: { (_, error) in
+              print(error)
+            })
             nowPlaying = songsList[0]
             vetoSong(id: songsList[0].id)
             songsList.remove(at: 0)
