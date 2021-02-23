@@ -104,7 +104,6 @@ class MusicQueue: Identifiable, ObservableObject {
 struct QueueEntry: View {
     //TODO- Get current song info
     //TODO- swiping for vetoing songs and viewing the user
-    //SWIPING NOT DONE
     @State var curSong: song
     @State var showingExtras: Bool = false
     

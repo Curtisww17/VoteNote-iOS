@@ -10,10 +10,10 @@ import SwiftUI
 
 struct User_RoomPageView: View {
   @State var currentView = 1
-  var roomName: String = "Primanti Bros."
-  var roomDescription: String = "Description goes here"
-  var roomCapacity: Int = 5
-  var songsPerUser: Int = 5
+  @State var roomName: String
+  @State var roomDescription: String
+  @State var roomCapacity: Int
+  @State var songsPerUser: Int
   @ObservedObject var currentRoom: CurrentRoom = CurrentRoom()
   
   @Binding var showNav: Bool
