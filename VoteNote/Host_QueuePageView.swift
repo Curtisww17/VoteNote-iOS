@@ -183,7 +183,11 @@ struct NowPlayingViewHost: View {
     
     //TO-DO: Add based on number of votes
     func skipSong(){
-        if /*nowPlaying != nil &&*/ songQueue.musicList.count > 0 {
+        if /*nowPlaying != nil &&*/
+            songQueue.musicList.count > 0 {
+            
+            print("Current Number of Songs in Queue \(songQueue.musicList.count)")
+            
             sharedSpotify.enqueue(songID: songQueue.musicList[0].id) //borked
             sharedSpotify.skip()
             nowPlaying = songQueue.musicList[0]
