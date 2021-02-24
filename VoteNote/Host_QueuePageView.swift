@@ -57,7 +57,7 @@ struct Host_QueuePageView: View {
             }
         }
         
-        NowPlayingViewHost(isPlaying: isPlaying, songsList: songQueue.musicList)
+        NowPlayingViewHost(isPlaying: isPlaying, songQueue: songQueue)
         
         //Text("Host Queue Page!")
         
@@ -162,7 +162,7 @@ struct QueueEntry: View {
 struct NowPlayingViewHost: View {
     @State var isMinimized: Bool = true //should start as true
     @State var isPlaying: Bool
-  @State var songsList: [song]
+  @ObservedObject var songQueue: MusicQueue
     //TODO- needs the title, artist, votes, and image of the current song, as well as the song itself
     
     func playSong(){
@@ -187,15 +187,16 @@ struct NowPlayingViewHost: View {
     
     //TO-DO: Add based on number of votes
     func skipSong(){
-        
-        if /*nowPlaying != nil &&*/ songsList.count > 0 {
-            sharedSpotify.enqueue(songID: songsList[0].id) //borked
-            sharedSpotify.appRemote?.playerAPI?.skip(toNext: { (_, error) in
-              print(error)
-            })
-            nowPlaying = songsList[0]
-            vetoSong(id: songsList[0].id)
-            songsList.remove(at: 0)
+        if /*nowPlaying != nil &&*/
+            songQueue.musicList.count > 0 {
+            
+            print("Current Number of Songs in Queue \(songQueue.musicList.count)")
+            
+            sharedSpotify.enqueue(songID: songQueue.musicList[0].id) //borked
+            sharedSpotify.skip()
+            nowPlaying = songQueue.musicList[0]
+            vetoSong(id: songQueue.musicList[0].id)
+            songQueue.musicList.remove(at: 0)
         }
     }
     
