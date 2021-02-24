@@ -15,11 +15,13 @@ struct Host_RoomPageView: View {
   var roomCapacity: Int
   var songsPerUser: Int
   @Binding var showNav: Bool
+  @ObservedObject var currentRoom: CurrentRoom = CurrentRoom()
+    //@State var notExited: Bool = true
   //TODO- make the room capacity, songs per user actually do stuff
   
   var body: some View {
     //return NavigationView {
-    return ZStack {
+    /*return*/ ZStack {
       VStack {
         
         Form {
@@ -47,6 +49,20 @@ struct Host_RoomPageView: View {
                                 Text("Users")
                               }
                             })
+            NavigationLink(destination: RoomCodeView(currentRoom: currentRoom)
+                            .onAppear(perform: {
+                              showNav = false
+                            })
+                            .onDisappear(perform: {
+                              showNav = true
+                            }), label: {
+                              HStack {
+                                Image(systemName: "qrcode")
+                                  .foregroundColor(Color.accentColor)
+                                  .padding()
+                                Text("Code")
+                              }
+                            })
           }
           
           Section(header: Text("Room Settings")) {
@@ -63,32 +79,18 @@ struct Host_RoomPageView: View {
               Text("\(songsPerUser)")
             }
           }
-          Button(action: {
-            actionSheet()
-          }, label: {
-            HStack {
-              Spacer()
-              Text("Share Room Code")
-                .foregroundColor(Color.accentColor)
-              Spacer()
-            }
-          })
             
             
         }
       }
       .navigationTitle("Room")
-      .navigationBarHidden(true)
+      .navigationBarHidden(true).navigationViewStyle(StackNavigationViewStyle())
         
     }
+    /*.onAppear(perform: {
+        notExited = false
+    }).navigate(to: LandingPageView(), when: $notExited)*/.navigationViewStyle(StackNavigationViewStyle())
   }
   
-  func actionSheet() {
-    getCurrRoom(completion: { code, err in
-      let data = code ?? " No Code Found"
-      let av = UIActivityViewController(activityItems: [data], applicationActivities: nil)
-      UIApplication.shared.windows.first?.rootViewController?.present(av, animated: true, completion: nil)
-    })
-    
-  }
+  
 }

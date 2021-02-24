@@ -11,28 +11,69 @@ import SwiftUI
 struct User_QueuePageView: View {
     @State var currentView = 0
   @ObservedObject var spotify = sharedSpotify
-  @State var songsList: [song]?
-  
+  //@State var songsList: [song]?
+    @State var queueRefreshSeconds = 60
+    @State var voteUpdateSeconds = 10
+    @ObservedObject var songQueue: MusicQueue = MusicQueue()
+    
+    let refreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
   
   
   var body: some View {
-    getQueue(completion: {songs, err in
-      self.songsList = songs
-    })
-    return NavigationView {
       VStack {
         
+        HStack {
+            Text("\(voteUpdateSeconds)").font(.largeTitle).multilineTextAlignment(.trailing).onReceive(refreshTimer) {
+                _ in
+                if self.voteUpdateSeconds > 0 {
+                    self.voteUpdateSeconds -= 1
+                } else {
+                    self.voteUpdateSeconds = 10
+                    print("Updating Queue")
+                    
+                    getQueue(){(songs, err) in
+                        if songs != nil {
+                            if songs!.count > 0 {
+                                songQueue.musicList.removeAll()
+                                var count: Int = 0
+                                while count < songs!.count {
+                                    songQueue.musicList.append(songs![count])
+                                    count = count + 1
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }.hidden()
+        
         List {
-            ForEach(songsList ?? []) { song in
+            ForEach(songQueue.musicList) { song in
                 QueueEntry(curSong: song)
             }
         }
         
         NowPlayingViewUser()
       }
-      .navigationBarHidden(true)
-    }
+      .navigationBarHidden(true).onAppear(perform: {
+        print("Updating Queue...")
+        
+        getQueue(){(songs, err) in
+            if songs != nil {
+                if songs!.count > 0 {
+                    songQueue.musicList.removeAll()
+                    var count: Int = 0
+                    while count < songs!.count {
+                        songQueue.musicList.append(songs![count])
+                        count = count + 1
+                    }
+                }
+            }
+        }
+        print("Queue Updated!")
+      })
   }
+  //}
 }
 
 struct NowPlayingViewUser: View {

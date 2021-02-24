@@ -122,7 +122,7 @@ struct AddMusicView: View {
             }
         }.navigationBarHidden(true).onAppear(perform: {
             selectedSongs.removeAll()
-        })
+        }).navigationViewStyle(StackNavigationViewStyle())
     }
 }
 
@@ -193,11 +193,11 @@ struct SearchEntry: View {
     }
 }
 
-/*struct AddMusicView_PreviewsContainer: View {
-    @State var spotify: Spotify = Spotify()
+struct AddMusicView_PreviewsContainer: View {
+    //@State var spotify: Spotify = Spotify()
 
     var body: some View {
-        AddMusicView(spotify: spotify)
+        AddMusicView()
     }
 }
 
@@ -205,4 +205,4 @@ struct AddMusicView_Previews: PreviewProvider {
   static var previews: some View {
     AddMusicView_PreviewsContainer()
   }
-}*/
+}

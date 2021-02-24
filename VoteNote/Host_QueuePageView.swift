@@ -15,30 +15,49 @@ var isPlaying: Bool = false //should be false by default
 struct Host_QueuePageView: View {
     @State var currentView = 0
     @ObservedObject var spotify = sharedSpotify
-  @State var songsList: [song]?
+    //@State var songsList: [song]?
+    @State var queueRefreshSeconds = 60
+    @State var voteUpdateSeconds = 10
+    @ObservedObject var songQueue: MusicQueue = MusicQueue()
+    
+    let refreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
   
   var body: some View {
-    //getQueue(completion: {songs, err in
-      //self.songsList = songs
-    //})
-    //return NavigationView {
     ZStack {
       VStack {
         
-        //temporary button for testing
-        /*NavigationLink(
-          destination: AddMusicView().navigationBarTitle("Browse"),
-          label: {
-          Text("Add")
-          })*/
+        HStack {
+            Text("\(voteUpdateSeconds)").font(.largeTitle).multilineTextAlignment(.trailing).onReceive(refreshTimer) {
+                _ in
+                if self.voteUpdateSeconds > 0 {
+                    self.voteUpdateSeconds -= 1
+                } else {
+                    self.voteUpdateSeconds = 10
+                    print("Updating Queue")
+                    
+                    getQueue(){(songs, err) in
+                        if songs != nil {
+                            if songs!.count > 0 {
+                                songQueue.musicList.removeAll()
+                                var count: Int = 0
+                                while count < songs!.count {
+                                    songQueue.musicList.append(songs![count])
+                                    count = count + 1
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }.hidden()
         
         List {
-            ForEach(songsList ?? []) { song in
+            ForEach(songQueue.musicList) { song in
                 QueueEntry(curSong: song)
             }
         }
         
-        NowPlayingViewHost(isPlaying: isPlaying)
+        NowPlayingViewHost(isPlaying: isPlaying, songQueue: songQueue)
         
         //Text("Host Queue Page!")
         
@@ -53,23 +72,38 @@ struct Host_QueuePageView: View {
       .navigationBarHidden(true)
     }.onAppear(perform: {
         //makes the first song in the queue to first to play
-        if nowPlaying == nil && (songsList ?? []).count > 0 {
-            nowPlaying = songsList![0]
-            sharedSpotify.enqueue(songID: songsList![0].id)
-            vetoSong(id: songsList![0].id)
+        if nowPlaying == nil && songQueue.musicList.count > 0 /*&& (songsList ?? []).count > 0*/ {
+            nowPlaying = songQueue.musicList[0]
+            sharedSpotify.enqueue(songID: songQueue.musicList[0].id)
+            vetoSong(id: songQueue.musicList[0].id)
         }
-        getQueue(){(songs, err) in
-            songsList = songs
-        }
+        print("Updating Queue...")
         
-    })
+        getQueue(){(songs, err) in
+            if songs != nil {
+                if songs!.count > 0 {
+                    songQueue.musicList.removeAll()
+                    var count: Int = 0
+                    while count < songs!.count {
+                        songQueue.musicList.append(songs![count])
+                        count = count + 1
+                    }
+                }
+            }
+        }
+        print("Queue Updated!")
+        
+    }).navigationViewStyle(StackNavigationViewStyle())
   }
+}
+
+class MusicQueue: Identifiable, ObservableObject {
+    var musicList: [song] = [song]()
 }
 
 struct QueueEntry: View {
     //TODO- Get current song info
     //TODO- swiping for vetoing songs and viewing the user
-    //SWIPING NOT DONE
     @State var curSong: song
     @State var showingExtras: Bool = false
     
@@ -83,10 +117,7 @@ struct QueueEntry: View {
     
     var body: some View {
         
-        let swipeGesture = DragGesture().onEnded {_ in
-            showingExtras = !showingExtras
-        }
-        ZStack{
+        ZStack {
             VStack {
                 HStack {
                     Image(systemName: "person.crop.square.fill").resizable().frame(width: 35.0, height: 35.0)
@@ -103,7 +134,12 @@ struct QueueEntry: View {
                     }
                     
                     Spacer()
-                    Text("\(curSong.numVotes!)")
+                    if curSong.numVotes != nil {
+                        Text("0")
+                    } /*else {
+                        Text("\(curSong.numVotes!)")
+                    }*/
+                    
                     Button(action: {upVoteSong()}) {
                         Image(systemName: "hand.thumbsup").resizable().frame(width: 30.0, height: 30.0)
                     }
@@ -126,7 +162,7 @@ struct QueueEntry: View {
 struct NowPlayingViewHost: View {
     @State var isMinimized: Bool = true //should start as true
     @State var isPlaying: Bool
-  @State var songsList: [song]?
+  @ObservedObject var songQueue: MusicQueue
     //TODO- needs the title, artist, votes, and image of the current song, as well as the song itself
     
     func playSong(){
@@ -147,12 +183,17 @@ struct NowPlayingViewHost: View {
     
     //TO-DO: Add based on number of votes
     func skipSong(){
-        //if /*nowPlaying != nil &&*/ (songsList ?? []).count > 0 {
-            sharedSpotify.enqueue(songID: songsList![0].id) //borked
+        if /*nowPlaying != nil &&*/
+            songQueue.musicList.count > 0 {
+            
+            print("Current Number of Songs in Queue \(songQueue.musicList.count)")
+            
+            sharedSpotify.enqueue(songID: songQueue.musicList[0].id) //borked
             sharedSpotify.skip()
-            nowPlaying = songsList![0]
-            vetoSong(id: songsList![0].id)
-        //}
+            nowPlaying = songQueue.musicList[0]
+            vetoSong(id: songQueue.musicList[0].id)
+            songQueue.musicList.remove(at: 0)
+        }
     }
     
     func previousSong(){
@@ -165,113 +206,109 @@ struct NowPlayingViewHost: View {
 
     var body: some View {
         ZStack {
-            if isMinimized {
-                HStack {
-                    Spacer()
-                    Spacer()
-                    Spacer()
-                    Spacer()
-                    Spacer()
-                    Spacer()
-                    Image(systemName: "person.crop.square.fill").resizable().frame(width: 40.0, height: 40.0)
-                    VStack {
-                        HStack {
-                            if nowPlaying == nil {
-                                Text("None Selected").padding(.leading)
-                            } else {
-                                Text(nowPlaying!.title).padding(.leading)
-                            }
-                            Spacer()
-                        }
-                        HStack {
-                            if nowPlaying != nil {
-                                Text(nowPlaying!.artist).font(.caption)
-                                    .foregroundColor(Color.gray).padding(.leading)
-                            }
-                            Spacer()
-                        }
-                    }
-                    Spacer()
-                    Spacer()
-                }
-                .padding(.vertical).onTapGesture {
+            Button(action: {
                     isMinimized = !isMinimized
-                }
-            } else {
-                VStack {
-                    Image(systemName: "person.crop.square.fill").resizable().frame(width: 160.0, height: 160.0)
+                
+            }) {
+                if isMinimized {
                     HStack {
                         Spacer()
-                        if nowPlaying == nil {
-                            Text("None Selected")
-                                .padding(.leading)
-                        } else {
-                            Text(nowPlaying!.title)
-                                .padding(.leading)
+                        Spacer()
+                        Spacer()
+                        Spacer()
+                        Spacer()
+                        Spacer()
+                        Image(systemName: "person.crop.square.fill").resizable().frame(width: 40.0, height: 40.0)
+                        VStack {
+                            HStack {
+                                if nowPlaying == nil {
+                                    Text("None Selected").padding(.leading)
+                                } else {
+                                    Text(nowPlaying!.title).padding(.leading)
+                                }
+                                Spacer()
+                            }
+                            HStack {
+                                if nowPlaying != nil {
+                                    Text(nowPlaying!.artist).font(.caption)
+                                        .foregroundColor(Color.gray).padding(.leading)
+                                }
+                                Spacer()
+                            }
                         }
                         Spacer()
+                        Spacer()
                     }
-                    
-                    if nowPlaying != nil {
-                        Text(nowPlaying!.artist)
-                            .font(.caption)
-                    }
-                    
-                    HStack {
-                        if nowPlaying != nil {
-                            Text("\(nowPlaying!.numVotes!)")
-                        } else {
-                            Text("0")
+                    .padding(.vertical)
+                } else {
+                    VStack {
+                        Image(systemName: "person.crop.square.fill").resizable().frame(width: 160.0, height: 160.0)
+                        HStack {
+                            Spacer()
+                            if nowPlaying == nil {
+                                Text("None Selected")
+                                    .padding(.leading)
+                            } else {
+                                Text(nowPlaying!.title)
+                                    .padding(.leading)
+                            }
+                            Spacer()
                         }
                         
-                        Spacer()
-                        Button(action: {previousSong()}) {
-                            Image(systemName: "backward").resizable().frame(width: 25.0, height: 20.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
+                        if nowPlaying != nil {
+                            Text(nowPlaying!.artist)
+                                .font(.caption)
                         }
-                        Spacer()
-                        Button(action: {if isPlaying {
-                            pauseSong()
-                        } else {
-                            playSong()
-                        }}) {
-                            if isPlaying {
-                                Image(systemName: "pause").resizable().frame(width: 20.0, height: 25.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
+                        
+                        HStack {
+                            if nowPlaying != nil {
+                                Text("\(nowPlaying!.numVotes!)")
                             } else {
-                                Image(systemName: "play")
-                                    .resizable().frame(width: 20.0, height: 25.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
+                                Text("0")
+                            }
+                            
+                            Spacer()
+                            Button(action: {previousSong()}) {
+                                Image(systemName: "backward").resizable().frame(width: 25.0, height: 20.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
+                            }
+                            Spacer()
+                            Button(action: {if isPlaying {
+                                pauseSong()
+                            } else {
+                                playSong()
+                            }}) {
+                                if isPlaying {
+                                    Image(systemName: "pause").resizable().frame(width: 20.0, height: 25.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
+                                } else {
+                                    Image(systemName: "play")
+                                        .resizable().frame(width: 20.0, height: 25.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
+                                }
+                            }
+                            Spacer()
+                            Button(action: {skipSong()}) {
+                                Image(systemName: "forward").resizable().frame(width: 25.0, height: 20.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
+                                
+                            }
+                            Spacer()
+                            Button(action: {favoriteSong()}) {
+                                Image(systemName: "heart")
+                                    .foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
                             }
                         }
-                        Spacer()
-                        Button(action: {skipSong()}) {
-                            Image(systemName: "forward").resizable().frame(width: 25.0, height: 20.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
-                            
-                        }
-                        Spacer()
-                        Button(action: {favoriteSong()}) {
-                            Image(systemName: "heart")
-                                .foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
-                        }
+                        .padding(.all)
                     }
-                    .padding(.all)
+                    .padding(.top)
                 }
-                .padding(.top).onTapGesture {
-                    isMinimized = !isMinimized
-                }
-                
             }
-        }/*.onAppear(perform: {
-            getQueue(){(songs, err) in
-                print(songs)
-                songsList = songs
-            }
-        })*/
+        }
     }
 }
 
 struct Host_QueuePageView_PreviewContainer: View {
-
+    @ObservedObject var songQueue: MusicQueue = MusicQueue()
+    
     var body: some View {
-        Host_QueuePageView()
+        Host_QueuePageView(songQueue: songQueue)
     }
 }
 

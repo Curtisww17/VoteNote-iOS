@@ -46,7 +46,7 @@ struct CreateRoomView: View {
     }
     
   var body: some View {
-    return NavigationView {
+    //return NavigationView {
       ZStack {
         Color.white
         VStack {
@@ -82,8 +82,8 @@ struct CreateRoomView: View {
           
           Spacer()
         }
-      }
-    }.navigationBarHidden(true).navigate(to: HostController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription), when: $madeRoom).onAppear(perform: {sharedSpotify.pause()})
+      //}
+    }.navigationBarHidden(true).navigate(to: HostController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription), when: $madeRoom).onAppear(perform: {sharedSpotify.pause()}).navigationViewStyle(StackNavigationViewStyle())
   }
 }
   

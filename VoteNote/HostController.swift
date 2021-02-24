@@ -84,7 +84,7 @@ struct HostController: View {
     .navigationTitle("Lobby")
     .navigationBarHidden(true).onAppear(perform: {
         notExited = false
-    }).navigate(to: LandingPageView(), when: $notExited)
+    }).navigate(to: LandingPageView(), when: $notExited).navigationViewStyle(StackNavigationViewStyle())
   }
 }
 
