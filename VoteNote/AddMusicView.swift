@@ -13,10 +13,10 @@ var selectedSongs: [song] = [song]()
 struct AddMusicView: View {
     @State var currentSearch: String = "" { //iOS 13 and earlier uses observer
         didSet {
-            if currentSearch != "" {
+            if currentSearch != " " {
                 sharedSpotify.searchSong(completion: { search in
                     sharedSpotify.recentSearch = search
-                  },Query: currentSearch, limit: "20", offset: "0")
+                  },Query: currentSearch + " ", limit: "20", offset: "0")
             }
         }
     }
@@ -57,7 +57,7 @@ struct AddMusicView: View {
                         TextField("Search Music", text: $currentSearch).onChange(of: self.currentSearch, perform: { value in
                             sharedSpotify.searchSong(completion: { search in
                                 sharedSpotify.recentSearch = search
-                              },Query: currentSearch, limit: "20", offset: "0")
+                              },Query: currentSearch  + " ", limit: "20", offset: "0")
                         })
                             .padding(7)
                             .padding(.horizontal, 25)

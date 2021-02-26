@@ -53,7 +53,7 @@ struct Host_QueuePageView: View {
         
         List {
             ForEach(songQueue.musicList) { song in
-                QueueEntry(curSong: song)
+                QueueEntry(curSong: song, songQueue: songQueue)
             }
         }
         
@@ -106,6 +106,12 @@ struct QueueEntry: View {
     //TODO- swiping for vetoing songs and viewing the user
     @State var curSong: song
     @State var showingExtras: Bool = false
+    @ObservedObject var songQueue: MusicQueue
+    
+    let width : CGFloat = 60
+    @State var offset = CGSize.zero
+    @State var scale : CGFloat = 0.5
+    @State var opened = false
     
     func upVoteSong(){
         //TODO- Implement Upvoting
@@ -113,6 +119,19 @@ struct QueueEntry: View {
     
     func downVoteSong(){
         //TODO- Implement Downvoting
+    }
+    
+    func vetoMusic(){
+        vetoSong(id: curSong.id)
+        
+        var count: Int = 0
+        while count < songQueue.musicList.count {
+            if curSong.id == songQueue.musicList[count].id {
+                songQueue.musicList.remove(at: count)
+                count = songQueue.musicList.count
+            }
+            count = count + 1
+        }
     }
     
     var body: some View {
@@ -147,15 +166,52 @@ struct QueueEntry: View {
                         Image(systemName: "hand.thumbsdown").resizable().frame(width: 30.0, height: 30.0)
                     }
                     
-                    if showingExtras {
-                        Button(action: {vetoSong(id: curSong.id)}) {
-                            Text("Veto")
+                    Image(systemName: "chevron.right").resizable().frame(width: 10.0, height: 20.0).foregroundColor(/*@START_MENU_TOKEN@*/.gray/*@END_MENU_TOKEN@*/)
+                    
+                    if opened {
+                        HStack {
+                            Button(action: {vetoMusic()}) {
+                                Text("Veto")
+                            }.padding(.all).background(Color.red).border(/*@START_MENU_TOKEN@*/Color.red/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/2/*@END_MENU_TOKEN@*/)
+                            
+                            /*Button(action: {vetoSong(id: curSong.id)}) {
+                                Text("User")
+                            }.padding(.all).border(/*@START_MENU_TOKEN@*/Color.gray/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/2/*@END_MENU_TOKEN@*/)*/
                         }
-                        .foregroundColor(/*@START_MENU_TOKEN@*/.red/*@END_MENU_TOKEN@*/)
+                        .padding(.leading)
                     }
                 }
             }
-        }
+        }.background(Color.white)
+        .offset(CGSize(width: self.offset.width , height: 0))
+        .animation(.spring())
+        /*.onTapGesture {
+          if !opened {
+            self.scale = 1
+            self.offset.width = -60
+            opened = true
+          } else {
+            self.scale = 0.5
+            self.offset = .zero
+            opened = false
+          }
+        }*/
+        .gesture(DragGesture()
+                  .onChanged { gesture in
+                    self.offset.width = gesture.translation.width
+                  }
+                  .onEnded { _ in
+                    if self.offset.width < -50 {
+                      self.scale = 1
+                      self.offset.width = -60
+                      opened = true
+                    } else {
+                      self.scale = 0.5
+                      self.offset = .zero
+                      opened = false
+                    }
+                  }
+        )
     }
 }
 
@@ -191,8 +247,9 @@ struct NowPlayingViewHost: View {
             sharedSpotify.enqueue(songID: songQueue.musicList[0].id) //borked
             sharedSpotify.skip()
             nowPlaying = songQueue.musicList[0]
-            vetoSong(id: songQueue.musicList[0].id)
             songQueue.musicList.remove(at: 0)
+            //vetoSong(id: nowPlaying.id)
+            
         }
     }
     
@@ -262,7 +319,7 @@ struct NowPlayingViewHost: View {
                         
                         HStack {
                             if nowPlaying != nil {
-                                Text("\(nowPlaying!.numVotes!)")
+                                /*Text("\(nowPlaying!.numVotes!)")*/
                             } else {
                                 Text("0")
                             }
