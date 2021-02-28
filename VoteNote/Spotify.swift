@@ -119,7 +119,7 @@ class Spotify: ObservableObject {
 
   }
   
-    func userPlaylists(completion: @escaping (playlistStub?) -> (), limit: String){
+    func userPlaylists(completion: @escaping (playlistStub?) -> (), limit: String) -> (){
       self.httpRequester.headerGet(url: "https://api.spotify.com/v1/me/playlists", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ]).onFinish = {
         (response) in
           do {
@@ -248,10 +248,10 @@ struct playlistStub: Codable{
   var total: Int?
 }
 
-struct Playlist: Codable{
+struct Playlist: Codable, Identifiable{
   var collaborative: Bool?
   var description: String?
-  var id: String?
+  var id: String
   var images: [SpotifyImage]?
   var name: String?
   //var tracks: trackStub?

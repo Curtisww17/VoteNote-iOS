@@ -109,6 +109,20 @@ struct AddMusicView: View {
                     }
                     
                     List {
+                        
+                        if( currentSearch == ""){
+                               NavigationLink(destination: playListView()) {
+                                   Text("View My Playlists")
+                               }.simultaneousGesture(TapGesture().onEnded{
+                                sharedSpotify.userPlaylists(completion: {playlist in sharedSpotify.userPlaylists = playlist}, limit: "3")
+                               })
+                               /*.onTapGesture {
+                                print("~~~~")
+                                sharedSpotify.userPlaylists(completion: {playlist in sharedSpotify.userPlaylists = playlist}, limit: "3")
+                               }*/
+                               
+                        }
+                        
                         //list of search results
                         //TO-DO: have a function to print all artist names
                         if currentSearch != "" {
@@ -124,6 +138,70 @@ struct AddMusicView: View {
             selectedSongs.removeAll()
         }).navigationViewStyle(StackNavigationViewStyle())
     }
+}
+
+struct playListView: View {
+    //@State var myPlaylists: [sharedSpotify.playlistStub]
+    
+    var body: some View {
+        ZStack{
+            VStack{
+                List{
+                    ForEach(((sharedSpotify.userPlaylists?.items ?? [Playlist(collaborative: false, description: "", id: "", images: nil, name: "", type: "", uri: "")]))) { list in playlistEntry(playlistName: list.name!, playlistID: list.id, playlistDesc: list.description!)
+                        
+                    }
+                    
+                    //[playlistStub(items: [Playlist(collaborative: false, description: "", id: "", images: nil, name: "", type: "", uri: "")])]
+                }
+            }
+        }
+    }
+}
+
+struct playlistEntry: View{
+    
+    @State var playlistName: String
+    @State var playlistID: String
+    @State var playlistDesc: String
+    
+    
+    func selectPlaylist(){
+        print(playlistID)
+    }
+    var body: some View {
+        ZStack{
+            Button(action: {selectPlaylist()}) {
+                HStack {
+                    Image(systemName: "person.crop.square.fill").resizable().frame(width: 35.0, height: 35.0)
+                    VStack {
+                        HStack {
+                            Text(playlistName)
+                            Spacer()
+                        }
+                        
+                        HStack {
+                            Text(playlistDesc)
+                                .font(.caption)
+                                .foregroundColor(Color.gray)
+                            Spacer()
+                        }
+                    }
+                    
+                    Spacer()
+                    /*if !selectedSong {
+                        Image(systemName: "plus.circle")
+                            .padding(.trailing)
+                    } else {
+                        Image(systemName: "checkmark")
+                            .padding(.trailing)
+                            .foregroundColor(/*@START_MENU_TOKEN@*/.blue/*@END_MENU_TOKEN@*/)
+                    }*/
+                }
+            }
+            
+        }
+    }
+    
 }
 
 struct SearchEntry: View {
