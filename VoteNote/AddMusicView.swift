@@ -113,9 +113,7 @@ struct AddMusicView: View {
                         if( currentSearch == ""){
                                NavigationLink(destination: playListView()) {
                                    Text("View My Playlists")
-                               }.simultaneousGesture(TapGesture().onEnded{
-                                sharedSpotify.userPlaylists(completion: {playlist in sharedSpotify.userPlaylists = playlist}, limit: "3")
-                               })
+                               }
                                /*.onTapGesture {
                                 print("~~~~")
                                 sharedSpotify.userPlaylists(completion: {playlist in sharedSpotify.userPlaylists = playlist}, limit: "3")
@@ -137,6 +135,9 @@ struct AddMusicView: View {
         }.navigationBarHidden(true).onAppear(perform: {
             selectedSongs.removeAll()
         }).navigationViewStyle(StackNavigationViewStyle())
+        .onAppear(perform: {
+            sharedSpotify.userPlaylists(completion: {playlist in sharedSpotify.userPlaylists = playlist}, limit: "3")
+        })
     }
 }
 
@@ -147,7 +148,11 @@ struct playListView: View {
         ZStack{
             VStack{
                 List{
-                    ForEach(((sharedSpotify.userPlaylists?.items ?? [Playlist(collaborative: false, description: "", id: "", images: nil, name: "", type: "", uri: "")]))) { list in playlistEntry(playlistName: list.name!, playlistID: list.id, playlistDesc: list.description!)
+                    ForEach(((sharedSpotify.userPlaylists?.items ?? [Playlist(collaborative: false, description: "", id: "", images: nil, name: "", type: "", uri: "")]))) { list in
+                        NavigationLink(destination: uniquePlaylistView()) {
+                            Text(playlistEntry(playlistName: list.name!, playlistID: list.id, playlistDesc: list.description!).playlistName)
+                        }
+                        
                         
                     }
                     
@@ -155,6 +160,13 @@ struct playListView: View {
                 }
             }
         }
+    }
+}
+
+struct uniquePlaylistView: View{
+    
+    var body: some View{
+        Text("my txt")
     }
 }
 

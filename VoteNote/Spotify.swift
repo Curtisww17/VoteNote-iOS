@@ -23,6 +23,7 @@ class Spotify: ObservableObject {
   var currentUser: SpotifyUser?
   var recentSearch: SearchResults?
   var userPlaylists: playlistStub?
+  var currentPlaylist: uniquePlaylist?
   
   var sessionManager: SPTSessionManager? {
     didSet {
@@ -134,6 +135,18 @@ class Spotify: ObservableObject {
       
       //print("!!!!"+(self.userPlaylists?.items?[0].name ?? ""))
     }
+  
+  func playlistSongs(completion: @escaping (uniquePlaylist?) -> (), id: String) -> (){
+    self.httpRequester.headerGet(url: "https://api.spotify.com/v1/playlists/\(id)", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ]).onFinish = {
+      (response) in
+      do {
+        let decoder = JSONDecoder()
+        try completion( decoder.decode(uniquePlaylist.self, from: response.data))
+      } catch {
+        fatalError("Couldn't parse \(response.description)")
+      }
+    }
+  }
   
   func isLoggedIn() -> Bool {
     if let rem: SPTAppRemote = self.appRemote {
@@ -259,7 +272,12 @@ struct Playlist: Codable, Identifiable{
   var uri: String?
 }
 
-/*struct trackStub {
-  var href: String?
-  var total: Int?
-}*/
+struct uniquePlaylist: Codable, Identifiable{
+  var collaborative: Bool?
+  var description: String?
+  var id: String
+  var name: String?
+  var images: [SpotifyImage]?
+  var owner: SpotifyUser
+  var tacks: SpotifyTrack
+}
