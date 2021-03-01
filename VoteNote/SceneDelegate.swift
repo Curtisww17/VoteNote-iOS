@@ -77,6 +77,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate,
     guard let url = URLContexts.first?.url else {
       return
     }
+    print(url)
     self.sessionManager.application(UIApplication.shared, open: url, options: [:])
     
     let parameters = appRemote.authorizationParameters(from: url)

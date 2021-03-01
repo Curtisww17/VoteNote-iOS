@@ -164,6 +164,29 @@ class Spotify: ObservableObject {
       }
     }
   }
+  
+  func getAlbumArt(for id: String, completion: @escaping (UIImage) -> Void) {
+    print("first thing")
+    let imageRep = SpotifyImageRepresentable(id: id)
+    sharedSpotify.appRemote!.imageAPI!.fetchImage(forItem: imageRep, with: CGSize(width: 300,height: 300), callback: { result, err in
+      print("something is working at least")
+        if err == nil {
+          print ("good")
+          completion(result as! UIImage)
+        } else {
+          print("not good")
+        }
+      })
+  }
+  
+}
+
+class SpotifyImageRepresentable: NSObject, SPTAppRemoteImageRepresentable {
+  var imageIdentifier: String
+  init(id: String) {
+    self.imageIdentifier = id
+  }
+  
 }
 
 struct SpotifyUser: Codable {
@@ -198,7 +221,7 @@ struct SpotifyArtist: Codable, Identifiable {
 struct SpotifyImage: Codable {
   var height: Int?
   var width: Int?
-  var url: URL?
+  var url: String
 }
 
 struct SearchResults: Codable{
@@ -217,12 +240,13 @@ struct trackStub: Codable {
 }
 
 struct songStub: Codable, Identifiable{
-    //let album: [album]
+  let album: albumStub?
   var artists: [artistStub]?
   var available_markets : [String]?
   var disc_number : Int?
   var duration_ms : Int?
   var explicit: Bool?
+  var images: [SpotifyImage]?
   var href: String?
   var id: String
   var is_local: Bool?
@@ -232,6 +256,11 @@ struct songStub: Codable, Identifiable{
   var track_number: Int?
   var type: String?
   var uri: String?
+}
+
+struct albumStub: Codable, Identifiable {
+  var id: String
+  var images: [SpotifyImage]?
 }
 
 struct artistStub: Codable{
@@ -263,3 +292,65 @@ struct Playlist: Codable{
   var href: String?
   var total: Int?
 }*/
+
+
+struct RemoteImage: View {
+    private enum LoadState {
+        case loading, success, failure
+    }
+
+    private class Loader: ObservableObject {
+        var data = Data()
+        var state = LoadState.loading
+
+        init(url: String) {
+            guard let parsedURL = URL(string: url) else {
+                fatalError("Invalid URL: \(url)")
+            }
+
+            URLSession.shared.dataTask(with: parsedURL) { data, response, error in
+                if let data = data, data.count > 0 {
+                    self.data = data
+                    self.state = .success
+                } else {
+                    self.state = .failure
+                }
+
+                DispatchQueue.main.async {
+                    self.objectWillChange.send()
+                }
+            }.resume()
+        }
+    }
+
+    @StateObject private var loader: Loader
+    var loading: Image
+    var failure: Image
+
+    var body: some View {
+        selectImage()
+            .resizable()
+    }
+
+    init(url: String, loading: Image = Image(systemName: "photo"), failure: Image = Image(systemName: "multiply.circle")) {
+        _loader = StateObject(wrappedValue: Loader(url: url))
+        self.loading = loading
+        self.failure = failure
+    }
+
+    private func selectImage() -> Image {
+        switch loader.state {
+        case .loading:
+            return loading
+        case .failure:
+            return failure
+        default:
+            if let image = UIImage(data: loader.data) {
+                return Image(uiImage: image)
+            } else {
+                return failure
+            }
+        }
+    }
+}
+
