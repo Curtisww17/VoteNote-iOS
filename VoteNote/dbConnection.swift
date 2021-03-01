@@ -307,6 +307,11 @@ func getUser(uid: String, completion: @escaping (user?, Error?) -> Void){
     
 }
 
+//gets the current users UID
+func getUID() -> String{
+    return FAuth.currentUser!.uid
+}
+
 //return 1 for success, 0 for song already in queue, and -1 for fail
 func addsong(id: String) -> Int{
     let addedBy = FAuth.currentUser!.uid
