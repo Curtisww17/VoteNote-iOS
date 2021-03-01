@@ -293,10 +293,18 @@ func getUsers(completion: @escaping ([user]?, Error?) -> Void){
 }
 
 //get individual user by id
-func getUser(uid: String) -> user{
-    let usr1 = user(name: "Wesley Curtis", profilePic: "www.picture.com")
+func getUser(uid: String, completion: @escaping (user?, Error?) -> Void){
+    db.collection("users").document(uid).getDocument { (res, err) in
+        if let err = err{
+            print("err gerring documents \(err)")
+            completion(nil, err)
+        }else{
+            let newusr = user(usr: res!.data()!)
+            completion(newusr, nil)
+        }
+        completion(nil, nil)
+    }
     
-    return usr1
 }
 
 //return 1 for success, 0 for song already in queue, and -1 for fail
