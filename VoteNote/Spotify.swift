@@ -20,6 +20,8 @@ class Spotify: ObservableObject {
   @Published var canLogin: Bool
   private var httpRequester: HttpRequester
   
+  @Published var isJoiningThroughLink: String
+  
   var currentUser: SpotifyUser?
   var recentSearch: SearchResults?
   var userPlaylists: playlistStub?
@@ -56,6 +58,7 @@ class Spotify: ObservableObject {
     self.loggedIn = false
     self.canLogin = false
     httpRequester = HttpRequester()
+    self.isJoiningThroughLink = ""
   }
   
   func login() -> Bool {
@@ -154,11 +157,11 @@ class Spotify: ObservableObject {
     }
   }
   
-  func getTrackInfo(track_uri: String, completion: @escaping (SpotifyTrack?) -> ()) {
+  func getTrackInfo(track_uri: String, completion: @escaping (songStub?) -> ()) {
     self.httpRequester.headerGet(url: "https://api.spotify.com/v1/tracks/\(track_uri)", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? "")" ]).onFinish = { (response) in
       do {
         let decoder = JSONDecoder()
-        try completion( decoder.decode(SpotifyTrack.self, from: response.data))
+        try completion( decoder.decode(songStub.self, from: response.data))
       } catch {
         fatalError("Couldn't parse \(response.description)")
       }
