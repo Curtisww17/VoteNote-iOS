@@ -12,8 +12,20 @@ struct UserController: View {
   @ObservedObject var spotify = sharedSpotify
   @Binding var isInRoom: Bool
   @State var showNav = true;
-  
+  @State var roomName: String
+  @State var roomDescription: String
+  @State var roomCapacity: Int
+  @State var songsPerUser: Int
+  @State var notExited: Bool = false
+    
   @State var currentView = 0
+    
+    func exitRoom() {
+        print("Left Room")
+        leaveRoom()
+        notExited = true
+    }
+    
   var body: some View {
     OperationQueue.main.addOperation {
       isInRoom = true
@@ -55,12 +67,26 @@ struct UserController: View {
           .animation(.default)
           .transition(.move(edge: .leading))
       } else {
-        User_RoomPageView(roomName: "Primanti Bros.", roomDescription: "Description goes here", roomCapacity: 5, songsPerUser: 5, showNav: $showNav)
+        User_RoomPageView(roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser, showNav: $showNav)
           .animation(.default)
           .transition(.move(edge: .trailing))
+        
+        Button(action: {
+            exitRoom()
+        }, label: {
+          HStack {
+            Spacer()
+            Text("Leave Room")
+                .foregroundColor(Color.red)
+            Spacer()
+          }
+        })
+        .padding(.vertical)
       }
     }
-    .navigationBarHidden(true)
+    .navigationBarHidden(true).onAppear(perform: {
+        notExited = false
+    }).navigate(to: LandingPageView(), when: $notExited).navigationViewStyle(StackNavigationViewStyle())
   }
 }
 

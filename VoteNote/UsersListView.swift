@@ -92,7 +92,7 @@ struct UserListItem: View {
                   }
                 }
       )
-    }
+    }.navigationViewStyle(StackNavigationViewStyle())
   }
 }
 

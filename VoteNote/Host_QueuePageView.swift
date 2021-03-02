@@ -53,11 +53,11 @@ struct Host_QueuePageView: View {
         
         List {
             ForEach(songQueue.musicList) { song in
-                QueueEntry(curSong: song)
+                QueueEntry(curSong: song, songQueue: songQueue)
             }
         }
         
-        NowPlayingViewHost(isPlaying: isPlaying, songsList: songQueue.musicList)
+        NowPlayingViewHost(isPlaying: isPlaying, songQueue: songQueue)
         
         //Text("Host Queue Page!")
         
@@ -104,9 +104,14 @@ class MusicQueue: Identifiable, ObservableObject {
 struct QueueEntry: View {
     //TODO- Get current song info
     //TODO- swiping for vetoing songs and viewing the user
-    //SWIPING NOT DONE
     @State var curSong: song
     @State var showingExtras: Bool = false
+    @ObservedObject var songQueue: MusicQueue
+    
+    let width : CGFloat = 60
+    @State var offset = CGSize.zero
+    @State var scale : CGFloat = 0.5
+    @State var opened = false
     
     func upVoteSong(){
         //TODO- Implement Upvoting
@@ -114,6 +119,19 @@ struct QueueEntry: View {
     
     func downVoteSong(){
         //TODO- Implement Downvoting
+    }
+    
+    func vetoMusic(){
+        vetoSong(id: curSong.id)
+        
+        var count: Int = 0
+        while count < songQueue.musicList.count {
+            if curSong.id == songQueue.musicList[count].id {
+                songQueue.musicList.remove(at: count)
+                count = songQueue.musicList.count
+            }
+            count = count + 1
+        }
     }
     
     var body: some View {
@@ -148,22 +166,59 @@ struct QueueEntry: View {
                         Image(systemName: "hand.thumbsdown").resizable().frame(width: 30.0, height: 30.0)
                     }
                     
-                    if showingExtras {
-                        Button(action: {vetoSong(id: curSong.id)}) {
-                            Text("Veto")
+                    Image(systemName: "chevron.right").resizable().frame(width: 10.0, height: 20.0).foregroundColor(/*@START_MENU_TOKEN@*/.gray/*@END_MENU_TOKEN@*/)
+                    
+                    if opened {
+                        HStack {
+                            Button(action: {vetoMusic()}) {
+                                Text("Veto")
+                            }.padding(.all).background(Color.red).border(/*@START_MENU_TOKEN@*/Color.red/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/2/*@END_MENU_TOKEN@*/)
+                            
+                            /*Button(action: {vetoSong(id: curSong.id)}) {
+                                Text("User")
+                            }.padding(.all).border(/*@START_MENU_TOKEN@*/Color.gray/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/2/*@END_MENU_TOKEN@*/)*/
                         }
-                        .foregroundColor(/*@START_MENU_TOKEN@*/.red/*@END_MENU_TOKEN@*/)
+                        .padding(.leading)
                     }
                 }
             }
-        }
+        }.background(Color.white)
+        .offset(CGSize(width: self.offset.width , height: 0))
+        .animation(.spring())
+        /*.onTapGesture {
+          if !opened {
+            self.scale = 1
+            self.offset.width = -60
+            opened = true
+          } else {
+            self.scale = 0.5
+            self.offset = .zero
+            opened = false
+          }
+        }*/
+        .gesture(DragGesture()
+                  .onChanged { gesture in
+                    self.offset.width = gesture.translation.width
+                  }
+                  .onEnded { _ in
+                    if self.offset.width < -50 {
+                      self.scale = 1
+                      self.offset.width = -60
+                      opened = true
+                    } else {
+                      self.scale = 0.5
+                      self.offset = .zero
+                      opened = false
+                    }
+                  }
+        )
     }
 }
 
 struct NowPlayingViewHost: View {
     @State var isMinimized: Bool = true //should start as true
     @State var isPlaying: Bool
-  @State var songsList: [song]
+  @ObservedObject var songQueue: MusicQueue
     //TODO- needs the title, artist, votes, and image of the current song, as well as the song itself
     
     func playSong(){
@@ -184,12 +239,17 @@ struct NowPlayingViewHost: View {
     
     //TO-DO: Add based on number of votes
     func skipSong(){
-        if /*nowPlaying != nil &&*/ songsList.count > 0 {
-            sharedSpotify.enqueue(songID: songsList[0].id) //borked
+        if /*nowPlaying != nil &&*/
+            songQueue.musicList.count > 0 {
+            
+            print("Current Number of Songs in Queue \(songQueue.musicList.count)")
+            
+            sharedSpotify.enqueue(songID: songQueue.musicList[0].id) //borked
             sharedSpotify.skip()
-            nowPlaying = songsList[0]
-            vetoSong(id: songsList[0].id)
-            songsList.remove(at: 0)
+            nowPlaying = songQueue.musicList[0]
+            songQueue.musicList.remove(at: 0)
+            //vetoSong(id: nowPlaying.id)
+            
         }
     }
     
@@ -259,7 +319,7 @@ struct NowPlayingViewHost: View {
                         
                         HStack {
                             if nowPlaying != nil {
-                                Text("\(nowPlaying!.numVotes!)")
+                                /*Text("\(nowPlaying!.numVotes!)")*/
                             } else {
                                 Text("0")
                             }

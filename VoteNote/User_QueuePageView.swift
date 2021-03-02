@@ -11,29 +11,127 @@ import SwiftUI
 struct User_QueuePageView: View {
     @State var currentView = 0
   @ObservedObject var spotify = sharedSpotify
-  @State var songsList: [song]?
-  
+  //@State var songsList: [song]?
+    @State var queueRefreshSeconds = 60
+    @State var voteUpdateSeconds = 10
+    @ObservedObject var songQueue: MusicQueue = MusicQueue()
+    
+    let refreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
   
   
   var body: some View {
-    /*getQueue(completion: {songs, err in
-      self.songsList = songs
-    })
-    return NavigationView {*/
       VStack {
         
+        HStack {
+            Text("\(voteUpdateSeconds)").font(.largeTitle).multilineTextAlignment(.trailing).onReceive(refreshTimer) {
+                _ in
+                if self.voteUpdateSeconds > 0 {
+                    self.voteUpdateSeconds -= 1
+                } else {
+                    self.voteUpdateSeconds = 10
+                    print("Updating Queue")
+                    
+                    getQueue(){(songs, err) in
+                        if songs != nil {
+                            if songs!.count > 0 {
+                                songQueue.musicList.removeAll()
+                                var count: Int = 0
+                                while count < songs!.count {
+                                    songQueue.musicList.append(songs![count])
+                                    count = count + 1
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }.hidden()
+        
         List {
-            ForEach(songsList ?? []) { song in
-                QueueEntry(curSong: song)
+            ForEach(songQueue.musicList) { song in
+                UserQueueEntry(curSong: song)
             }
         }
         
         NowPlayingViewUser()
       }
-      .navigationBarHidden(true)
-    }
+      .navigationBarHidden(true).onAppear(perform: {
+        print("Updating Queue...")
+        
+        getQueue(){(songs, err) in
+            if songs != nil {
+                if songs!.count > 0 {
+                    songQueue.musicList.removeAll()
+                    var count: Int = 0
+                    while count < songs!.count {
+                        songQueue.musicList.append(songs![count])
+                        count = count + 1
+                    }
+                }
+            }
+        }
+        print("Queue Updated!")
+      })
+  }
   //}
 }
+
+struct UserQueueEntry: View {
+    //TODO- Get current song info
+    //TODO- swiping for vetoing songs and viewing the user
+    @State var curSong: song
+    @State var showingExtras: Bool = false
+    
+    let width : CGFloat = 60
+    @State var offset = CGSize.zero
+    @State var scale : CGFloat = 0.5
+    @State var opened = false
+    
+    func upVoteSong(){
+        //TODO- Implement Upvoting
+    }
+    
+    func downVoteSong(){
+        //TODO- Implement Downvoting
+    }
+    
+    var body: some View {
+        
+        ZStack {
+            VStack {
+                HStack {
+                    Image(systemName: "person.crop.square.fill").resizable().frame(width: 35.0, height: 35.0)
+                    VStack {
+                        HStack {
+                            Text(curSong.title)
+                            Spacer()
+                        }
+                        HStack {
+                            Text(curSong.artist).font(.caption)
+                                .foregroundColor(Color.gray)
+                            Spacer()
+                        }
+                    }
+                    
+                    Spacer()
+                    if curSong.numVotes != nil {
+                        Text("0")
+                    } /*else {
+                        Text("\(curSong.numVotes!)")
+                    }*/
+                    
+                    Button(action: {upVoteSong()}) {
+                        Image(systemName: "hand.thumbsup").resizable().frame(width: 30.0, height: 30.0)
+                    }
+                    Button(action: {downVoteSong()}) {
+                        Image(systemName: "hand.thumbsdown").resizable().frame(width: 30.0, height: 30.0)
+                    }
+                }
+            }
+        }.background(Color.white)
+    }
+}
+
 
 struct NowPlayingViewUser: View {
     //TODO- needs the title, artist, votes, and image of the current song
