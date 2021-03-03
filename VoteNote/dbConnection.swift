@@ -49,10 +49,11 @@ class room{
     let voting: Bool    //is voting enabled
     let queue: [song]
     let code: String    //the room code, used for joining
-    //need to add songs per user and allowed genres
+    let spu: Int    //songs per user
+    //need to add allowed genres
     
     //normal constructor
-    init(name: String, desc: String? = "", anonUsr: Bool, capacity: Int, explicit: Bool, voting: Bool) {
+    init(name: String, desc: String? = "", anonUsr: Bool, capacity: Int, explicit: Bool, voting: Bool, spu: Int = -1) {
         self.name = name
         self.desc = desc
         self.anonUsr = anonUsr
@@ -61,6 +62,7 @@ class room{
         self.voting = voting
         queue = []
         code = ""
+        self.spu = spu
     }
     
     //constructor for firestore
@@ -73,6 +75,7 @@ class room{
         self.voting = rm["voting"] as! Bool
         queue = [] //need to grab this as well once properly implemented
         code = rm["code"] as! String
+        spu = rm["spu"] as? Int ?? -1
     }
 }
 
@@ -160,6 +163,7 @@ func firebaseLogin(name: String){
 //puts the user in the room with code = code
 func joinRoom(code: String) -> room?{
     //put the user in the correct room
+    //TODO: add checking for banned user and capacity
    
     let upperCode = code.uppercased()
     
@@ -222,7 +226,8 @@ func makeRoom(newRoom: room) -> Bool{
         "capacity": newRoom.capacity,
         "explicit": newRoom.explicit,
         "voting": newRoom.voting,
-        "code": code])
+        "code": code,
+        "spu": newRoom.spu])
     
     //put the user who made the room into the room
     db.collection("users").document(usr!.uid).updateData(["currentRoom": code])
@@ -318,8 +323,9 @@ func addsong(id: String) -> Int{
     var length = 0
     var title = ""
     var artist = ""
-    
-    
+    var imgURL = ""
+    //TODO: get album art stuff
+    //TODO: check for songs per user limit
     getCurrRoom { (currRoom, err) in
         
     
