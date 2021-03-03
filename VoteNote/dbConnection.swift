@@ -418,3 +418,13 @@ func voteSong(vote: Int, id: String){
     
     }//end getCurrRoom
 }
+
+func banUser(uid: String){
+    getCurrRoom { (currRoom, err) in
+        
+        //append the uid to the banned user array
+        //TODO: figure out how to tell the user they have been kicked
+        db.collection("room").document(currRoom).updateData(["bannedUsers" : FieldValue.arrayUnion([uid])])
+        
+    }
+}
