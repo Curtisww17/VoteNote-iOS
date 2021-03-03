@@ -394,7 +394,12 @@ func getSong(id: String, completion: @escaping (song?, Error?) -> Void){
 
 //need to make sure user is allowed at some point
 func vetoSong(id: String){
+    getCurrRoom { (currRoom, err) in
     
+        //remove the song from the queue
+        db.collection("room").document(currRoom).updateData(["queue" : FieldValue.arrayRemove([id])])
+        
+    }//end getCurrRoom
 }
 
 //1 upvote, -1 downvote, 0 clear vote?
