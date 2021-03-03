@@ -400,38 +400,10 @@ func vetoSong(id: String){
 //1 upvote, -1 downvote, 0 clear vote?
 //returns new vote number
 //id is song id
-func voteSong(vote: Int, id: String, completion: @escaping (Int, Error?) -> Void){
+func voteSong(vote: Int, id: String){
     getCurrRoom { (currRoom, err) in
         
+        db.collection("room").document(currRoom).updateData(["queue.id": FieldValue.increment(Int64(vote))])
     
-    var songout: song? = nil
-    
-        //grab our room
-        db.collection("room").document(currRoom).getDocument { (doc, err) in
-        if let err = err {
-            print("Error getting song \(err)")
-            completion(-1, err)
-        } else{
-            //grab the queue
-            let queue: Dictionary = doc?.data()?["queue"] as! Dictionary<String, Any?>
-            if queue != nil {
-                //grab the song from the queue
-                var sng: Dictionary = queue[id] as! Dictionary<String, Any?>
-                
-                //add the vote to the song
-                let numVotes = sng["numvotes"] as! Int
-                sng["numvotes"] = numVotes + vote
-                
-                //replace old song object with new song
-                //this could create a race condition if multiple people vote at once
-                //will want to investigate grabbing and updataing a single variable
-                db.collection("room").document(currRoom).updateData([
-                    "queue.\(id)": sng])
-                
-                completion(numVotes+vote, nil)
-            }
-            completion(-1, nil)
-        }
-    }//end get room
     }//end getCurrRoom
 }
