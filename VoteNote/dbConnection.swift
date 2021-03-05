@@ -183,11 +183,15 @@ func joinRoom(code: String) -> room?{
         else{
             //put the user in the room
             db.collection("users").document(usr!.uid).updateData(["currentRoom": upperCode])
-            //check if allowed in room
             //increase count of people in room
             
             let rm = query?.documents[0].data()
-            //joinedRoom = room(name: rm!["name"] as! String, desc: rm!["desc"] as! String, anonUsr: rm!["anonUsr"] as! Bool, capacity: rm!["capacity"] as! Int, explicit: rm!["explicit"] as! Bool, voting: rm!["voting"] as! Bool)
+            
+            //check if banned
+            /*for (u in (rm["bannedUsers"] as? [String] ?? [])){
+                
+            }*/
+            
             joinedRoom = room(rm: rm!)
         }
         
@@ -212,6 +216,7 @@ func makeRoom(newRoom: room) -> Bool{
     let usr = FAuth.currentUser
     
     //randomy generate a code if the room doesn't have one
+    //TODO: make sure no other room with code exists
     if newRoom.code == "" {
         code = randomString(length: 5)
     } else{
