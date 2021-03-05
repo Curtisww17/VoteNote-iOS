@@ -118,6 +118,7 @@ class song: Identifiable, ObservableObject{
         numVotes = sng["numVotes"] as? Int
         title = sng["title"] as! String
     }
+  
 }
 
 func getCurrRoom(completion: @escaping (String, Error?) -> Void){
