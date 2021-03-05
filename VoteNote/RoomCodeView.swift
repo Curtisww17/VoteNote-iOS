@@ -47,7 +47,8 @@ struct RoomCodeView: View {
   }
   
   func actionSheet() {
-    let data = [currentRoom.roomCode, currentRoom.roomQR!] as [Any]
+    let link = "VoteNote://SpotifyAuthentication/?room_code=" + currentRoom.roomCode
+    let data = [currentRoom.roomCode, currentRoom.roomQR!, link] as [Any]
     let av = UIActivityViewController(activityItems: data, applicationActivities: nil)
     UIApplication.shared.windows.first?.rootViewController?.present(av, animated: true, completion: nil)
     

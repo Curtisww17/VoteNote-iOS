@@ -73,6 +73,11 @@ struct JoinRoomView: View {
         }
       }
     }
+    .onAppear(perform: {
+      if sharedSpotify.isJoiningThroughLink.count != 0 {
+        join(c: sharedSpotify.isJoiningThroughLink)
+      }
+    })
     .navigationBarHidden(true)
     .sheet(isPresented: $isShowingScanner) {
       CodeScannerView(codeTypes: [.qr], simulatedData: "1QCXT", completion: self.handleScan)

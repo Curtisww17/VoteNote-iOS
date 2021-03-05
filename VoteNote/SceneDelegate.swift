@@ -77,6 +77,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate,
     guard let url = URLContexts.first?.url else {
       return
     }
+    //print(url)
     self.sessionManager.application(UIApplication.shared, open: url, options: [:])
     
     let parameters = appRemote.authorizationParameters(from: url)
@@ -84,11 +85,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate,
     if let access_token = parameters?[SPTAppRemoteAccessTokenKey] {
       appRemote.connectionParameters.accessToken = access_token
       self.accessToken = access_token
-      print("\(self.accessToken!)")
+      //print("\(self.accessToken!)")
     } else if let error = parameters?[SPTAppRemoteErrorDescriptionKey] {
       // Show the error
       print(error)
       //print("\(parameters?[SPTAppRemoteErrorDescriptionKey])")
+    }
+    if let room_code = parameters?["room_code"] {
+      print(room_code)
+      sharedSpotify.isJoiningThroughLink = room_code
+      sharedSpotify.login()
     }
     
   }
@@ -109,9 +115,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate,
   func sceneDidBecomeActive(_ scene: UIScene) {
     // Called when the scene has moved from an inactive state to an active state.
     // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
-//    if let _ = self.appRemote.connectionParameters.accessToken {
-//      self.appRemote.connect()
-//    }
+    //    if let _ = self.appRemote.connectionParameters.accessToken {
+    //      self.appRemote.connect()
+    //    }
     if sharedSpotify.loggedIn {
       self.appRemote.connect()
     }
@@ -153,11 +159,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate,
         
         
         
-//        sharedSpotify.getTrackInfo(track_uri: "0weAUscowxeqDtpCgtbpgp", completion: { track in
-//          if track != nil {
-//            print(track!.name)
-//          }
-//        })
+        //        sharedSpotify.getTrackInfo(track_uri: "0weAUscowxeqDtpCgtbpgp", completion: { track in
+        //          if track != nil {
+        //            print(track!.name)
+        //          }
+        //        })
         
         
         

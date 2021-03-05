@@ -127,6 +127,7 @@ class song: Identifiable, ObservableObject{
         numVotes = sng["numVotes"] as? Int
         title = sng["title"] as! String
     }
+  
 }
 
 //get's the string code for the user's current room
