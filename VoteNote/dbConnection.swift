@@ -161,7 +161,7 @@ func firebaseLogin(name: String){
 }
 
 //puts the user in the room with code = code
-func joinRoom(code: String) -> room?{
+func joinRoom(code: String, completion:@escaping (room?, String?) -> Void){
     //put the user in the correct room
     //TODO: add checking for banned user and capacity
    
@@ -179,6 +179,7 @@ func joinRoom(code: String) -> room?{
     joiningQuery.getDocuments() { (query, err) in
         if let err = err{
             print("err gerring documents \(err)")
+            completion(nil, err.localizedDescription)
         }
         else{
             //put the user in the room
@@ -188,17 +189,18 @@ func joinRoom(code: String) -> room?{
             let rm = query?.documents[0].data()
             
             //check if banned
-            /*for (u in (rm["bannedUsers"] as? [String] ?? [])){
-                
-            }*/
+            for u in (rm?["bannedUsers"] as? [String] ?? []){
+                if u == usr?.uid {
+                    //tell them they cannot join the room
+                    completion(nil, "You are banned from this room")
+                }
+            }
             
-            joinedRoom = room(rm: rm!)
+            completion(room(rm: rm!), nil)
         }
         
     }
     
-    //this will always return nil, we need to change the return type, probably to void
-    return joinedRoom
 }
 
 //makes the user leave the room
