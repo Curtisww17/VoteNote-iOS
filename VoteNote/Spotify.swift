@@ -275,9 +275,22 @@ struct Playlist: Codable, Identifiable{
 struct uniquePlaylist: Codable, Identifiable{
   var collaborative: Bool?
   var description: String?
+  var href: String?
   var id: String
   var name: String?
   var images: [SpotifyImage]?
-  var owner: SpotifyUser
-  var tacks: SpotifyTrack
+  var owner: SpotifyUser?
+  var tracks: playlistTrackTime?
+}
+
+struct playlistTrackTime: Codable{
+  var href: String?
+  var items: [songTimeAdded]?
+}
+
+struct songTimeAdded: Codable{
+  //var id = UUID()
+  //var added_at: String
+  var track: songStub
+  
 }

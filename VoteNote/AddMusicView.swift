@@ -111,7 +111,7 @@ struct AddMusicView: View {
                     List {
                         
                         if( currentSearch == ""){
-                               NavigationLink(destination: playListView()) {
+                            NavigationLink(destination: playListView(myPlaylists: sharedSpotify.userPlaylists?.items ?? [Playlist(id: "")])) {
                                    Text("View My Playlists")
                                }
                                /*.onTapGesture {
@@ -136,23 +136,23 @@ struct AddMusicView: View {
             selectedSongs.removeAll()
         }).navigationViewStyle(StackNavigationViewStyle())
         .onAppear(perform: {
-            sharedSpotify.userPlaylists(completion: {playlist in sharedSpotify.userPlaylists = playlist}, limit: "3")
+            sharedSpotify.userPlaylists(completion: {playlist in sharedSpotify.userPlaylists = playlist}, limit: "10")
         })
     }
 }
 
 struct playListView: View {
-    //@State var myPlaylists: [sharedSpotify.playlistStub]
+    @State var myPlaylists: [Playlist]
     
     var body: some View {
         ZStack{
             VStack{
                 List{
                     ForEach(((sharedSpotify.userPlaylists?.items ?? [Playlist(collaborative: false, description: "", id: "", images: nil, name: "", type: "", uri: "")]))) { list in
-                        NavigationLink(destination: uniquePlaylistView()) {
+                        NavigationLink(destination: uniquePlaylistView( playlistInfo: list)) {
                             Text(playlistEntry(playlistName: list.name!, playlistID: list.id, playlistDesc: list.description!).playlistName)
                         }
-                        
+                        //myPlaylist: sharedSpotify.currentPlaylist ?? uniquePlaylist(id: "" ),
                         
                     }
                     
@@ -160,13 +160,73 @@ struct playListView: View {
                 }
             }
         }
+
     }
 }
 
 struct uniquePlaylistView: View{
     
+    //@State var myPlaylist: uniquePlaylist
+    @State var playlistInfo: Playlist
+    @State private var isEditing = false
+    @Environment(\.presentationMode) var presentationMode
+    
+    func addMusic(){
+        
+        //select the first song if nothing is playing
+        if nowPlaying == nil && selectedSongs.count > 0 {
+            print("Song Added")
+            nowPlaying = selectedSongs[0]
+            sharedSpotify.enqueue(songID: selectedSongs[0].id)
+            selectedSongs.remove(at: 0)
+        }
+        
+        for i in selectedSongs {
+            print("Added")
+            addsong(id: i.id) //there's an issue here
+            print("Done")
+        }
+        
+        selectedSongs.removeAll()
+        
+        self.presentationMode.wrappedValue.dismiss()
+    }
+    
     var body: some View{
-        Text("my txt")
+        ZStack{
+            VStack{
+                HStack {
+                    
+                    if isEditing {
+                        Button(action: {
+                            self.isEditing = false
+                            
+                            // Dismiss the keyboard
+                            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                        }) {
+                            Text("Cancel")
+                        }
+                        .padding(.trailing, 10)
+                        .transition(.move(edge: .trailing))
+                        .animation(.default)
+                    }
+                    
+                    Button(action: {addMusic()}) {
+                        Text("Add Songs")
+                    }
+                    .padding(.trailing)
+                }
+                
+                List{
+                    ForEach((sharedSpotify.currentPlaylist?.tracks?.items ?? [songTimeAdded(track: songStub(id: "", name: ""))]), id: \.track.id){ songs in
+                        SearchEntry(songTitle: songs.track.name, songArtist: (songs.track.artists?[0].name) ?? "", songID: songs.track.id)
+                    }
+                }
+            }
+        }.onAppear(perform: {
+            
+            sharedSpotify.playlistSongs(completion: {playlistSongs in sharedSpotify.currentPlaylist = playlistSongs}, id: playlistInfo.id)
+        })
     }
 }
 
