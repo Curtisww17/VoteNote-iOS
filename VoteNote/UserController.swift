@@ -20,6 +20,8 @@ struct UserController: View {
     
   @State var currentView = 0
     
+  @ObservedObject var userControllerHidden: ObservableBoolean = ObservableBoolean(boolValue: false)
+    
     func exitRoom() {
         print("Left Room")
         leaveRoom()
@@ -42,7 +44,7 @@ struct UserController: View {
         VStack {
             if (currentView == 0) {
                 NavigationLink(
-                  destination: AddMusicView().navigationBarTitle("Browse"),
+                    destination: AddMusicView(hostControllerHidden: userControllerHidden).navigationBarTitle("Browse"),
                   label: {
                   Text("Add")
                   })

@@ -14,7 +14,8 @@ struct UsersListView: View {
   
   var body: some View {
     
-    return NavigationView {
+    //return NavigationView {
+    ZStack {
       List {
         ForEach (users ?? []) { user in
           UserListItem(user: user)

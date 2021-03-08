@@ -25,7 +25,7 @@ struct AddMusicView: View {
     
     @Environment(\.presentationMode) var presentationMode
     
-    //TO-DO: Have songs filtered by search
+    @ObservedObject var hostControllerHidden: ObservableBoolean
     
     func addMusic(){
         
@@ -50,8 +50,9 @@ struct AddMusicView: View {
     
     var body: some View {
         NavigationView {
-            ZStack{
+            ZStack {
                 VStack {
+                    Text("Test")
                     
                     HStack {
                         TextField("Search Music", text: $currentSearch).onChange(of: self.currentSearch, perform: { value in
@@ -113,15 +114,18 @@ struct AddMusicView: View {
                         //TO-DO: have a function to print all artist names
                         if currentSearch != "" {
                             ForEach((sharedSpotify.recentSearch?.tracks?.items ?? [songStub(artists: [artistStub(href: "", id: "", name: "", type: "", uri: "")], available_markets: nil, disc_number: 0, duration_ms: 0, explicit: false, href: "", id: "", is_local: false, name: "Searching...", popularity: 0, preview_url: "", track_number: 0, type: "", uri: "")])) { song in
-                                SearchEntry(songTitle: song.name, songArtist: (song.artists?[0].name)!, songID: song.id)
+                                SearchEntry(songTitle: song.name, songArtist: (song.artists?[0].name)!, songID: song.id, length: song.duration_ms ?? 0)
                             }
                         }
                     }
                 }
                 
             }
-        }.navigationBarHidden(true).onAppear(perform: {
+        }.onAppear(perform: {
             selectedSongs.removeAll()
+            hostControllerHidden.boolValue = true
+        }).onDisappear(perform: {
+            hostControllerHidden.boolValue = false
         }).navigationViewStyle(StackNavigationViewStyle())
     }
 }
@@ -134,17 +138,18 @@ struct SearchEntry: View {
     @State var songTitle: String
     @State var songArtist: String
     @State var songID: String
+    @State var length: Int //this is in milliseconds
     
     //TO-DO: Use actual values
-    @State var addedBy: String = ""
     @State var genres: [String] = ["Placeholder"]
-    @State var length: Int = 0
     @State var numVotes: Int? = 0
+    
+    //TO-DO: use new DB call to get the ID of the current user
     
     func selectSong() {
         selectedSong = !selectedSong
         if selectedSong {
-            selectedSongs.append(song(addedBy: self.addedBy, artist: self.songArtist, genres: self.genres, id: self.songID, length: self.length, numVotes: self.numVotes, title: self.songTitle))
+            selectedSongs.append(song(addedBy: "Test User ID", artist: self.songArtist, genres: self.genres, id: self.songID, length: self.length, numVotes: self.numVotes, title: self.songTitle))
             print("Selected Song. Currently Selected this many songs: \(selectedSongs.count)")
         } else {
             var songIndex: Int = 0
@@ -193,11 +198,11 @@ struct SearchEntry: View {
     }
 }
 
-struct AddMusicView_PreviewsContainer: View {
+/*struct AddMusicView_PreviewsContainer: View {
     //@State var spotify: Spotify = Spotify()
 
     var body: some View {
-        AddMusicView()
+        AddMusicView(, hostControllerHidden: <#ObservableBoolean#>)
     }
 }
 
@@ -205,4 +210,4 @@ struct AddMusicView_Previews: PreviewProvider {
   static var previews: some View {
     AddMusicView_PreviewsContainer()
   }
-}
+}*/

@@ -19,6 +19,9 @@ struct Host_QueuePageView: View {
     @State var queueRefreshSeconds = 60
     @State var voteUpdateSeconds = 10
     @ObservedObject var songQueue: MusicQueue = MusicQueue()
+    @ObservedObject var isViewingUser: ObservableBoolean = ObservableBoolean(boolValue: false)
+    @ObservedObject var selectedSong: song = song(addedBy: "Nil User", artist: "", genres: [""], id: "", length: 0, numVotes: 0, title: "None Selected")
+    @ObservedObject var hostControllerHidden: ObservableBoolean
     
     let refreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
   
@@ -53,7 +56,7 @@ struct Host_QueuePageView: View {
         
         List {
             ForEach(songQueue.musicList) { song in
-                QueueEntry(curSong: song, songQueue: songQueue)
+                QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: isViewingUser, isDetailView: false, isUserQueue: false, hostControllerHidden: hostControllerHidden)
             }
         }
         
@@ -71,6 +74,8 @@ struct Host_QueuePageView: View {
       }
       .navigationBarHidden(true)
     }.onAppear(perform: {
+        //isViewingUser.boolValue = false
+        
         //makes the first song in the queue to first to play
         if nowPlaying == nil && songQueue.musicList.count > 0 /*&& (songsList ?? []).count > 0*/ {
             nowPlaying = songQueue.musicList[0]
@@ -92,8 +97,9 @@ struct Host_QueuePageView: View {
             }
         }
         print("Queue Updated!")
+        hostControllerHidden.boolValue = false
         
-    }).navigationViewStyle(StackNavigationViewStyle())
+    }).navigate(to: HostUserDetailView(user: getUser(uid: selectedSong.addedBy), songQueue: songQueue), when: $isViewingUser.boolValue).navigationViewStyle(StackNavigationViewStyle())
   }
 }
 
@@ -101,10 +107,19 @@ class MusicQueue: Identifiable, ObservableObject {
     var musicList: [song] = [song]()
 }
 
+class ObservableBoolean: ObservableObject {
+    var boolValue: Bool
+    
+    init(boolValue: Bool) {
+        self.boolValue = boolValue
+    }
+}
+
 struct QueueEntry: View {
     //TODO- Get current song info
     //TODO- swiping for vetoing songs and viewing the user
     @State var curSong: song
+    @State var selectedSong: song
     @State var showingExtras: Bool = false
     @ObservedObject var songQueue: MusicQueue
     
@@ -112,6 +127,13 @@ struct QueueEntry: View {
     @State var offset = CGSize.zero
     @State var scale : CGFloat = 0.5
     @State var opened = false
+    
+    @ObservedObject var isViewingUser: ObservableBoolean
+    @State var isDetailView: Bool
+    @State var isUserQueue: Bool
+    
+    @State var showNav: Bool = false
+    @ObservedObject var hostControllerHidden: ObservableBoolean
     
     func upVoteSong(){
         //TODO- Implement Upvoting
@@ -132,6 +154,14 @@ struct QueueEntry: View {
             }
             count = count + 1
         }
+    }
+    
+    func viewUser(){
+        print("Viewing User \(isViewingUser.boolValue)")
+        selectedSong = self.curSong
+        hostControllerHidden.boolValue = true
+        isViewingUser.boolValue = true
+        print("\(isViewingUser.boolValue)")
     }
     
     var body: some View {
@@ -166,17 +196,27 @@ struct QueueEntry: View {
                         Image(systemName: "hand.thumbsdown").resizable().frame(width: 30.0, height: 30.0)
                     }
                     
-                    Image(systemName: "chevron.right").resizable().frame(width: 10.0, height: 20.0).foregroundColor(/*@START_MENU_TOKEN@*/.gray/*@END_MENU_TOKEN@*/)
+                    Spacer()
+                    Spacer()
                     
-                    if opened {
+                    /*Image(systemName: "chevron.right").resizable().frame(width: 10.0, height: 20.0).foregroundColor(/*@START_MENU_TOKEN@*/.gray/*@END_MENU_TOKEN@*/)*/
+                    
+                    
+                    if opened && !isUserQueue {
                         HStack {
                             Button(action: {vetoMusic()}) {
-                                Text("Veto")
-                            }.padding(.all).background(Color.red).border(/*@START_MENU_TOKEN@*/Color.red/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/2/*@END_MENU_TOKEN@*/)
+                                Text("Veto").scaleEffect(scale)
+                            }.padding(.all).background(Color.red).border(/*@START_MENU_TOKEN@*/Color.red/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/2/*@END_MENU_TOKEN@*/).onTapGesture {
+                                vetoMusic()
+                            }
                             
-                            /*Button(action: {vetoSong(id: curSong.id)}) {
-                                Text("User")
-                            }.padding(.all).border(/*@START_MENU_TOKEN@*/Color.gray/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/2/*@END_MENU_TOKEN@*/)*/
+                            if !isDetailView {
+                                Button(action: {viewUser()}) {
+                                    Text("User").scaleEffect(scale)
+                                }.padding(.all).border(/*@START_MENU_TOKEN@*/Color.black/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/).onTapGesture {
+                                    viewUser()
+                                }
+                            }
                         }
                         .padding(.leading)
                     }
@@ -198,17 +238,21 @@ struct QueueEntry: View {
         }*/
         .gesture(DragGesture()
                   .onChanged { gesture in
-                    self.offset.width = gesture.translation.width
+                    if !isUserQueue {
+                        self.offset.width = gesture.translation.width
+                    }
                   }
                   .onEnded { _ in
-                    if self.offset.width < -50 {
-                      self.scale = 1
-                      self.offset.width = -60
-                      opened = true
-                    } else {
-                      self.scale = 0.5
-                      self.offset = .zero
-                      opened = false
+                    if !isUserQueue {
+                        if self.offset.width < -50 {
+                          self.scale = 1
+                          self.offset.width = -60
+                          opened = true
+                        } else {
+                          self.scale = 0.5
+                          self.offset = .zero
+                          opened = false
+                        }
                     }
                   }
         )
@@ -361,11 +405,11 @@ struct NowPlayingViewHost: View {
     }
 }
 
-struct Host_QueuePageView_PreviewContainer: View {
+/*struct Host_QueuePageView_PreviewContainer: View {
     @ObservedObject var songQueue: MusicQueue = MusicQueue()
     
     var body: some View {
-        Host_QueuePageView(songQueue: songQueue)
+        Host_QueuePageView(songQueue: songQueue, isViewing)
     }
 }
 
@@ -373,7 +417,7 @@ struct Host_QueuePageView_Previews: PreviewProvider {
   static var previews: some View {
     Host_QueuePageView_PreviewContainer()
   }
-}
+}*/
 
 /*struct NowPlayingViewHost_Previews: PreviewProvider {
   static var previews: some View {

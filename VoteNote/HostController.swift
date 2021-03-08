@@ -15,6 +15,7 @@ struct HostController: View {
     @State var roomName: String
     @State var roomDescription: String
     @State var notExited: Bool = false
+    @ObservedObject var hostControllerHidden: ObservableBoolean = ObservableBoolean(boolValue: false)
   
     func exitRoom() {
         print("Left Room")
@@ -28,64 +29,73 @@ struct HostController: View {
       isInRoom = true
     }
     return VStack {
-      HStack {
-        Spacer()
-          .frame(width: UIScreen.main.bounds.size.width / 4)
-        Picker(selection: self.$currentView, label: Text("I don't know what this label is for")) {
-          Text("Queue").tag(0)
-          Text("Room").tag(1)
-        }.pickerStyle(SegmentedPickerStyle())
-        .frame(width: UIScreen.main.bounds.size.width / 2,  alignment: .center)
+        if !hostControllerHidden.boolValue {
+            Text("Hidden Howdy").hidden()
         VStack {
-            if (currentView == 0) {
-                NavigationLink(
-                  destination: AddMusicView().navigationBarTitle("Browse"),
-                  label: {
-                  Text("Add")
+            if !hostControllerHidden.boolValue {
+                HStack {
+                  Spacer()
+                    .frame(width: UIScreen.main.bounds.size.width / 4)
+                  Picker(selection: self.$currentView, label: Text("I don't know what this label is for")) {
+                    Text("Queue").tag(0)
+                    Text("Room").tag(1)
+                  }.pickerStyle(SegmentedPickerStyle())
+                  .frame(width: UIScreen.main.bounds.size.width / 2,  alignment: .center)
+                  
+                  VStack {
+                      if (currentView == 0) {
+                          NavigationLink(
+                              destination: AddMusicView( hostControllerHidden: hostControllerHidden).navigationBarTitle("Browse"),
+                            label: {
+                            Text("Add")
+                            })
+                      } else {
+                          NavigationLink(
+                            destination: ProfileView(),
+                            label: {
+                                Image(systemName: "person")
+                                  .resizable()
+                                  
+                                  .frame(width: 30, height: 30)
+                            })
+                      }
+                  }
+                  .frame(width: UIScreen.main.bounds.size.width/4)
+                  
+                }
+                .frame(width: UIScreen.main.bounds.size.width, alignment: .top)
+                
+                if (currentView == 0) {
+                  Host_QueuePageView( hostControllerHidden: hostControllerHidden)
+                    .animation(.default)
+                    .transition(.move(edge: .leading))
+                } else {
+                  Host_RoomPageView(roomName: roomName, roomDescription: roomDescription, roomCapacity: 5, songsPerUser: 5, showNav: $showNav)
+                    .animation(.default)
+                    .transition(.move(edge: .trailing))
+                  
+                  Button(action: {
+                      exitRoom()
+                  }, label: {
+                    HStack {
+                      Spacer()
+                      Text("Leave Room")
+                          .foregroundColor(Color.red)
+                      Spacer()
+                    }
                   })
-            } else {
-                NavigationLink(
-                  destination: ProfileView(),
-                  label: {
-                      Image(systemName: "person")
-                        .resizable()
-                        
-                        .frame(width: 30, height: 30)
-                  })
+                  .padding(.vertical)
+                }
             }
         }
-        .frame(width: UIScreen.main.bounds.size.width/4)
-        
-      }
-      .frame(width: UIScreen.main.bounds.size.width, alignment: .top)
-      
-      if (currentView == 0) {
-        Host_QueuePageView()
-          .animation(.default)
-          .transition(.move(edge: .leading))
-      } else {
-        Host_RoomPageView(roomName: roomName, roomDescription: roomDescription, roomCapacity: 5, songsPerUser: 5, showNav: $showNav)
-          .animation(.default)
-          .transition(.move(edge: .trailing))
-        
-        Button(action: {
-            exitRoom()
-        }, label: {
-          HStack {
-            Spacer()
-            Text("Leave Room")
-                .foregroundColor(Color.red)
-            Spacer()
-          }
-        })
-        .padding(.vertical)
-      }
-    }
-    .navigationTitle("Lobby")
-    .navigationBarHidden(true).onAppear(perform: {
-        notExited = false
-    }).navigate(to: LandingPageView(), when: $notExited).navigationViewStyle(StackNavigationViewStyle())
-  }
+        .navigationTitle("Lobby")
+        .navigationBarHidden(true).onAppear(perform: {
+            notExited = false
+        }).navigate(to: LandingPageView(), when: $notExited)
+        .navigationViewStyle(StackNavigationViewStyle())
+        }
+    }.navigationViewStyle(StackNavigationViewStyle())
+}
 }
 
 struct HostController_PreviewContainer: View {
