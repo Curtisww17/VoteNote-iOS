@@ -118,6 +118,7 @@ class song: Identifiable, ObservableObject{
         numVotes = sng["numVotes"] as? Int
         title = sng["title"] as! String
     }
+  
 }
 
 func getCurrRoom(completion: @escaping (String, Error?) -> Void){
@@ -229,7 +230,6 @@ func getQueue(completion: @escaping ([song]?, Error?) -> Void){
                 var songs: [song] = []
                 if queue != nil {
                     for (id, s) in queue!{
-                        print("\n\n\n\n\(id), \(s)")
                         songs.append(song(sng: s as! [String: Any], id: id))
                     }
                 }
