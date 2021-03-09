@@ -100,7 +100,9 @@ struct UserQueueEntry: View {
         ZStack {
             VStack {
                 HStack {
-                    Image(systemName: "person.crop.square.fill").resizable().frame(width: 35.0, height: 35.0)
+                  RemoteImage(url: curSong.imageUrl)
+                    .frame(width: 35, height: 35)
+//                    Image(systemName: "person.crop.square.fill").resizable().frame(width: 35.0, height: 35.0)
                     VStack {
                         HStack {
                             Text(curSong.title)
@@ -145,7 +147,12 @@ struct NowPlayingViewUser: View {
                 Spacer()
                 Spacer()
                 Spacer()
+              if (nowPlaying != nil) {
+                RemoteImage(url: nowPlaying!.imageUrl)
+                  .frame(width: 40, height: 40)
+              } else {
                 Image(systemName: "person.crop.square.fill").resizable().frame(width: 40.0, height: 40.0)
+              }
                 VStack {
                     HStack {
                         if nowPlaying == nil {

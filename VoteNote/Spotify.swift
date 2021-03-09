@@ -168,29 +168,9 @@ class Spotify: ObservableObject {
     }
   }
   
-  func getAlbumArt(for id: String, completion: @escaping (UIImage) -> Void) {
-    print("first thing")
-    let imageRep = SpotifyImageRepresentable(id: id)
-    sharedSpotify.appRemote!.imageAPI!.fetchImage(forItem: imageRep, with: CGSize(width: 300,height: 300), callback: { result, err in
-      print("something is working at least")
-        if err == nil {
-          print ("good")
-          completion(result as! UIImage)
-        } else {
-          print("not good")
-        }
-      })
-  }
   
 }
 
-class SpotifyImageRepresentable: NSObject, SPTAppRemoteImageRepresentable {
-  var imageIdentifier: String
-  init(id: String) {
-    self.imageIdentifier = id
-  }
-  
-}
 
 struct SpotifyUser: Codable {
   var country: String?
