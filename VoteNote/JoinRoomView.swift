@@ -24,17 +24,22 @@ struct JoinRoomView: View {
   @State var songsPerUser: Int = 0
   
   func join(c: String) {
-    let ret = joinRoom(code: c)
-    
-    self.joined = true
-    if ret != nil {
-      roomName = ret!.name
-      roomDescription = (ret?.desc)!
-      roomCapacity = ret!.capacity
-      //songsPerUser = ret. //not in db room object
-      self.joined = true
+    joinRoom(code: c){ (ret, message) in
+      if message != nil {
+        //TODO: popup that they cannot join the room
+      }else{
+      
+        self.joined = true
+        if ret != nil {
+          roomName = ret!.name
+          roomDescription = (ret?.desc)!
+          roomCapacity = ret!.capacity
+          //songsPerUser = ret. //not in db room object
+          self.joined = true
+        }
+      }
     }
-    print("\n\n\n\(self.joined)")
+    //print("\n\n\nyou joined \(c)\n\n\n")
   }
   
   

@@ -155,7 +155,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate,
       sharedSpotify.getCurrentUser(completion: { user in
         sharedSpotify.currentUser = user
         //login user to db
-        login(name: (user?.display_name)!)
+        firebaseLogin(name: (user?.display_name)!)
         
         
         
