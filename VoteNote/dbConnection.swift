@@ -239,6 +239,39 @@ func joinRoom(code: String, completion:@escaping (room?, String?) -> Void){
     
 }
 
+//get the current room
+func getRoom(completion: @escaping (room?, Error?) -> Void){
+    //get UID from firebase auth
+    let usr = FAuth.currentUser
+    
+    
+    db.collection("users").document(usr!.uid).getDocument() { (doc, err1) in
+        if let err1 = err1{
+            print("error, could not get user document")
+            completion(nil, err1)
+        }else{
+            let rmCode = doc?.data()!["currentRoom"] as! String
+            let joiningQuery = db.collection("room").whereField("code", isEqualTo: rmCode)
+            
+            joiningQuery.getDocuments() { (query, err) in
+                if let err = err{
+                    print("err gerring documents \(err)")
+                    completion(nil, err)
+                }
+                else{
+                    
+                    let rm = query?.documents[0].data()
+                    
+                    //return the room
+                    completion(room(rm: rm!), nil)
+                }
+            
+        }//end joiningquerey
+        }
+    }
+    
+}
+
 //makes the user leave the room
 func leaveRoom() -> Bool{
     //take the user out of the room
