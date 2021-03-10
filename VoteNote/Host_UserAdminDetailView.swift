@@ -14,6 +14,7 @@ struct HostUserDetailView: View {
     @ObservedObject var selectedSong: song = song(addedBy: "Nil User", artist: "", genres: [""], id: "", length: 0, numVotes: 0, title: "None Selected", imageUrl: "")
     @ObservedObject var hostControllerHidden: ObservableBoolean = ObservableBoolean(boolValue: false)
     @State var shouldReturn: Bool = false
+    @ObservedObject var votingEnabled: ObservableBoolean
     
     func returnToQueue(){
         shouldReturn = true
@@ -44,7 +45,7 @@ struct HostUserDetailView: View {
                     List {
                         ForEach(songQueue.musicList) { song in
                             if song.addedBy == user.name { //we should probably have a better way to make this comparision
-                                QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: hostControllerHidden, isDetailView: true, isUserQueue: false, selectedUser: user)
+                                QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: hostControllerHidden, isDetailView: true, isUserQueue: false, votingEnabled: votingEnabled, selectedUser: user)
                             }
                         }
                     }
@@ -56,7 +57,7 @@ struct HostUserDetailView: View {
                 }
             }
         }
-    }.navigate(to: Host_QueuePageView(), when: $shouldReturn).onAppear(perform: {
+    }.navigate(to: Host_QueuePageView(votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue)), when: $shouldReturn).onAppear(perform: {
         shouldReturn = false
     }).navigationViewStyle(StackNavigationViewStyle())
   }

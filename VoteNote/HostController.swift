@@ -65,7 +65,7 @@ struct HostController: View {
       .frame(width: UIScreen.main.bounds.size.width, alignment: .top)
       
       if (currentView == 0) {
-        Host_QueuePageView()
+        Host_QueuePageView(votingEnabled: ObservableBoolean(boolValue: votingEnabled))
           .animation(.default)
           .transition(.move(edge: .leading))
       } else {

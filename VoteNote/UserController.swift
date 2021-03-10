@@ -68,7 +68,7 @@ struct UserController: View {
       .frame(width: UIScreen.main.bounds.size.width, alignment: .top)
       
       if (currentView == 0) {
-        User_QueuePageView()
+        User_QueuePageView(votingEnabled: ObservableBoolean(boolValue: votingEnabled))
           .animation(.default)
           .transition(.move(edge: .leading))
       } else {

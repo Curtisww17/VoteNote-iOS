@@ -23,9 +23,31 @@ struct Host_QueuePageView: View {
     @ObservedObject var selectedSong: song = song(addedBy: "Nil User", artist: "", genres: [""], id: "", length: 0, numVotes: 0, title: "None Selected", imageUrl: "")
         //@ObservedObject var hostControllerHidden: ObservableBoolean
     @ObservedObject var selectedUser: user = user(name: "", profilePic: "")
+    @ObservedObject var votingEnabled: ObservableBoolean
     
     let refreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
   
+    func updateQueue() {
+        getQueue(){(songs, err) in
+            if songs != nil {
+                if songs!.count > 0 {
+                    songQueue.musicList.removeAll()
+                    var count: Int = 0
+                    while count < songs!.count {
+                        songQueue.musicList.append(songs![count])
+                        count = count + 1
+                    }
+                    
+                    if votingEnabled.boolValue {
+                        if self.songQueue.musicList[0].numVotes != nil && self.songQueue.musicList[1].numVotes != nil {
+                            self.songQueue.musicList.sort { $0.numVotes! < $1.numVotes! }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
   var body: some View {
     ZStack {
       VStack {
@@ -39,25 +61,14 @@ struct Host_QueuePageView: View {
                     self.voteUpdateSeconds = 10
                     print("Updating Queue")
                     
-                    getQueue(){(songs, err) in
-                        if songs != nil {
-                            if songs!.count > 0 {
-                                songQueue.musicList.removeAll()
-                                var count: Int = 0
-                                while count < songs!.count {
-                                    songQueue.musicList.append(songs![count])
-                                    count = count + 1
-                                }
-                            }
-                        }
-                    }
+                    updateQueue()
                 }
             }
         }.hidden()
         
         List {
             ForEach(songQueue.musicList) { song in
-                QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: isViewingUser, isDetailView: false, isUserQueue: false, selectedUser: selectedUser)
+                QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: isViewingUser, isDetailView: false, isUserQueue: false, votingEnabled: votingEnabled, selectedUser: selectedUser)
                         }
         }
         
@@ -82,23 +93,11 @@ struct Host_QueuePageView: View {
                 vetoSong(id: songQueue.musicList[0].id)
             }
             print("Updating Queue...")
-            
-            getQueue(){(songs, err) in
-                if songs != nil {
-                    if songs!.count > 0 {
-                        songQueue.musicList.removeAll()
-                        var count: Int = 0
-                        while count < songs!.count {
-                            songQueue.musicList.append(songs![count])
-                            count = count + 1
-                        }
-                    }
-                }
-            }
+            updateQueue()
             print("Queue Updated!")
             //hostControllerHidden.boolValue = false
             
-        }).navigate(to: HostUserDetailView(user: selectedUser, songQueue: songQueue), when: $isViewingUser.boolValue).navigationViewStyle(StackNavigationViewStyle())
+    }).navigate(to: HostUserDetailView(user: selectedUser, songQueue: songQueue, votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue)), when: $isViewingUser.boolValue).navigationViewStyle(StackNavigationViewStyle())
   }
 }
 
@@ -125,6 +124,7 @@ struct QueueEntry: View {
     
     @State var showNav: Bool = false
     //@ObservedObject var hostControllerHidden: ObservableBoolean
+    @ObservedObject var votingEnabled: ObservableBoolean
     
     @State var selectedUser: user
     
@@ -185,17 +185,19 @@ struct QueueEntry: View {
                     }
                     
                     Spacer()
-                    if curSong.numVotes != nil {
-                        Text("0")
-                    } /*else {
-                        Text("\(curSong.numVotes!)")
-                    }*/
                     
-                    Button(action: {upVoteSong()}) {
-                        Image(systemName: "hand.thumbsup").resizable().frame(width: 30.0, height: 30.0)
-                    }
-                    Button(action: {downVoteSong()}) {
-                        Image(systemName: "hand.thumbsdown").resizable().frame(width: 30.0, height: 30.0)
+                    if votingEnabled.boolValue {
+                        if curSong.numVotes != nil {
+                            Text("0")
+                        } /*else {
+                            Text("\(curSong.numVotes!)")
+                        }*/
+                        Button(action: {upVoteSong()}) {
+                            Image(systemName: "hand.thumbsup").resizable().frame(width: 30.0, height: 30.0)
+                        }
+                        Button(action: {downVoteSong()}) {
+                            Image(systemName: "hand.thumbsdown").resizable().frame(width: 30.0, height: 30.0)
+                        }
                     }
                     
                     Spacer()
@@ -417,7 +419,7 @@ struct NowPlayingViewHost: View {
     }
 }
 
-struct Host_QueuePageView_PreviewContainer: View {
+/*struct Host_QueuePageView_PreviewContainer: View {
     @ObservedObject var songQueue: MusicQueue = MusicQueue()
     
     var body: some View {
@@ -429,7 +431,7 @@ struct Host_QueuePageView_Previews: PreviewProvider {
   static var previews: some View {
     Host_QueuePageView_PreviewContainer()
   }
-}
+}*/
 
 /*struct NowPlayingViewHost_Previews: PreviewProvider {
   static var previews: some View {
