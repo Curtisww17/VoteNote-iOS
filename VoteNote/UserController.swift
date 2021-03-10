@@ -17,15 +17,10 @@ struct UserController: View {
   @State var roomCapacity: Int
   @State var songsPerUser: Int
   @State var votingEnabled: Bool
+  @State var anonUsr: Bool
   @State var notExited: Bool = false
     
   @State var currentView = 0
-    
-    func exitRoom() {
-        print("Left Room")
-        leaveRoom()
-        notExited = true
-    }
     
   var body: some View {
     OperationQueue.main.addOperation {
@@ -72,21 +67,10 @@ struct UserController: View {
           .animation(.default)
           .transition(.move(edge: .leading))
       } else {
-        User_RoomPageView(roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser, votingEnabled: votingEnabled, showNav: $showNav)
+        User_RoomPageView(roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser, votingEnabled: votingEnabled, anonUsr: $anonUsr, notExited: $notExited, showNav: $showNav)
           .animation(.default)
           .transition(.move(edge: .trailing))
         
-        Button(action: {
-            exitRoom()
-        }, label: {
-          HStack {
-            Spacer()
-            Text("Leave Room")
-                .foregroundColor(Color.red)
-            Spacer()
-          }
-        })
-        .padding(.vertical)
       }
     }
     .navigationBarHidden(true).onAppear(perform: {

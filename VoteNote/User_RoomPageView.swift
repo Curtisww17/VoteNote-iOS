@@ -15,9 +15,18 @@ struct User_RoomPageView: View {
   @State var roomCapacity: Int
   @State var songsPerUser: Int
     @State var votingEnabled: Bool
+  @Binding var anonUsr: Bool
   @ObservedObject var currentRoom: CurrentRoom = CurrentRoom()
+  @Binding var notExited: Bool
   
   @Binding var showNav: Bool
+  
+  
+  func exitRoom() {
+      leaveRoom()
+      notExited = true
+  }
+  
   
   var body: some View {
     //return NavigationView {
@@ -86,6 +95,30 @@ struct User_RoomPageView: View {
                     Text("Voting Enabled")
                 }
             }
+            
+            HStack{
+              Text("Anonymize All Users:")
+              Spacer()
+                if anonUsr {
+                    Text("True")
+                } else {
+                    Text("False")
+                }
+            }
+          }
+          
+          Section() {
+            Button(action: {
+                exitRoom()
+            }, label: {
+              HStack {
+                Spacer()
+                Text("Leave Room")
+                    .foregroundColor(Color.red)
+                Spacer()
+              }
+            })
+            .padding(.vertical)
           }
         }
       }

@@ -15,13 +15,9 @@ struct HostController: View {
   @State var roomName: String
   @State var roomDescription: String
   @State var votingEnabled: Bool
+  @State var anonUsr: Bool
   @State var notExited: Bool = false
   
-  func exitRoom() {
-    print("Left Room")
-    leaveRoom()
-    notExited = true
-  }
   
   @State var currentView = 1
   var body: some View {
@@ -72,21 +68,11 @@ struct HostController: View {
           .animation(.default)
           .transition(.move(edge: .leading))
       } else {
-        Host_RoomPageView(roomName: roomName, roomDescription: roomDescription, roomCapacity: 5, songsPerUser: 5, votingEnabled: votingEnabled, showNav: $showNav)
+        Host_RoomPageView(roomName: roomName, roomDescription: roomDescription, roomCapacity: 5, songsPerUser: 5, votingEnabled: votingEnabled, anonUsr: $anonUsr, showNav: $showNav, notExited: $notExited)
           .animation(.default)
           .transition(.move(edge: .trailing))
         
-        Button(action: {
-            exitRoom()
-          }, label: {
-            HStack {
-              Spacer()
-              Text("Leave Room")
-                .foregroundColor(Color.red)
-              Spacer()
-            }
-          })
-          .padding(.vertical)
+        
         }
       }
       .navigationTitle("Lobby")
