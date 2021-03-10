@@ -32,6 +32,7 @@ struct CreateRoomView: View {
     
   @State var roomName: String = ""
   @State var roomDescription: String = ""
+  @State var votingEnabled: Bool = true
     @State var madeRoom: Bool = false
     
     @Environment(\.presentationMode) var presentationMode
@@ -39,7 +40,7 @@ struct CreateRoomView: View {
     func createRoom(){
         //TO-DO- send info to room, songs per user
         print("Room")
-        var newRoom: room = room(name: roomName, desc: roomDescription, anonUsr: false, capacity: userCapacity, explicit: false, voting: true)
+        var newRoom: room = room(name: roomName, desc: roomDescription, anonUsr: false, capacity: userCapacity, explicit: false, voting: votingEnabled)
         makeRoom(newRoom: newRoom)
         madeRoom = true
         self.presentationMode.wrappedValue.dismiss()
@@ -70,6 +71,14 @@ struct CreateRoomView: View {
                         Stepper("\(songsPerUser)", onIncrement: { songsPerUser+=1}, onDecrement: { songsPerUser-=1})
                             .padding(.leading)
                     }
+                    
+                    HStack {
+                        Text("Enable Voting")
+                     Toggle(isOn: $votingEnabled) {
+                        Text("")
+                     }
+                    }
+                    .padding(.trailing)
                 }
             }
             
@@ -83,7 +92,7 @@ struct CreateRoomView: View {
           Spacer()
         }
       //}
-    }.navigationBarHidden(true).navigate(to: HostController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription), when: $madeRoom).onAppear(perform: {sharedSpotify.pause()}).navigationViewStyle(StackNavigationViewStyle())
+      }.navigationBarHidden(true).navigate(to: HostController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription, votingEnabled: votingEnabled), when: $madeRoom).onAppear(perform: {sharedSpotify.pause()}).navigationViewStyle(StackNavigationViewStyle())
   }
 }
   

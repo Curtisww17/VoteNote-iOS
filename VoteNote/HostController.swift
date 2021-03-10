@@ -14,6 +14,7 @@ struct HostController: View {
   @State var showNav = true
     @State var roomName: String
     @State var roomDescription: String
+    @State var votingEnabled: Bool
     @State var notExited: Bool = false
   
     func exitRoom() {
@@ -68,7 +69,7 @@ struct HostController: View {
           .animation(.default)
           .transition(.move(edge: .leading))
       } else {
-        Host_RoomPageView(roomName: roomName, roomDescription: roomDescription, roomCapacity: 5, songsPerUser: 5, showNav: $showNav)
+        Host_RoomPageView(roomName: roomName, roomDescription: roomDescription, roomCapacity: 5, songsPerUser: 5, votingEnabled: votingEnabled, showNav: $showNav)
           .animation(.default)
           .transition(.move(edge: .trailing))
         

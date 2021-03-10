@@ -22,6 +22,7 @@ struct Host_QueuePageView: View {
         @ObservedObject var isViewingUser: ObservableBoolean = ObservableBoolean(boolValue: false)
     @ObservedObject var selectedSong: song = song(addedBy: "Nil User", artist: "", genres: [""], id: "", length: 0, numVotes: 0, title: "None Selected", imageUrl: "")
         //@ObservedObject var hostControllerHidden: ObservableBoolean
+    @ObservedObject var selectedUser: user = user(name: "", profilePic: "")
     
     let refreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
   
@@ -56,13 +57,11 @@ struct Host_QueuePageView: View {
         
         List {
             ForEach(songQueue.musicList) { song in
-                            QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: isViewingUser, isDetailView: false, isUserQueue: false)
+                QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: isViewingUser, isDetailView: false, isUserQueue: false, selectedUser: selectedUser)
                         }
         }
         
         NowPlayingViewHost(isPlaying: isPlaying, songQueue: songQueue)
-        
-        //Text("Host Queue Page!")
         
         /*Button(action: {
           //these are the scopes that our app requests
@@ -99,7 +98,7 @@ struct Host_QueuePageView: View {
             print("Queue Updated!")
             //hostControllerHidden.boolValue = false
             
-        }).navigate(to: HostUserDetailView(user: getUser(uid: selectedSong.addedBy), songQueue: songQueue), when: $isViewingUser.boolValue).navigationViewStyle(StackNavigationViewStyle())
+        }).navigate(to: HostUserDetailView(user: selectedUser, songQueue: songQueue), when: $isViewingUser.boolValue).navigationViewStyle(StackNavigationViewStyle())
   }
 }
 
@@ -127,6 +126,8 @@ struct QueueEntry: View {
     @State var showNav: Bool = false
     //@ObservedObject var hostControllerHidden: ObservableBoolean
     
+    @State var selectedUser: user
+    
     func upVoteSong(){
         //TODO- Implement Upvoting
     }
@@ -150,6 +151,13 @@ struct QueueEntry: View {
     
     func viewUser(){
         //print("Viewing User \(isViewingUser.boolValue)")
+        /*getUser(uid: curSong.id)(user, err) in
+            self.selectedUser = user!
+        }*/
+        
+        getUser(uid: curSong.id){(user, err) in
+            selectedUser = user!
+        }
         selectedSong = self.curSong
         //hostControllerHidden.boolValue = true
         //isViewingUser.boolValue = true

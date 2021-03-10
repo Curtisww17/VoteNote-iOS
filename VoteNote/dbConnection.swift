@@ -79,7 +79,7 @@ class room{
     }
 }
 
-class user: Identifiable {
+class user: Identifiable, ObservableObject {
     let name: String
     let profilePic: String //link to pfp
     let isAnon: Bool

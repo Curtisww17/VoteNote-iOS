@@ -44,7 +44,7 @@ struct HostUserDetailView: View {
                     List {
                         ForEach(songQueue.musicList) { song in
                             if song.addedBy == user.name { //we should probably have a better way to make this comparision
-                                QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: hostControllerHidden, isDetailView: true, isUserQueue: false)
+                                QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: hostControllerHidden, isDetailView: true, isUserQueue: false, selectedUser: user)
                             }
                         }
                     }

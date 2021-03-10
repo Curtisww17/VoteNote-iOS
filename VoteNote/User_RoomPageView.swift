@@ -14,6 +14,7 @@ struct User_RoomPageView: View {
   @State var roomDescription: String
   @State var roomCapacity: Int
   @State var songsPerUser: Int
+    @State var votingEnabled: Bool
   @ObservedObject var currentRoom: CurrentRoom = CurrentRoom()
   
   @Binding var showNav: Bool
@@ -76,6 +77,14 @@ struct User_RoomPageView: View {
               Text("Songs Per User")
               Spacer()
               Text("\(songsPerUser)")
+            }
+            
+            HStack{
+                if votingEnabled {
+                    Text("Voting Enabled")
+                } else {
+                    Text("Voting Enabled")
+                }
             }
           }
         }

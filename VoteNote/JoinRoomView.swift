@@ -22,6 +22,7 @@ struct JoinRoomView: View {
   @State var roomDescription: String = ""
   @State var roomCapacity: Int = 0
   @State var songsPerUser: Int = 0
+  @State var votingEnabled: Bool = true
   
   func join(c: String) {
     joinRoom(code: c){ (ret, message) in
@@ -34,6 +35,7 @@ struct JoinRoomView: View {
           roomName = ret!.name
           roomDescription = (ret?.desc)!
           roomCapacity = ret!.capacity
+          votingEnabled = ret!.voting
           //songsPerUser = ret. //not in db room object
           self.joined = true
         }
@@ -82,7 +84,7 @@ struct JoinRoomView: View {
     .sheet(isPresented: $isShowingScanner) {
       CodeScannerView(codeTypes: [.qr], simulatedData: "1QCXT", completion: self.handleScan)
     }
-    /*}*/.navigate(to: UserController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser), when: $joined).onAppear(perform: {sharedSpotify.pause()}).navigationViewStyle(StackNavigationViewStyle())
+    /*}*/.navigate(to: UserController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser, votingEnabled: votingEnabled), when: $joined).onAppear(perform: {sharedSpotify.pause()}).navigationViewStyle(StackNavigationViewStyle())
   }
   
   func handleScan(result: Result<String, CodeScannerView.ScanError>) {
