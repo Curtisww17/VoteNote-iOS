@@ -15,43 +15,48 @@ struct LandingPageView: View {
   @State var isInRoom = false
   var body: some View {
     return NavigationView {
-      VStack {
-        if (!isInRoom) {
-          HStack {
-            Spacer()
-              .frame(width: UIScreen.main.bounds.size.width / 4)
-            Picker(selection: self.$currentView, label: Text("I don't know what this label is for")) {
-              Text("Join").tag(0)
-              Text("Host").tag(1)
-            }.pickerStyle(SegmentedPickerStyle())
-            .frame(width: UIScreen.main.bounds.size.width / 2,  alignment: .center)
+        VStack {
+            //if !hostControllerHidden.boolValue {
+                Text("Hidden Howdy").hidden()
+            //}
             VStack {
-              NavigationLink(
-                destination: ProfileView(),
-                label: {
-                  Image(systemName: "person")
-                    .resizable()
-                    .frame(width: 30, height: 30)
-                })
+              if (!isInRoom) {
+                HStack {
+                  Spacer()
+                    .frame(width: UIScreen.main.bounds.size.width / 4)
+                  Picker(selection: self.$currentView, label: Text("I don't know what this label is for")) {
+                    Text("Join").tag(0)
+                    Text("Host").tag(1)
+                  }.pickerStyle(SegmentedPickerStyle())
+                  .frame(width: UIScreen.main.bounds.size.width / 2,  alignment: .center)
+                  VStack {
+                    NavigationLink(
+                      destination: ProfileView(),
+                      label: {
+                        Image(systemName: "person")
+                          .resizable()
+                          .frame(width: 30, height: 30)
+                      })
+                  }
+                  .frame(width: UIScreen.main.bounds.size.width/4)
+                  
+                }
+                .frame(width: UIScreen.main.bounds.size.width, alignment: .top)
+              }
+              
+              if (currentView == 0) {
+                JoinRoomView(isInRoom: $isInRoom)
+                  .animation(.default)
+                  .transition(.move(edge: .leading))
+              } else {
+                CreateRoomView(isInRoom: $isInRoom, spotify: spotify)
+                  .animation(.default)
+                  .transition(.move(edge: .trailing))
+              }
             }
-            .frame(width: UIScreen.main.bounds.size.width/4)
-            
-          }
-          .frame(width: UIScreen.main.bounds.size.width, alignment: .top)
+            .navigationTitle("Lobby")
+            .navigationBarHidden(true)
         }
-        
-        if (currentView == 0) {
-          JoinRoomView(isInRoom: $isInRoom)
-            .animation(.default)
-            .transition(.move(edge: .leading))
-        } else {
-          CreateRoomView(isInRoom: $isInRoom, spotify: spotify)
-            .animation(.default)
-            .transition(.move(edge: .trailing))
-        }
-      }
-      .navigationTitle("Lobby")
-      .navigationBarHidden(true)
     }
     .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading).onAppear(perform: {sharedSpotify.pause()}).navigationViewStyle(StackNavigationViewStyle())
     

@@ -31,6 +31,10 @@ struct UserController: View {
       isInRoom = true
     }
     return VStack {
+        //if !hostControllerHidden.boolValue {
+            //Text("Hidden Howdy").hidden()
+        //}
+        VStack {
       HStack {
         Spacer()
           .frame(width: UIScreen.main.bounds.size.width / 4)
@@ -87,6 +91,7 @@ struct UserController: View {
     .navigationBarHidden(true).onAppear(perform: {
         notExited = false
     }).navigate(to: LandingPageView(), when: $notExited).navigationViewStyle(StackNavigationViewStyle())
+    }
   }
 }
 
