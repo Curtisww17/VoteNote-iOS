@@ -80,7 +80,7 @@ class room{
 }
 
 class user: Identifiable, ObservableObject {
-    let name: String
+    var name: String
     let profilePic: String //link to pfp
     let isAnon: Bool?
     let anon_name: String
@@ -362,7 +362,11 @@ func getUsers(completion: @escaping ([user]?, Error?) -> Void){
             //iterate through user documents and get their data
             for usr in query!.documents{
                 let newusr = user(usr: usr.data())
-                
+              if (newusr.isAnon != nil) {
+                if newusr.isAnon! {
+                  newusr.name = newusr.anon_name
+                }
+              }
                 users.append(newusr)
             }
             completion(users, nil)
@@ -381,6 +385,11 @@ func getUser(uid: String, completion: @escaping (user?, Error?) -> Void){
             completion(nil, err)
         } else if res!.data() != nil {
             let newusr = user(usr: res!.data()!)
+          if (newusr.isAnon != nil) {
+            if newusr.isAnon! {
+              newusr.name = newusr.anon_name
+            }
+          }
             completion(newusr, nil)
         } else {
         completion(nil, nil)

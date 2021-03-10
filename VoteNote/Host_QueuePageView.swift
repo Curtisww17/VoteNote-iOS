@@ -155,7 +155,7 @@ struct QueueEntry: View {
             self.selectedUser = user!
         }*/
         
-        getUser(uid: curSong.id){(user, err) in
+        getUser(uid: curSong.addedBy){(user, err) in
             selectedUser = user!
         }
         selectedSong = self.curSong
