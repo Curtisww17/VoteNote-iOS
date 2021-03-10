@@ -11,7 +11,8 @@ import SwiftUI
 
 struct ProfileView: View {
   @ObservedObject var spotify: Spotify = sharedSpotify
-  @State var currentUser: SpotifyUser?
+  @State var isAnon: Bool = false
+  @State var anonName: String = ""
   
   var body: some View {
     return VStack {
@@ -23,10 +24,23 @@ struct ProfileView: View {
             .clipShape(Circle())
           Spacer()
         }
+        Text("\(sharedSpotify.currentUser?.display_name ?? "Unknown")")
+          .font(.title)
       }
       Form {
-        if(spotify.loggedIn) {
-          Text("logged in as \(sharedSpotify.currentUser?.display_name ?? "Unknown")")
+        HStack {
+          Text("Anonymize Me")
+          Toggle(isOn: $isAnon, label: {
+            
+          })
+          .onTapGesture {
+            anonName = generateAnonName()
+          }
+        }
+        if (isAnon) {
+          Text("Display Name: \(anonName)")
+        } else {
+          Text("Display Name: \(sharedSpotify.currentUser!.display_name ?? "Unknown")")
         }
         if (spotify.loggedIn) {
           HStack {
