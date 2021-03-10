@@ -95,7 +95,6 @@ struct HostController: View {
       }).navigate(to: LandingPageView(), when: $notExited).navigationViewStyle(StackNavigationViewStyle())
     }
   }
-}
 
 /*struct HostController_PreviewContainer: View {
  @State var isInRoom: Bool = true
