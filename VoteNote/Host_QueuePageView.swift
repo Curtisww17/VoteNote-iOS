@@ -409,7 +409,7 @@ struct NowPlayingViewHost: View {
     }
 }
 
-/*struct Host_QueuePageView_PreviewContainer: View {
+struct Host_QueuePageView_PreviewContainer: View {
     @ObservedObject var songQueue: MusicQueue = MusicQueue()
     
     var body: some View {
@@ -421,7 +421,7 @@ struct Host_QueuePageView_Previews: PreviewProvider {
   static var previews: some View {
     Host_QueuePageView_PreviewContainer()
   }
-}*/
+}
 
 /*struct NowPlayingViewHost_Previews: PreviewProvider {
   static var previews: some View {

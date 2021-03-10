@@ -72,5 +72,5 @@ struct HostUserDetailView_Previews: PreviewProvider {
   static var previews: some View {
     User_QueuePageView_PreviewContainer()
   }
-}
-*/
+}*/
+
