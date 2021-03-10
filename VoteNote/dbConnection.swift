@@ -239,36 +239,36 @@ func joinRoom(code: String, completion:@escaping (room?, String?) -> Void){
     
 }
 
-//get the current room
-func getRoom(completion: @escaping (room?, Error?) -> Void){
-    //get UID from firebase auth
-    let usr = FAuth.currentUser
+//get the room referenced by code
+func getRoom(code: String, completion: @escaping (room?, Error?) -> Void){
     
     
-    db.collection("users").document(usr!.uid).getDocument() { (doc, err1) in
-        if let err1 = err1{
-            print("error, could not get user document")
-            completion(nil, err1)
-        }else{
-            let rmCode = doc?.data()!["currentRoom"] as! String
-            let joiningQuery = db.collection("room").whereField("code", isEqualTo: rmCode)
-            
-            joiningQuery.getDocuments() { (query, err) in
-                if let err = err{
-                    print("err gerring documents \(err)")
-                    completion(nil, err)
-                }
-                else{
-                    
-                    let rm = query?.documents[0].data()
-                    
-                    //return the room
-                    completion(room(rm: rm!), nil)
-                }
-            
-        }//end joiningquerey
+    let joiningQuery = db.collection("room").whereField("code", isEqualTo: code)
+    
+    joiningQuery.getDocuments() { (query, err) in
+        if let err = err{
+            print("err gerring documents \(err)")
+            completion(nil, err)
         }
-    }
+        else{
+            
+            let rm = query?.documents[0].data()
+            
+            //if we didn't find the document
+            if rm == nil{
+                enum newError: Error {
+                    case documentError(String)
+                }
+                completion(nil, newError.documentError("no room with that code could be found"))
+            }
+            
+            //return the room
+            completion(room(rm: rm!), nil)
+        }
+    
+    }//end joiningquerey
+        
+    
     
 }
 
@@ -400,9 +400,6 @@ func addsong(id: String) -> Int{
     var title = ""
     var artist = ""
     var imageUrl = ""
-    
-    //find current room
-    //var currRoom = getCurrRoom()
     
     //TODO: get album art stuff
     //TODO: check for songs per user limit
