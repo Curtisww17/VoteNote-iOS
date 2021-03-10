@@ -26,6 +26,7 @@
 		4485731025BF8390006C5C07 /* Host_RoomPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4485730F25BF8390006C5C07 /* Host_RoomPageView.swift */; };
 		4485731525BF8727006C5C07 /* User_RoomPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4485731425BF8727006C5C07 /* User_RoomPageView.swift */; };
 		4485733425C22F0E006C5C07 /* SpotifyiOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4485733325C22F0E006C5C07 /* SpotifyiOS.framework */; };
+		44A2831325F7F97E00DDF229 /* AnonymousLists.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44A2831225F7F97E00DDF229 /* AnonymousLists.swift */; };
 		44C07DAE25E565B200D3667A /* QRCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44C07DAD25E565B200D3667A /* QRCode.swift */; };
 		44C07DB325E5664100D3667A /* RoomCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44C07DB225E5664100D3667A /* RoomCodeView.swift */; };
 		44C07DB825E566BE00D3667A /* CurrentRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44C07DB725E566BE00D3667A /* CurrentRoom.swift */; };
@@ -94,6 +95,7 @@
 		4485731425BF8727006C5C07 /* User_RoomPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User_RoomPageView.swift; sourceTree = "<group>"; };
 		4485731F25C225DD006C5C07 /* VoteNote-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "VoteNote-Bridging-Header.h"; sourceTree = "<group>"; };
 		4485733325C22F0E006C5C07 /* SpotifyiOS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpotifyiOS.framework; sourceTree = "<group>"; };
+		44A2831225F7F97E00DDF229 /* AnonymousLists.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnonymousLists.swift; sourceTree = "<group>"; };
 		44C07DAD25E565B200D3667A /* QRCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCode.swift; sourceTree = "<group>"; };
 		44C07DB225E5664100D3667A /* RoomCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomCodeView.swift; sourceTree = "<group>"; };
 		44C07DB725E566BE00D3667A /* CurrentRoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentRoom.swift; sourceTree = "<group>"; };
@@ -201,6 +203,7 @@
 				44C07DAD25E565B200D3667A /* QRCode.swift */,
 				44C07DB225E5664100D3667A /* RoomCodeView.swift */,
 				44C07DB725E566BE00D3667A /* CurrentRoom.swift */,
+				44A2831225F7F97E00DDF229 /* AnonymousLists.swift */,
 			);
 			path = VoteNote;
 			sourceTree = "<group>";
@@ -518,6 +521,7 @@
 				67DC8DA625DB3F63008C07F8 /* AddMusicView.swift in Sources */,
 				88FB569625CAF48B007114C7 /* dbConnection.swift in Sources */,
 				44C07DB825E566BE00D3667A /* CurrentRoom.swift in Sources */,
+				44A2831325F7F97E00DDF229 /* AnonymousLists.swift in Sources */,
 				448572F525BF7A61006C5C07 /* ProfileView.swift in Sources */,
 				448572AE25BF421E006C5C07 /* AppDelegate.swift in Sources */,
 				448572B025BF421E006C5C07 /* SceneDelegate.swift in Sources */,

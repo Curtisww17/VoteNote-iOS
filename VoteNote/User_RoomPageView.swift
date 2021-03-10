@@ -92,7 +92,9 @@ struct User_RoomPageView: View {
       .navigationTitle("Room")
       .navigationBarHidden(true)
     }
+    
   }
+  
   
 }
 

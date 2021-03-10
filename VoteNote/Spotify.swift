@@ -48,8 +48,8 @@ class Spotify: ObservableObject {
   let SCOPES: SPTScope = [ .userReadRecentlyPlayed, .userTopRead, .streaming, .userReadEmail, .appRemoteControl, .playlistModifyPrivate, .playlistModifyPublic, .playlistReadPrivate, .userModifyPlaybackState, .userReadPlaybackState, .userReadCurrentlyPlaying]
   
   @Published var loggedIn: Bool
-  
-  
+  //@Published var isAnon: Bool
+  //@Published var anon_name: String
   
   
   
@@ -59,6 +59,7 @@ class Spotify: ObservableObject {
     self.canLogin = false
     httpRequester = HttpRequester()
     self.isJoiningThroughLink = ""
+    
   }
   
   func login() -> Bool {
@@ -178,6 +179,7 @@ struct SpotifyUser: Codable {
   var email: String?
   var product: String?
   var uri: String?
+  var id: String
   var images: [SpotifyImage]?
 }
 
