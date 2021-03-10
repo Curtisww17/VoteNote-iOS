@@ -11,7 +11,7 @@ struct HostUserDetailView: View {
     //need to manually add back button
   @State var user: user
   @ObservedObject var songQueue: MusicQueue
-  @ObservedObject var selectedSong: song = song(addedBy: "Nil User", artist: "", genres: [""], id: "", length: 0, numVotes: 0, title: "None Selected")
+    @ObservedObject var selectedSong: song = song(addedBy: "Nil User", artist: "", genres: [""], id: "", length: 0, numVotes: 0, title: "None Selected", imageUrl: "")
     @ObservedObject var hostControllerHidden: ObservableBoolean = ObservableBoolean(boolValue: false)
     @State var shouldReturn: Bool = false
     
