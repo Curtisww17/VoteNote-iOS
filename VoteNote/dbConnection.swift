@@ -97,9 +97,10 @@ class song: Identifiable, ObservableObject{
     let length: Int
     let numVotes: Int?
     let title: String
+  let imageUrl: String
     //let timeStarted: Int
     
-    init(addedBy: String, artist: String, genres: [String], id: String, length: Int, numVotes: Int?, title: String) {
+  init(addedBy: String, artist: String, genres: [String], id: String, length: Int, numVotes: Int?, title: String, imageUrl: String) {
         self.addedBy = addedBy
         self.artist = artist
         self.genres = genres
@@ -107,6 +108,7 @@ class song: Identifiable, ObservableObject{
         self.length = length
         self.numVotes = numVotes
         self.title = title
+    self.imageUrl = imageUrl
     }
     
     init(sng: [String: Any], id: String){
@@ -117,6 +119,7 @@ class song: Identifiable, ObservableObject{
         length = sng["length"] as! Int
         numVotes = sng["numVotes"] as? Int
         title = sng["title"] as! String
+      imageUrl = sng["imageurl"] as! String
     }
   
 }
@@ -294,6 +297,7 @@ func addsong(id: String) -> Int{
     var length = 0
     var title = ""
     var artist = ""
+  var imageUrl = ""
     
     //find current room
     //var currRoom = getCurrRoom()
@@ -310,6 +314,7 @@ func addsong(id: String) -> Int{
             }
             length = (track?.duration_ms)!
             title = track!.name
+          imageUrl = track?.album?.images?[0].url ?? ""
         }
     
     
@@ -323,6 +328,7 @@ func addsong(id: String) -> Int{
                        "artist": artist,
                        "length": length,
                        "addedBy": addedBy,
+                       "imageurl": imageUrl,
                        "numvotes": 0] as [String : Any]
             
             

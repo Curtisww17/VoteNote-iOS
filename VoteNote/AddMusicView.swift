@@ -150,7 +150,7 @@ struct SearchEntry: View {
   func selectSong() {
     selectedSong = !selectedSong
     if selectedSong {
-      selectedSongs.append(song(addedBy: self.addedBy, artist: self.songArtist, genres: self.genres, id: self.songID, length: self.length, numVotes: self.numVotes, title: self.songTitle))
+      selectedSongs.append(song(addedBy: self.addedBy, artist: self.songArtist, genres: self.genres, id: self.songID, length: self.length, numVotes: self.numVotes, title: self.songTitle, imageUrl: self.imageURL ?? ""))
       print("Selected Song. Currently Selected this many songs: \(selectedSongs.count)")
     } else {
       var songIndex: Int = 0
