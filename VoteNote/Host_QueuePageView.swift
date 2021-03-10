@@ -20,7 +20,7 @@ struct Host_QueuePageView: View {
         @State var voteUpdateSeconds = 10
         @ObservedObject var songQueue: MusicQueue = MusicQueue()
         @ObservedObject var isViewingUser: ObservableBoolean = ObservableBoolean(boolValue: false)
-        @ObservedObject var selectedSong: song = song(addedBy: "Nil User", artist: "", genres: [""], id: "", length: 0, numVotes: 0, title: "None Selected")
+    @ObservedObject var selectedSong: song = song(addedBy: "Nil User", artist: "", genres: [""], id: "", length: 0, numVotes: 0, title: "None Selected", imageUrl: "")
         //@ObservedObject var hostControllerHidden: ObservableBoolean
     
     let refreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
