@@ -15,19 +15,24 @@ struct ProfileView: View {
   
   var body: some View {
     return VStack {
+      if (spotify.loggedIn) {
+        HStack {
+          Spacer()
+          RemoteImage(url: sharedSpotify.currentUser!.images?[0].url ?? "")
+            .frame(width: 150, height: 150)
+            .clipShape(Circle())
+          Spacer()
+        }
+      }
       Form {
         if(spotify.loggedIn) {
-          RemoteImage(url: sharedSpotify.currentUser!.images?[0].url ?? "")
           Text("logged in as \(sharedSpotify.currentUser?.display_name ?? "Unknown")")
         }
         if (spotify.loggedIn) {
           HStack {
             Spacer()
             Button(action: {
-              //spotify.logout()
-              sharedSpotify.getAlbumArt(for: "0weAUscowxeqDtpCgtbpgp", completion: { image in
-                print ("hi")
-              })
+              spotify.logout()
             }, label: {
               Text("Log out of Spotify")
             })
