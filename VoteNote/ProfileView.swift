@@ -11,8 +11,7 @@ import SwiftUI
 
 struct ProfileView: View {
   @ObservedObject var spotify: Spotify = sharedSpotify
-  @State var isAnon: Bool = false
-  @State var anonName: String = ""
+  @State var isAnon: Bool = sharedSpotify.isAnon
   
   var body: some View {
     return VStack {
@@ -24,23 +23,35 @@ struct ProfileView: View {
             .clipShape(Circle())
           Spacer()
         }
-        Text("\(sharedSpotify.currentUser?.display_name ?? "Unknown")")
+        Text("\(spotify.currentUser?.display_name ?? "Unknown")")
           .font(.title)
       }
       Form {
         HStack {
           Text("Anonymize Me")
-          Toggle(isOn: $isAnon, label: {
-            
-          })
-          .onTapGesture {
-            anonName = generateAnonName()
-          }
+          Toggle(isOn: $isAnon, label: {})
+            .onChange(of: self.isAnon) { newValue in
+              print("anon")
+                setAnon(isAnon: isAnon)
+                spotify.isAnon = isAnon
+            }
         }
-        if (isAnon) {
-          Text("Display Name: \(anonName)")
+        .frame(height:50)
+        if (spotify.isAnon) {
+          HStack {
+            Text("Display Name: \(spotify.anon_name)")
+            Spacer()
+          Image(systemName: "arrow.clockwise")
+            .onTapGesture {
+              let newName = generateAnonName()
+              setAnonName(name: newName)
+              spotify.anon_name = newName
+            }
+          }
+          .frame(height: 50)
         } else {
-          Text("Display Name: \(sharedSpotify.currentUser!.display_name ?? "Unknown")")
+          Text("Display Name: \(spotify.currentUser!.display_name ?? "Unknown")")
+            .frame(height: 50)
         }
         if (spotify.loggedIn) {
           HStack {

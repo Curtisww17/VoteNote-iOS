@@ -48,8 +48,8 @@ class Spotify: ObservableObject {
   let SCOPES: SPTScope = [ .userReadRecentlyPlayed, .userTopRead, .streaming, .userReadEmail, .appRemoteControl, .playlistModifyPrivate, .playlistModifyPublic, .playlistReadPrivate, .userModifyPlaybackState, .userReadPlaybackState, .userReadCurrentlyPlaying]
   
   @Published var loggedIn: Bool
-  //@Published var isAnon: Bool
-  //@Published var anon_name: String
+  @Published var isAnon: Bool
+  @Published var anon_name: String
   
   
   
@@ -59,7 +59,8 @@ class Spotify: ObservableObject {
     self.canLogin = false
     httpRequester = HttpRequester()
     self.isJoiningThroughLink = ""
-    
+    self.isAnon = false;
+    self.anon_name = ""
   }
   
   func login() -> Bool {
@@ -75,34 +76,58 @@ class Spotify: ObservableObject {
     return true
   }
   
+  func initializeAnon() {
+    getUser(uid: getUID()) { (user, err) in
+      if (err != nil) {
+        print(err!)
+      } else if user != nil {
+        if user!.isAnon != nil {
+          self.isAnon = user!.isAnon!
+        } else {
+          setAnon(isAnon: false)
+          self.isAnon = false
+        }
+        if user!.anon_name == "" {
+          let newName = generateAnonName()
+          setAnonName(name: newName)
+          self.anon_name = newName
+        } else {
+          self.anon_name = user!.anon_name
+        }
+        
+      }
+      
+    }
+  }
+  
   func pause() {
     self.appRemote?.playerAPI?.pause({ (_, error) in
-      print(error)
+      print(error as Any)
     })
   }
   
   func resume(){
     self.appRemote?.playerAPI?.resume({ (_, error) in
-      print(error)
+      print(error as Any)
     })
   }
   
   func enqueue(songID: String){
     self.appRemote?.playerAPI?.enqueueTrackUri("spotify:track:"+songID, callback: { (_, error) in
-      print(error)
+      print(error as Any)
     })
   }
   
   func skip(){
     self.appRemote?.playerAPI?.skip(toNext: { (_, error) in
-      print(error)
+      print(error as Any)
     })
   }
   
   //need to add call back(?)
   func getPlayerState(){
     self.appRemote?.playerAPI?.getPlayerState({ (_, error) in
-      print(error)
+      print(error as Any)
     })
   }
   

@@ -82,7 +82,7 @@ class room{
 class user: Identifiable, ObservableObject {
     let name: String
     let profilePic: String //link to pfp
-    let isAnon: Bool
+    let isAnon: Bool?
     let anon_name: String
     
     //TODO: refactor this out
@@ -169,29 +169,29 @@ func firebaseLogin(name: String){
             //user created successfully
             //make a user document
             //TODO: add pfp
-            db.collection("users").document(result!.user.uid).updateData( [
+            db.collection("users").document(result!.user.uid).setData( [
                 "name":  name,
                 "profilePic": "https://i.pinimg.com/474x/be/80/75/be8075c3043965030d69e8bccf2b5c5c.jpg",
-                "isAnon": false,
-                "anon_name": ""
-            ])
+                //"isAnon": false//,
+                //"anon_name": ""
+            ], merge: true)
         }
     }
 }
 
 //makes the current user anonymous with the anon name name
-func setAnon(name: String){
+func setAnonName(name: String){
     let uid = FAuth.currentUser!.uid
-    
-    db.collection("users").document(uid).updateData(["isAnon": true, "anon_name": name])
-    
+
+    db.collection("users").document(uid).updateData(["anon_name": name])
+
 }
 
 //makes the current user not anonymous
-func setNotAnon(){
+func setAnon(isAnon: Bool){
     let uid = FAuth.currentUser!.uid
     
-    db.collection("users").document(uid).updateData(["isAnon": false])
+    db.collection("users").document(uid).updateData(["isAnon": isAnon])
     
 }
 
@@ -376,14 +376,15 @@ func getUsers(completion: @escaping ([user]?, Error?) -> Void){
 //get individual user by id
 func getUser(uid: String, completion: @escaping (user?, Error?) -> Void){
     db.collection("users").document(uid).getDocument { (res, err) in
-        if let err = err{
+        if let err = err {
             print("err gerring documents \(err)")
             completion(nil, err)
-        }else{
+        } else if res!.data() != nil {
             let newusr = user(usr: res!.data()!)
             completion(newusr, nil)
-        }
+        } else {
         completion(nil, nil)
+        }
     }
     
 }

@@ -158,13 +158,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate,
         firebaseLogin(name: (user?.display_name)!)
         
         
-        //        sharedSpotify.getTrackInfo(track_uri: "0weAUscowxeqDtpCgtbpgp", completion: { track in
-        //          if track != nil {
-        //            print(track!.name)
-        //          }
-        //        })
-        
-        
         
       })
       
