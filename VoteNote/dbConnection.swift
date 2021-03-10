@@ -82,17 +82,31 @@ class room{
 class user: Identifiable {
     let name: String
     let profilePic: String //link to pfp
+    let isAnon: Bool
+    let anon_name: String
     
-    //normal
+    //TODO: refactor this out
     init(name: String, profilePic: String){
         self.name = name
         self.profilePic = profilePic
+        isAnon = false
+        anon_name = ""
+    }
+    
+    //default
+    init(name: String, profilePic: String, isAnon: Bool, anon_name: String){
+        self.name = name
+        self.profilePic = profilePic
+        self.isAnon = isAnon
+        self.anon_name = anon_name
     }
     
     //for firestore
     init(usr: [String: Any]){
         name = usr["name"] as! String
         profilePic = usr["profilePic"] as! String
+        isAnon = usr["isAnon"] as? Bool ?? false
+        anon_name = usr["anon_name"] as? String ?? ""
     }
 }
 
@@ -154,13 +168,33 @@ func firebaseLogin(name: String){
         else{
             //user created successfully
             //make a user document
+            //TODO: add pfp
             db.collection("users").document(result!.user.uid).updateData( [
                 "name":  name,
                 "profilePic": "https://i.pinimg.com/474x/be/80/75/be8075c3043965030d69e8bccf2b5c5c.jpg",
+                "isAnon": false,
+                "anon_name": ""
             ])
         }
     }
 }
+
+//makes the current user anonymous with the anon name name
+func setAnon(name: String){
+    let uid = FAuth.currentUser!.uid
+    
+    db.collection("users").document(uid).updateData(["isAnon": true, "anon_name": name])
+    
+}
+
+//makes the current user not anonymous
+func setNotAnon(){
+    let uid = FAuth.currentUser!.uid
+    
+    db.collection("users").document(uid).updateData(["isAnon": false])
+    
+}
+
 
 //puts the user in the room with code = code
 func joinRoom(code: String, completion:@escaping (room?, String?) -> Void){
