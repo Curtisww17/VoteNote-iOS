@@ -117,8 +117,9 @@ class song: Identifiable, ObservableObject{
     let numVotes: Int?  //nuber of votes recived by the song
     let title: String   //name of the song
     let imageUrl: String
+    let isExplicit: Bool?
     //let timeStarted: Int
-    init(addedBy: String, artist: String, genres: [String], id: String, length: Int, numVotes: Int?, title: String, imageUrl: String) {
+    init(addedBy: String, artist: String, genres: [String], id: String, length: Int, numVotes: Int?, title: String, imageUrl: String, explicit: Bool?) {
         self.addedBy = addedBy
         self.artist = artist
         self.genres = genres
@@ -127,6 +128,7 @@ class song: Identifiable, ObservableObject{
         self.numVotes = numVotes
         self.title = title
         self.imageUrl = imageUrl
+        isExplicit = explicit ?? true
     }
     
     //firestore
@@ -139,6 +141,7 @@ class song: Identifiable, ObservableObject{
         numVotes = sng["numVotes"] as? Int
         title = sng["title"] as! String
         imageUrl = sng["imageurl"] as! String
+        isExplicit = sng["isExplicit"] as? Bool ?? true
     }
     
 }
@@ -383,7 +386,6 @@ func getUsers(completion: @escaping ([user]?, Error?) -> Void){
     var users: [user] = []
     
     getCurrRoom { (code, err) in
-        <#code#>
         
         getRoom(code: code) { (currRoom, err) in
             
@@ -480,27 +482,33 @@ func banUser(uid: String){
  - Parameter id: the spotify id of the song to be added
  */
 func addsong(id: String){
-    let addedBy = FAuth.currentUser!.uid
-    var length = 0
-    var title = ""
-    var artist = ""
-    var imageUrl = ""
+
     
     //TODO: get album art stuff
     //TODO: check for songs per user limit
+    //TODO: get explicit
     getCurrRoom { (currRoom, err) in
         
         
         
         //get the track deets
         sharedSpotify.getTrackInfo(track_uri: id) { (track) in
+            let addedBy = FAuth.currentUser!.uid
+            var length = 0
+            var title = ""
+            var artist = ""
+            var imageUrl = ""
+            var isExplicit = true
+            
             if track != nil{
+                
                 for art in track!.artists! {
                     artist += art.name + " "
                 }
                 length = (track?.duration_ms)!
                 title = track!.name
                 imageUrl = track?.album?.images?[0].url ?? ""
+                isExplicit = track?.explicit ?? true
             }
             
             
@@ -516,7 +524,8 @@ func addsong(id: String){
                                "length": length,
                                "addedBy": addedBy,
                                "imageurl": imageUrl,
-                               "numvotes": 0] as [String : Any]
+                               "numvotes": 0,
+                               "isExplicit": isExplicit] as [String : Any]
                     
                     //put the map into the queue
                     db.collection("room").document(docid!).updateData([
@@ -551,10 +560,10 @@ func getSong(id: String, completion: @escaping (song?, Error?) -> Void){
                 completion(nil, err)
             } else{
                 //grab the queue
-                let queue: Dictionary = doc?.data()?["queue"] as! Dictionary<String, Any?>
+                let queue: Dictionary? = doc?.data()?["queue"] as? Dictionary<String, Any?>
                 if queue != nil {
                     //grab the song from the queue
-                    let sng: Dictionary = queue[id] as! Dictionary<String, Any?>
+                    let sng: Dictionary = queue![id] as! Dictionary<String, Any?>
                     
                     //convert from the db map of song to song obj
                     songout = song(sng: sng, id: id)
