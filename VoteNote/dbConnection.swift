@@ -151,7 +151,7 @@ class song: Identifiable, ObservableObject{
 
 //gets the string code for the user's current room
 /**
- Gets the string code for the current room
+ Gets the string code for the current room, returns `""` if they aren't in a room
  
  - Parameter completion: completion handler to return the asynchronous call
  */
@@ -159,7 +159,8 @@ func getCurrRoom(completion: @escaping (String, Error?) -> Void){
     var currRoom = ""
     //get the user's document using firebase auth
     db.collection("users").document(FAuth.currentUser!.uid).getDocument { (res, err) in
-        currRoom = res?.data()!["currentRoom"] as! String //grab the value for current room
+        //grab the value for current room
+        currRoom = res?.data()?["currentRoom"] as? String ?? ""
         completion(currRoom, nil)
     }
     //return currRoom
@@ -259,7 +260,9 @@ func getRoom(code: String, completion: @escaping (room?, Error?) -> Void){
             print("err gerring documents \(err)")
             completion(nil, err)
         }
-        else{
+        else if query!.isEmpty { //make sure the querey returns a room
+            completion(nil, nil)
+        } else {
             
             let rm = query?.documents[0].data()
             
