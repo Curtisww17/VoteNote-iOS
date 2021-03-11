@@ -15,10 +15,32 @@ struct User_QueuePageView: View {
     @State var queueRefreshSeconds = 60
     @State var voteUpdateSeconds = 10
     @ObservedObject var songQueue: MusicQueue = MusicQueue()
+    @ObservedObject var votingEnabled: ObservableBoolean
     
     let refreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
   
-  
+    func updateQueue() {
+        getQueue(){(songs, err) in
+            if songs != nil {
+                if songs!.count > 0 {
+                    songQueue.musicList.removeAll()
+                    var count: Int = 0
+                    while count < songs!.count {
+                        songQueue.musicList.append(songs![count])
+                        count = count + 1
+                    }
+                    
+                    if votingEnabled.boolValue {
+                        if self.songQueue.musicList[0].numVotes != nil && self.songQueue.musicList[1].numVotes != nil {
+                            self.songQueue.musicList.sort { $0.numVotes! < $1.numVotes! }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    
   var body: some View {
       VStack {
         
@@ -31,18 +53,7 @@ struct User_QueuePageView: View {
                     self.voteUpdateSeconds = 10
                     print("Updating Queue")
                     
-                    getQueue(){(songs, err) in
-                        if songs != nil {
-                            if songs!.count > 0 {
-                                songQueue.musicList.removeAll()
-                                var count: Int = 0
-                                while count < songs!.count {
-                                    songQueue.musicList.append(songs![count])
-                                    count = count + 1
-                                }
-                            }
-                        }
-                    }
+                    updateQueue()
                 }
             }
         }.hidden()
@@ -57,19 +68,7 @@ struct User_QueuePageView: View {
       }
       .navigationBarHidden(true).onAppear(perform: {
         print("Updating Queue...")
-        
-        getQueue(){(songs, err) in
-            if songs != nil {
-                if songs!.count > 0 {
-                    songQueue.musicList.removeAll()
-                    var count: Int = 0
-                    while count < songs!.count {
-                        songQueue.musicList.append(songs![count])
-                        count = count + 1
-                    }
-                }
-            }
-        }
+        updateQueue()
         print("Queue Updated!")
       })
   }
@@ -178,11 +177,11 @@ struct NowPlayingViewUser: View {
     }
 }
 
-struct User_QueuePageView_PreviewContainer: View {
+/*struct User_QueuePageView_PreviewContainer: View {
     @State var isInRoom: Bool = true
 
     var body: some View {
-        User_QueuePageView()
+        User_QueuePageView(votingEnabled: ObservableBoolean(boolValue: true))
     }
 }
 
@@ -190,4 +189,4 @@ struct User_QueuePageView_Previews: PreviewProvider {
   static var previews: some View {
     User_QueuePageView_PreviewContainer()
   }
-}
+}*/

@@ -41,3 +41,10 @@ struct LoginWithSpotifyView: View {
   }
 }
 
+class ObservableBoolean: ObservableObject {
+    var boolValue: Bool
+    
+    init(boolValue: Bool) {
+        self.boolValue = boolValue
+    }
+}

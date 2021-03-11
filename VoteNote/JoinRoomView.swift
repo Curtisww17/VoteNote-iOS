@@ -22,18 +22,23 @@ struct JoinRoomView: View {
   @State var roomDescription: String = ""
   @State var roomCapacity: Int = 0
   @State var songsPerUser: Int = 0
+  @State private var isShowingJoinAlert = false
+  @State var votingEnabled: Bool = true
+  @State var anonUsr: Bool = false
   
   func join(c: String) {
     joinRoom(code: c){ (ret, message) in
       if message != nil {
         //TODO: popup that they cannot join the room
       }else{
-      
+        
         self.joined = true
         if ret != nil {
           roomName = ret!.name
           roomDescription = (ret?.desc)!
           roomCapacity = ret!.capacity
+          votingEnabled = ret!.voting
+          anonUsr = ret!.anonUsr
           //songsPerUser = ret. //not in db room object
           self.joined = true
         }
@@ -45,35 +50,43 @@ struct JoinRoomView: View {
   
   var body: some View {
     //return NavigationView {
-    ZStack {
+    Form {
       //Color.white
-      VStack {
-        Text("Join Room")
-        /*
-         NavigationLink(
-         destination: UserController(isInRoom: $isInRoom),
-         label: {
-         Text("go to User Queue Page")
-         })*/
-        TextField("Room Code", text: $code).multilineTextAlignment(.center)
-        Button(action: {
-          self.isShowingScanner = true
-        }, label: {
-          Text("Join with QR")
-        })
-        
-        if self.code != "" {
-          Button(action: {
-            join(c: code)
-            //print("\n\n\n\n\n\n\n\n\n\n\n\\n\(code)")
-          }) {
-            Text("Join Room")
-            
-          }.padding()
-        }
+      HStack {
+        Image(systemName: "qrcode")
+          .foregroundColor(.accentColor)
+        Text("Join with QR Code")
+        Spacer()
+        Image(systemName: "chevron.forward")
+          .frame(alignment: .trailing)
       }
-    }
-    .onAppear(perform: {
+      .frame(height: 60)
+      .onTapGesture {
+        self.isShowingScanner = true
+      }
+        HStack {
+          Image(systemName: "textformat")
+            .foregroundColor(.accentColor)
+          Text("Join with Room Code")
+          Spacer()
+          Image(systemName: "chevron.forward")
+            .frame(alignment: .trailing)
+        }
+        .frame(height: 60)
+      .onTapGesture(perform: {
+        isShowingJoinAlert.toggle()
+      })
+        if (isShowingJoinAlert) {
+            TextField("RoomCode", text: $code)
+              .textFieldStyle(RoundedBorderTextFieldStyle())
+              Button(action: {
+                join(c: code)
+              }, label: {
+                Text("Join")
+              })
+              .frame(width: UIScreen.main.bounds.width * 0.8, height: 60, alignment: .center)
+        }
+    }    .onAppear(perform: {
       if sharedSpotify.isJoiningThroughLink.count != 0 {
         join(c: sharedSpotify.isJoiningThroughLink)
       }
@@ -82,7 +95,7 @@ struct JoinRoomView: View {
     .sheet(isPresented: $isShowingScanner) {
       CodeScannerView(codeTypes: [.qr], simulatedData: "1QCXT", completion: self.handleScan)
     }
-    /*}*/.navigate(to: UserController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser), when: $joined).onAppear(perform: {sharedSpotify.pause()}).navigationViewStyle(StackNavigationViewStyle())
+    /*}*/.navigate(to: UserController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser, votingEnabled: votingEnabled, anonUsr: anonUsr), when: $joined).onAppear(perform: {sharedSpotify.pause()}).navigationViewStyle(StackNavigationViewStyle())
   }
   
   func handleScan(result: Result<String, CodeScannerView.ScanError>) {
@@ -99,26 +112,19 @@ struct JoinRoomView: View {
   }
 }
 
-/*struct JoinRoomView_Previews: PreviewProvider {
- static var previews: some View {
- JoinRoomView()
- }
- }*/
-
-struct JoinRoomView_PreviewContainer: View {
-  
-  @State var isInRoom = false
+struct JoinRoomView_PreviewsContainer: View {
   //@State var spotify: Spotify = Spotify()
-  
+  @State var isInRoom = false
   var body: some View {
     JoinRoomView(isInRoom: $isInRoom)
   }
 }
 
-
 struct JoinRoomView_Previews: PreviewProvider {
   static var previews: some View {
-    
-    JoinRoomView_PreviewContainer()
+    JoinRoomView_PreviewsContainer()
   }
 }
+
+
+

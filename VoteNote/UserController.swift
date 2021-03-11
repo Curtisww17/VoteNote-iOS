@@ -16,21 +16,21 @@ struct UserController: View {
   @State var roomDescription: String
   @State var roomCapacity: Int
   @State var songsPerUser: Int
+  @State var votingEnabled: Bool
+  @State var anonUsr: Bool
   @State var notExited: Bool = false
     
   @State var currentView = 0
-    
-    func exitRoom() {
-        print("Left Room")
-        leaveRoom()
-        notExited = true
-    }
     
   var body: some View {
     OperationQueue.main.addOperation {
       isInRoom = true
     }
     return VStack {
+        //if !hostControllerHidden.boolValue {
+            //Text("Hidden Howdy").hidden()
+        //}
+        VStack {
       HStack {
         Spacer()
           .frame(width: UIScreen.main.bounds.size.width / 4)
@@ -63,30 +63,20 @@ struct UserController: View {
       .frame(width: UIScreen.main.bounds.size.width, alignment: .top)
       
       if (currentView == 0) {
-        User_QueuePageView()
+        User_QueuePageView(votingEnabled: ObservableBoolean(boolValue: votingEnabled))
           .animation(.default)
           .transition(.move(edge: .leading))
       } else {
-        User_RoomPageView(roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser, showNav: $showNav)
+        User_RoomPageView(roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser, votingEnabled: votingEnabled, anonUsr: $anonUsr, notExited: $notExited, showNav: $showNav)
           .animation(.default)
           .transition(.move(edge: .trailing))
         
-        Button(action: {
-            exitRoom()
-        }, label: {
-          HStack {
-            Spacer()
-            Text("Leave Room")
-                .foregroundColor(Color.red)
-            Spacer()
-          }
-        })
-        .padding(.vertical)
       }
     }
     .navigationBarHidden(true).onAppear(perform: {
         notExited = false
     }).navigate(to: LandingPageView(), when: $notExited).navigationViewStyle(StackNavigationViewStyle())
+    }
   }
 }
 

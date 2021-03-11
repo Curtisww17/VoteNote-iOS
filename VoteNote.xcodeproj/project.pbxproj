@@ -26,6 +26,7 @@
 		4485731025BF8390006C5C07 /* Host_RoomPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4485730F25BF8390006C5C07 /* Host_RoomPageView.swift */; };
 		4485731525BF8727006C5C07 /* User_RoomPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4485731425BF8727006C5C07 /* User_RoomPageView.swift */; };
 		4485733425C22F0E006C5C07 /* SpotifyiOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4485733325C22F0E006C5C07 /* SpotifyiOS.framework */; };
+		44A2831325F7F97E00DDF229 /* AnonymousLists.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44A2831225F7F97E00DDF229 /* AnonymousLists.swift */; };
 		44C07DAE25E565B200D3667A /* QRCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44C07DAD25E565B200D3667A /* QRCode.swift */; };
 		44C07DB325E5664100D3667A /* RoomCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44C07DB225E5664100D3667A /* RoomCodeView.swift */; };
 		44C07DB825E566BE00D3667A /* CurrentRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44C07DB725E566BE00D3667A /* CurrentRoom.swift */; };
@@ -36,6 +37,7 @@
 		44F8D5DA25DB512C00D2B461 /* UsersListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44F8D5D925DB512C00D2B461 /* UsersListView.swift */; };
 		44F8D5DF25DB51DA00D2B461 /* UserDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44F8D5DE25DB51DA00D2B461 /* UserDetailView.swift */; };
 		671BABC925D895B500964AAF /* httpRequester.swift in Sources */ = {isa = PBXBuildFile; fileRef = 671BABC825D895B500964AAF /* httpRequester.swift */; };
+		67C1C10825F6F67D006A878B /* Host_UserAdminDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67C1C10725F6F67D006A878B /* Host_UserAdminDetailView.swift */; };
 		67DC8DA625DB3F63008C07F8 /* AddMusicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67DC8DA525DB3F63008C07F8 /* AddMusicView.swift */; };
 		88FB562525C73562007114C7 /* (null) in Resources */ = {isa = PBXBuildFile; };
 		88FB562625C73562007114C7 /* (null) in Resources */ = {isa = PBXBuildFile; };
@@ -93,6 +95,7 @@
 		4485731425BF8727006C5C07 /* User_RoomPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User_RoomPageView.swift; sourceTree = "<group>"; };
 		4485731F25C225DD006C5C07 /* VoteNote-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "VoteNote-Bridging-Header.h"; sourceTree = "<group>"; };
 		4485733325C22F0E006C5C07 /* SpotifyiOS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpotifyiOS.framework; sourceTree = "<group>"; };
+		44A2831225F7F97E00DDF229 /* AnonymousLists.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnonymousLists.swift; sourceTree = "<group>"; };
 		44C07DAD25E565B200D3667A /* QRCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCode.swift; sourceTree = "<group>"; };
 		44C07DB225E5664100D3667A /* RoomCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomCodeView.swift; sourceTree = "<group>"; };
 		44C07DB725E566BE00D3667A /* CurrentRoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentRoom.swift; sourceTree = "<group>"; };
@@ -102,6 +105,7 @@
 		44F8D5D925DB512C00D2B461 /* UsersListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsersListView.swift; sourceTree = "<group>"; };
 		44F8D5DE25DB51DA00D2B461 /* UserDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDetailView.swift; sourceTree = "<group>"; };
 		671BABC825D895B500964AAF /* httpRequester.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = httpRequester.swift; sourceTree = "<group>"; tabWidth = 2; };
+		67C1C10725F6F67D006A878B /* Host_UserAdminDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Host_UserAdminDetailView.swift; sourceTree = "<group>"; };
 		67DC8DA525DB3F63008C07F8 /* AddMusicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddMusicView.swift; sourceTree = "<group>"; };
 		88FB569525CAF48A007114C7 /* dbConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dbConnection.swift; sourceTree = "<group>"; };
 		88FB56C025CB0B21007114C7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -187,6 +191,7 @@
 				448572FE25BF81D5006C5C07 /* User_QueuePageView.swift */,
 				4485730F25BF8390006C5C07 /* Host_RoomPageView.swift */,
 				4485731425BF8727006C5C07 /* User_RoomPageView.swift */,
+				67C1C10725F6F67D006A878B /* Host_UserAdminDetailView.swift */,
 				445F0AF225C72EE700EF80F5 /* Spotify.swift */,
 				88FB569525CAF48A007114C7 /* dbConnection.swift */,
 				671BABC825D895B500964AAF /* httpRequester.swift */,
@@ -198,6 +203,7 @@
 				44C07DAD25E565B200D3667A /* QRCode.swift */,
 				44C07DB225E5664100D3667A /* RoomCodeView.swift */,
 				44C07DB725E566BE00D3667A /* CurrentRoom.swift */,
+				44A2831225F7F97E00DDF229 /* AnonymousLists.swift */,
 			);
 			path = VoteNote;
 			sourceTree = "<group>";
@@ -502,6 +508,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				44F8D5A425D9B66600D2B461 /* UserController.swift in Sources */,
+				67C1C10825F6F67D006A878B /* Host_UserAdminDetailView.swift in Sources */,
 				448572FF25BF81D5006C5C07 /* User_QueuePageView.swift in Sources */,
 				445F0AF325C72EE700EF80F5 /* Spotify.swift in Sources */,
 				4485731525BF8727006C5C07 /* User_RoomPageView.swift in Sources */,
@@ -514,6 +521,7 @@
 				67DC8DA625DB3F63008C07F8 /* AddMusicView.swift in Sources */,
 				88FB569625CAF48B007114C7 /* dbConnection.swift in Sources */,
 				44C07DB825E566BE00D3667A /* CurrentRoom.swift in Sources */,
+				44A2831325F7F97E00DDF229 /* AnonymousLists.swift in Sources */,
 				448572F525BF7A61006C5C07 /* ProfileView.swift in Sources */,
 				448572AE25BF421E006C5C07 /* AppDelegate.swift in Sources */,
 				448572B025BF421E006C5C07 /* SceneDelegate.swift in Sources */,

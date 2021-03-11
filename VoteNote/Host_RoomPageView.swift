@@ -14,12 +14,22 @@ struct Host_RoomPageView: View {
   var roomDescription: String
   var roomCapacity: Int
   var songsPerUser: Int
+  var votingEnabled: Bool
+  @Binding var anonUsr: Bool
   @Binding var showNav: Bool
   @ObservedObject var currentRoom: CurrentRoom = CurrentRoom()
+  @Binding var notExited: Bool
+  
+  func exitRoom() {
+    print("Left Room")
+    leaveRoom()
+    notExited = true
+  }
     //@State var notExited: Bool = true
   //TODO- make the room capacity, songs per user actually do stuff
   
   var body: some View {
+    GeometryReader { geo in
     //return NavigationView {
     /*return*/ ZStack {
       VStack {
@@ -78,18 +88,49 @@ struct Host_RoomPageView: View {
               Spacer()
               Text("\(songsPerUser)")
             }
+            
+            HStack{
+                if votingEnabled {
+                    Text("Voting Enabled")
+                } else {
+                    Text("Voting Enabled")
+                }
+            }
+            
+            HStack{
+              Text("Anonymize All Users:")
+              Spacer()
+                if anonUsr {
+                    Text("True")
+                } else {
+                    Text("False")
+                }
+            }
           }
-            
-            
+          Section() {
+            Button(action: {
+                exitRoom()
+              }, label: {
+                HStack {
+                  Spacer()
+                  Text("Leave Room")
+                    .foregroundColor(Color.red)
+                  Spacer()
+                }
+              })
+              .padding(.vertical)
+          }
         }
       }
       .navigationTitle("Room")
       .navigationBarHidden(true).navigationViewStyle(StackNavigationViewStyle())
         
     }
+    .frame(height: geo.size.height)
     /*.onAppear(perform: {
         notExited = false
     }).navigate(to: LandingPageView(), when: $notExited)*/.navigationViewStyle(StackNavigationViewStyle())
+  }
   }
   
   

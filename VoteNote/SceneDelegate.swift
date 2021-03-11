@@ -159,15 +159,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate,
         
         
         
-        //        sharedSpotify.getTrackInfo(track_uri: "0weAUscowxeqDtpCgtbpgp", completion: { track in
-        //          if track != nil {
-        //            print(track!.name)
-        //          }
-        //        })
-        
-        
-        
       })
+      
     }
     
     //self.appRemote = appRemote
