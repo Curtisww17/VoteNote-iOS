@@ -186,23 +186,8 @@ func firebaseLogin(name: String){
     }
 }
 
-//makes the current user anonymous with the anon name name
-func setAnonName(name: String){
-    let uid = FAuth.currentUser!.uid
-    
-    db.collection("users").document(uid).updateData(["anon_name": name])
-    
-}
 
-//makes the current user not anonymous
-func setAnon(isAnon: Bool){
-    let uid = FAuth.currentUser!.uid
-    
-    db.collection("users").document(uid).updateData(["isAnon": isAnon])
-    
-}
-
-
+//MARK: Room
 /**
  Put the user in the room referenced by code
  
@@ -367,6 +352,31 @@ func getQueue(completion: @escaping ([song]?, Error?) -> Void){
     
 }
 
+//MARK: users
+/**
+ sets the anon name of the current user
+ 
+ - Parameter name: the anonymous name to be set
+ */
+func setAnonName(name: String){
+    let uid = FAuth.currentUser!.uid
+    
+    db.collection("users").document(uid).updateData(["anon_name": name])
+    
+}
+
+/**
+ sets the user to anon or not
+ 
+ - parameter isAnon: whether or not the user is anonymous
+ */
+func setAnon(isAnon: Bool){
+    let uid = FAuth.currentUser!.uid
+    
+    db.collection("users").document(uid).updateData(["isAnon": isAnon])
+    
+}
+
 ///get all the users for the current room
 func getUsers(completion: @escaping ([user]?, Error?) -> Void){
     
@@ -448,6 +458,22 @@ func getUID() -> String{
     return FAuth.currentUser!.uid
 }
 
+/**
+ bans a user from the room permanently
+ 
+ - Parameter uid: the id of the user to be banned
+ */
+func banUser(uid: String){
+    getCurrRoom { (currRoom, err) in
+        
+        //append the uid to the banned user array
+        //TODO: figure out how to tell the user they have been kicked
+        db.collection("room").document(currRoom).updateData(["bannedUsers" : FieldValue.arrayUnion([uid])])
+        
+    }
+}
+
+//MARK: Song
 /**
  add a song to the current room by the song id
  
@@ -576,17 +602,4 @@ func voteSong(vote: Int, id: String){
     }//end getCurrRoom
 }
 
-/**
- bans a user from the room permanently
- 
- - Parameter uid: the id of the user to be banned
- */
-func banUser(uid: String){
-    getCurrRoom { (currRoom, err) in
-        
-        //append the uid to the banned user array
-        //TODO: figure out how to tell the user they have been kicked
-        db.collection("room").document(currRoom).updateData(["bannedUsers" : FieldValue.arrayUnion([uid])])
-        
-    }
-}
+
