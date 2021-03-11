@@ -18,6 +18,7 @@ struct UserController: View {
   @State var songsPerUser: Int
   @State var votingEnabled: Bool
   @State var anonUsr: Bool
+  @State var explicitSongsAllowed: Bool
   @State var notExited: Bool = false
     
   @State var currentView = 0
@@ -42,7 +43,7 @@ struct UserController: View {
         VStack {
             if (currentView == 0) {
                 NavigationLink(
-                    destination: AddMusicView(songsPerUser: songsPerUser).navigationBarTitle("Browse"),
+                    destination: AddMusicView(songsPerUser: songsPerUser, explicitSongsAllowed: explicitSongsAllowed).navigationBarTitle("Browse"),
                   label: {
                   Text("Add")
                   })

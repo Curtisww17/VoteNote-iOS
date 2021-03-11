@@ -111,7 +111,7 @@ struct CreateRoomView: View {
           Spacer()
         }
       //}
-      }.navigationBarHidden(true).navigate(to: HostController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription, votingEnabled: votingEnabled, anonUsr: anonUsr, songsPerUser: songsPerUser), when: $madeRoom).onAppear(perform: {sharedSpotify.pause()}).navigationViewStyle(StackNavigationViewStyle())
+      }.navigationBarHidden(true).navigate(to: HostController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription, votingEnabled: votingEnabled, anonUsr: anonUsr, songsPerUser: songsPerUser, explicitSongsAllowed: explicitSongsAllowed), when: $madeRoom).onAppear(perform: {sharedSpotify.pause()}).navigationViewStyle(StackNavigationViewStyle())
   }
 }
   
