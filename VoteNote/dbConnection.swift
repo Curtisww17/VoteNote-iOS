@@ -322,40 +322,9 @@ func makeRoom(newRoom: room) -> Bool{
     return true
 }
 
-/**
- get the queue from the current room
- */
-func getQueue(completion: @escaping ([song]?, Error?) -> Void){
-    
-    getCurrRoom { (currRoom, err) in
-        
-        //find the current room doc
-        let joiningQuery = db.collection("room").whereField("code", isEqualTo: currRoom)
-        
-        joiningQuery.getDocuments { (docs, err) in
-            if let err = err {
-                print("\n\n\n Error Getting Queue \(err)")
-                completion(nil, err)
-            } else {
-                //grab the queue from the room
-                let queue = docs?.documents[0].data()["queue"] as? [String: Any]
-                var songs: [song] = []
-                if queue != nil {
-                    //iterate through the queue and convert it into an array of song
-                    for (id, s) in queue!{
-                        songs.append(song(sng: s as! [String: Any], id: id))
-                    }
-                }
-                completion(songs, nil)
-            }
-            completion(nil, nil)
-        }
-    }//end getCurrRoom
-    
-    
-}
 
-//MARK: users
+
+//MARK: Users
 /**
  sets the anon name of the current user
  
@@ -578,6 +547,42 @@ func getSong(id: String, completion: @escaping (song?, Error?) -> Void){
 }
 
 /**
+ removes a song from the queue and puts it into the history
+ 
+ - parameter id: the id of the song to be dequeued
+ */
+func dequeue(id: String){
+    
+    //first we get the song in doc form
+    getCurrRoom { (currRoom, err) in
+        
+        
+        //grab our room
+        db.collection("room").document(currRoom).getDocument { (doc, err) in
+            if let err = err {
+                print("Error getting song \(err)")
+                //completion(nil, err)
+            } else{
+                //grab the queue
+                let queue: Dictionary? = doc?.data()?["queue"] as? Dictionary<String, Any?>
+                if queue != nil {
+                    //grab the song from the queue
+                    let sng: Dictionary = queue![id] as! Dictionary<String, Any?>
+                    
+                    //put our thing in the history
+                    db.collection("room").document(currRoom).updateData([
+                        "history.\(id)": sng
+                    ])
+                    //completion(songout, nil)
+                }
+                //completion(nil, nil)
+            }
+        }
+    }//end getCurrRoom
+}
+
+
+/**
  removes a song from the current rooms queue without moving it to history
  
  - Parameter id: the id of the song that is to be removed
@@ -611,4 +616,74 @@ func voteSong(vote: Int, id: String){
     }//end getCurrRoom
 }
 
+/**
+ get the queue from the current room
+ */
+func getQueue(completion: @escaping ([song]?, Error?) -> Void){
+    
+    getCurrRoom { (currRoom, err) in
+        
+        //find the current room doc
+        let joiningQuery = db.collection("room").whereField("code", isEqualTo: currRoom)
+        
+        joiningQuery.getDocuments { (docs, err) in
+            if let err = err {
+                print("\n\n\n Error Getting Queue \(err)")
+                completion(nil, err)
+            } else {
+                //grab the queue from the room
+                let queue = docs?.documents[0].data()["queue"] as? [String: Any]
+                var songs: [song] = []
+                if queue != nil {
+                    //iterate through the queue and convert it into an array of song
+                    for (id, s) in queue!{
+                        songs.append(song(sng: s as! [String: Any], id: id))
+                    }
+                }
+                completion(songs, nil)
+            }
+            completion(nil, nil)
+        }
+    }//end getCurrRoom
+    
+    
+}
 
+/**
+ get the history from the current room
+ */
+func getHistory(completion: @escaping ([song]?, Error?) -> Void){
+    
+    getCurrRoom { (currRoom, err) in
+        
+        //find the current room doc
+        let joiningQuery = db.collection("room").whereField("code", isEqualTo: currRoom)
+        
+        joiningQuery.getDocuments { (docs, err) in
+            if let err = err {
+                print("\n\n\n Error Getting History \(err)")
+                completion(nil, err)
+            } else {
+                //grab the history from the room
+                let queue = docs?.documents[0].data()["history"] as? [String: Any]
+                var songs: [song] = []
+                if queue != nil {
+                    //iterate through the queue and convert it into an array of song
+                    for (id, s) in queue!{
+                        songs.append(song(sng: s as! [String: Any], id: id))
+                    }
+                } else {
+                    print("\n\n\n Error Getting History")
+                    enum newError: Error {
+                        case documentError(String)
+                    }
+                    completion(nil, newError.documentError("history does not exist"))
+                }
+                completion(songs, nil)
+            }
+            completion(nil, nil)
+        }
+    }//end getCurrRoom
+    
+    
+}
