@@ -42,7 +42,7 @@ struct UserController: View {
         VStack {
             if (currentView == 0) {
                 NavigationLink(
-                  destination: AddMusicView().navigationBarTitle("Browse"),
+                    destination: AddMusicView(songsPerUser: songsPerUser).navigationBarTitle("Browse"),
                   label: {
                   Text("Add")
                   })

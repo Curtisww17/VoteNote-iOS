@@ -35,13 +35,14 @@ struct CreateRoomView: View {
   @State var votingEnabled: Bool = true
     @State var madeRoom: Bool = false
   @State var anonUsr: Bool = false
+    @State var explicitSongsAllowed: Bool = false
     
     @Environment(\.presentationMode) var presentationMode
     
     func createRoom(){
         //TO-DO- send info to room, songs per user
         print("Room")
-      let newRoom: room = room(name: roomName, desc: roomDescription, anonUsr: anonUsr, capacity: userCapacity, explicit: false, voting: votingEnabled)
+      let newRoom: room = room(name: roomName, desc: roomDescription, anonUsr: anonUsr, capacity: userCapacity, explicit: explicitSongsAllowed, voting: votingEnabled)
         makeRoom(newRoom: newRoom)
         madeRoom = true
         self.presentationMode.wrappedValue.dismiss()
@@ -72,22 +73,31 @@ struct CreateRoomView: View {
                         Stepper("\(songsPerUser)", onIncrement: { songsPerUser+=1}, onDecrement: { songsPerUser-=1})
                             .padding(.leading)
                     }
-                    
+                  
                     HStack {
-                        Text("Enable Voting")
-                     Toggle(isOn: $votingEnabled) {
+                        Text("Explicit Songs Allowed")
+                            
+                     Toggle(isOn: $explicitSongsAllowed) {
                         Text("")
                      }
                     }
                     .padding(.trailing)
-                  
+                    
                   HStack {
-                      Text("Anonymize All Users")
+                      Text("Anonymous Users")
                    Toggle(isOn: $anonUsr) {
                       Text("")
                    }
                   }
                   .padding(.trailing)
+                    
+                    HStack {
+                        Text("Voting Enabled")
+                     Toggle(isOn: $votingEnabled) {
+                        Text("")
+                     }
+                    }
+                    .padding(.trailing)
                 }
             }
             
@@ -101,7 +111,7 @@ struct CreateRoomView: View {
           Spacer()
         }
       //}
-      }.navigationBarHidden(true).navigate(to: HostController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription, votingEnabled: votingEnabled, anonUsr: anonUsr), when: $madeRoom).onAppear(perform: {sharedSpotify.pause()}).navigationViewStyle(StackNavigationViewStyle())
+      }.navigationBarHidden(true).navigate(to: HostController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription, votingEnabled: votingEnabled, anonUsr: anonUsr, songsPerUser: songsPerUser), when: $madeRoom).onAppear(perform: {sharedSpotify.pause()}).navigationViewStyle(StackNavigationViewStyle())
   }
 }
   

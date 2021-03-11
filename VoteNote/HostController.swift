@@ -16,6 +16,7 @@ struct HostController: View {
   @State var roomDescription: String
   @State var votingEnabled: Bool
   @State var anonUsr: Bool
+  @State var songsPerUser: Int
   @State var notExited: Bool = false
   
   
@@ -40,7 +41,7 @@ struct HostController: View {
           VStack {
             if (currentView == 0) {
               NavigationLink(
-                destination: AddMusicView().navigationBarTitle("Browse"),
+                destination: AddMusicView(songsPerUser: songsPerUser).navigationBarTitle("Browse"),
                 label: {
                   Text("Add")
                 })
