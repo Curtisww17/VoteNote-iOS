@@ -172,15 +172,17 @@ struct QueueEntry: View {
                   RemoteImage(url: curSong.imageUrl)
                     .frame(width: 35, height: 35)
 //                    Image(systemName: "person.crop.square.fill").resizable().frame(width: 35.0, height: 35.0)
-                    VStack {
-                        HStack {
-                            Text(curSong.title)
-                            Spacer()
-                        }
-                        HStack {
-                            Text(curSong.artist).font(.caption)
-                                .foregroundColor(Color.gray)
-                            Spacer()
+                    if !opened {
+                        VStack {
+                            HStack {
+                                Text(curSong.title)
+                                Spacer()
+                            }
+                            HStack {
+                                Text(curSong.artist).font(.caption)
+                                    .foregroundColor(Color.gray)
+                                Spacer()
+                            }
                         }
                     }
                     
@@ -212,14 +214,14 @@ struct QueueEntry: View {
                                 Text("Veto").scaleEffect(scale)
                             }.padding(.all).background(Color.red).border(/*@START_MENU_TOKEN@*/Color.red/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/2/*@END_MENU_TOKEN@*/).onTapGesture {
                                 vetoMusic()
-                            }
+                            }.frame(width: 80, height: 80)
                             
                             if !isDetailView {
                                 Button(action: {viewUser()}) {
                                     Text("User").scaleEffect(scale)
                                 }.padding(.all).border(/*@START_MENU_TOKEN@*/Color.black/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/).onTapGesture {
                                     viewUser()
-                                }
+                                }.frame(width: 80, height: 80)
                             }
                         }
                         .padding(.leading)
@@ -246,19 +248,17 @@ struct QueueEntry: View {
                         self.offset.width = gesture.translation.width
                     }
                   }
-                  .onEnded { _ in
-                    if !isUserQueue {
-                        if self.offset.width < -50 {
-                          self.scale = 1
-                          self.offset.width = -60
-                          opened = true
-                        } else {
-                          self.scale = 0.5
-                          self.offset = .zero
-                          opened = false
-                        }
+                    .onEnded { _ in
+                      if self.offset.width < 50 {
+                        self.scale = 1
+                        self.offset.width = -60
+                        opened = true
+                      } else {
+                        self.scale = 0.5
+                        self.offset = .zero
+                        opened = false
+                      }
                     }
-                  }
         )
     }
 }
