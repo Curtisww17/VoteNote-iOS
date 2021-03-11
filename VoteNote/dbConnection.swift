@@ -9,15 +9,13 @@ import Foundation
 import FirebaseFirestore
 import FirebaseAuth
 
-/* class stub cause patrick said we can't access funtions inside a class
-class dbConnection: ObservableObject {
-    
-    init() {
-        
-    }
-}*/
-
-//credit for this function to https://stackoverflow.com/a/26845710
+///Generates a random string containing capitol letters and numbers
+///
+///credit for this function to [iAhmed](https://stackoverflow.com/a/26845710)
+///
+///- Parameter length: the length of the string to be generated
+///
+///
 func randomString(length: Int) -> String {
 
     let letters : NSString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -35,11 +33,11 @@ func randomString(length: Int) -> String {
 }
 
 
-//we should probably bring this all back under one class
 let db = Firestore.firestore()
 let FAuth = Auth.auth()
 
 //MARK: Data objects
+
 class room{
     let name: String
     let desc: String?
@@ -82,8 +80,8 @@ class room{
 class user: Identifiable {
     let name: String
     let profilePic: String //link to pfp
-    let isAnon: Bool
-    let anon_name: String
+    let isAnon: Bool       //is the user anonymized
+    let anon_name: String  //the user's anonymous name
     
     //TODO: refactor this out
     init(name: String, profilePic: String){
@@ -145,7 +143,12 @@ class song: Identifiable, ObservableObject{
   
 }
 
-//get's the string code for the user's current room
+//gets the string code for the user's current room
+/**
+ Gets the string code for the current room
+ 
+ - Parameter completion: completion handler to return the asynchronous call
+ */
 func getCurrRoom(completion: @escaping (String, Error?) -> Void){
     var currRoom = ""
     //get the user's document using firebase auth
@@ -158,7 +161,11 @@ func getCurrRoom(completion: @escaping (String, Error?) -> Void){
 
 //MARK: API Calls
 
-//signs the user in to firebase
+/**
+ signs the user into firebase
+ 
+ - Parameter name: the name of the user
+ */
 func firebaseLogin(name: String){
     FAuth.signInAnonymously { (result, err) in
         if let err = err {
@@ -179,7 +186,11 @@ func firebaseLogin(name: String){
     }
 }
 
-//makes the current user anonymous with the anon name name
+/**
+ Makes the current user anonymous
+ 
+ - Parameter name: the anonymous name for the user
+ */
 func setAnon(name: String){
     let uid = FAuth.currentUser!.uid
     
@@ -187,7 +198,9 @@ func setAnon(name: String){
     
 }
 
-//makes the current user not anonymous
+/**
+ Set the current user to not anonymous
+ */
 func setNotAnon(){
     let uid = FAuth.currentUser!.uid
     
@@ -196,7 +209,11 @@ func setNotAnon(){
 }
 
 
-//puts the user in the room with code = code
+/**
+ Put the user in the room referenced by code
+ 
+ - Parameter code: the code of the room to join (not case sensitive)
+ */
 func joinRoom(code: String, completion:@escaping (room?, String?) -> Void){
     //put the user in the correct room
     //TODO: add checking for banned user and capacity
@@ -239,7 +256,13 @@ func joinRoom(code: String, completion:@escaping (room?, String?) -> Void){
     
 }
 
-//get the room referenced by code
+/**
+Get the room referenced by code
+ 
+to get the current room use the code from getCurrRoom
+ 
+- Parameter code: the code of the room you want to get
+ */
 func getRoom(code: String, completion: @escaping (room?, Error?) -> Void){
     
     
@@ -272,7 +295,7 @@ func getRoom(code: String, completion: @escaping (room?, Error?) -> Void){
     
 }
 
-//makes the user leave the room
+///makes the user leave the room
 func leaveRoom() -> Bool{
     //take the user out of the room
     let usr = FAuth.currentUser
@@ -281,7 +304,12 @@ func leaveRoom() -> Bool{
     return true
 }
 
-//makes a new room in the db from a room obj
+
+/**
+ makes a new room in the db from a room obj
+ 
+ - Parameter newRoom: a room object which will be used to make a new room
+ */
 func makeRoom(newRoom: room) -> Bool{
     let code: String
     let usr = FAuth.currentUser
@@ -311,7 +339,9 @@ func makeRoom(newRoom: room) -> Bool{
     return true
 }
 
-//get the queue from the current room
+/**
+ get the queue from the current room
+ */
 func getQueue(completion: @escaping ([song]?, Error?) -> Void){
     
     getCurrRoom { (currRoom, err) in
@@ -342,7 +372,7 @@ func getQueue(completion: @escaping ([song]?, Error?) -> Void){
     
 }
 
-//get all the users for a room
+///get all the users for the current room
 func getUsers(completion: @escaping ([user]?, Error?) -> Void){
  
     var users: [user] = []
@@ -373,7 +403,11 @@ func getUsers(completion: @escaping ([user]?, Error?) -> Void){
     }//end getCurrRoom
 }
 
-//get individual user by id
+/**
+ get individual user by id
+ 
+ - Parameter uid: the uid of the user that we want to get
+ */
 func getUser(uid: String, completion: @escaping (user?, Error?) -> Void){
     db.collection("users").document(uid).getDocument { (res, err) in
         if let err = err{
@@ -388,13 +422,17 @@ func getUser(uid: String, completion: @escaping (user?, Error?) -> Void){
     
 }
 
-//gets the current users UID
+///gets the current users UID
 func getUID() -> String{
     return FAuth.currentUser!.uid
 }
 
-//return 1 for success, 0 for song already in queue, and -1 for fail
-func addsong(id: String) -> Int{
+/**
+ add a song to the current room by the song id
+ 
+ - Parameter id: the spotify id of the song to be added
+ */
+func addsong(id: String){
     let addedBy = FAuth.currentUser!.uid
     var length = 0
     var title = ""
@@ -442,10 +480,16 @@ func addsong(id: String) -> Int{
     }//end sharedSpotify
     }//end currRoom
     
-    return 1
 }
 
 //used to get details like who posted the song
+/**
+ gets a songs details by it's id
+ 
+ used to get details like who posted the song and how many votes it has
+ 
+ - Parameter id: the spotify id of the song
+ */
 func getSong(id: String, completion: @escaping (song?, Error?) -> Void){
     
     getCurrRoom { (currRoom, err) in
@@ -477,7 +521,11 @@ func getSong(id: String, completion: @escaping (song?, Error?) -> Void){
     //return songout
 }
 
-//need to make sure user is allowed at some point
+/**
+ removes a song from the current rooms queue without moving it to history
+ 
+ - Parameter id: the id of the song that is to be removed
+ */
 func vetoSong(id: String){
     getCurrRoom { (currRoom, err) in
     
@@ -490,6 +538,15 @@ func vetoSong(id: String){
 //1 upvote, -1 downvote, 0 clear vote?
 //returns new vote number
 //id is song id
+/**
+ allows a user to vote on a song
+ 
+ 1 for upvote -1 for downvote
+ 
+ - Parameters:
+    - vote: the vote of the song 1 for up, -1 for down
+    - id: the id of the song to be voted on
+ */
 func voteSong(vote: Int, id: String){
     getCurrRoom { (currRoom, err) in
         
@@ -498,6 +555,11 @@ func voteSong(vote: Int, id: String){
     }//end getCurrRoom
 }
 
+/**
+ bans a user from the room permanently
+ 
+ - Parameter uid: the id of the user to be banned
+ */
 func banUser(uid: String){
     getCurrRoom { (currRoom, err) in
         
