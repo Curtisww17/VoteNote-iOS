@@ -48,10 +48,11 @@ class room{
     let queue: [song]
     let code: String    //the room code, used for joining
     let spu: Int    //songs per user
+    let playlist: String //playlist id thing
     //need to add allowed genres
     
     //normal constructor
-    init(name: String, desc: String? = "", anonUsr: Bool, capacity: Int, explicit: Bool, voting: Bool, spu: Int = -1) {
+    init(name: String, desc: String? = "", anonUsr: Bool, capacity: Int, explicit: Bool, voting: Bool, spu: Int = -1, playlist: String?) {
         self.name = name
         self.desc = desc
         self.anonUsr = anonUsr
@@ -61,6 +62,7 @@ class room{
         queue = []
         code = ""
         self.spu = spu
+        self.playlist = playlist ?? ""
     }
     
     //constructor for firestore
@@ -74,6 +76,7 @@ class room{
         queue = [] //need to grab this as well once properly implemented
         code = rm["code"] as! String
         spu = rm["spu"] as? Int ?? -1
+        playlist = rm["playlist"] as? String ?? ""
     }
 }
 
@@ -314,7 +317,8 @@ func makeRoom(newRoom: room) -> Bool{
                                         "explicit": newRoom.explicit,
                                         "voting": newRoom.voting,
                                         "code": code,
-                                        "spu": newRoom.spu])
+                                        "spu": newRoom.spu,
+                                        "playlist": newRoom.playlist])
     
     //put the user who made the room into the room
     db.collection("users").document(usr!.uid).updateData(["currentRoom": code])
