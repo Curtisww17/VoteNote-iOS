@@ -80,7 +80,7 @@ class room{
     }
 }
 
-class user: Identifiable {
+class user: Identifiable, ObservableObject {
     var name: String
     var profilePic: String //link to pfp
     var isAnon: Bool?       //is the user anonymized
