@@ -239,7 +239,7 @@ struct SearchEntry: View {
   }
 }
 
-struct AddMusicView_PreviewsContainer: View {
+/*struct AddMusicView_PreviewsContainer: View {
   //@State var spotify: Spotify = Spotify()
   
   var body: some View {
@@ -251,4 +251,4 @@ struct AddMusicView_Previews: PreviewProvider {
   static var previews: some View {
     AddMusicView_PreviewsContainer()
   }
-}
+}*/

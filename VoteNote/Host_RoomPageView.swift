@@ -76,7 +76,11 @@ struct Host_RoomPageView: View {
           }
           
           Section(header: Text("Room Settings")) {
-            Text(roomDescription)
+            if roomDescription == "" {
+                Text("A VoteNote room")
+            } else {
+                Text(roomDescription)
+            }
             HStack{
               Text("Room Capacity")
               Spacer()

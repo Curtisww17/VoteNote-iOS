@@ -14,14 +14,12 @@ var isPlaying: Bool = false //should be false by default
 
 struct Host_QueuePageView: View {
     @State var currentView = 0
-        @ObservedObject var spotify = sharedSpotify
-        //@State var songsList: [song]?
-        @State var queueRefreshSeconds = 60
-        @State var voteUpdateSeconds = 10
-        @ObservedObject var songQueue: MusicQueue = MusicQueue()
-        @ObservedObject var isViewingUser: ObservableBoolean = ObservableBoolean(boolValue: false)
+    @ObservedObject var spotify = sharedSpotify
+    @State var queueRefreshSeconds = 60
+    @State var voteUpdateSeconds = 10
+    @ObservedObject var songQueue: MusicQueue = MusicQueue()
+    @ObservedObject var isViewingUser: ObservableBoolean = ObservableBoolean(boolValue: false)
     @ObservedObject var selectedSong: song = song(addedBy: "Nil User", artist: "", genres: [""], id: "", length: 0, numVotes: 0, title: "None Selected", imageUrl: "")
-        //@ObservedObject var hostControllerHidden: ObservableBoolean
     @ObservedObject var selectedUser: user = user(name: "", profilePic: "")
     @ObservedObject var votingEnabled: ObservableBoolean
     
@@ -49,55 +47,58 @@ struct Host_QueuePageView: View {
     }
     
   var body: some View {
-    ZStack {
-      VStack {
-        
-        HStack {
-            Text("\(voteUpdateSeconds)").font(.largeTitle).multilineTextAlignment(.trailing).onReceive(refreshTimer) {
-                _ in
-                if self.voteUpdateSeconds > 0 {
-                    self.voteUpdateSeconds -= 1
-                } else {
-                    self.voteUpdateSeconds = 10
-                    print("Updating Queue")
-                    
-                    updateQueue()
+    GeometryReader { geo in
+        ZStack {
+          VStack {
+            HStack {
+                Text("\(voteUpdateSeconds)").font(.largeTitle).multilineTextAlignment(.trailing).onReceive(refreshTimer) {
+                    _ in
+                    if self.voteUpdateSeconds > 0 {
+                        self.voteUpdateSeconds -= 1
+                    } else {
+                        self.voteUpdateSeconds = 10
+                        print("Updating Queue")
+                        
+                        updateQueue()
+                    }
+                }
+            }.hidden().frame(width: 0, height: 0)
+            Form {
+                
+                List {
+                    ForEach(songQueue.musicList) { song in
+                        QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: isViewingUser, isDetailView: false, isUserQueue: false, votingEnabled: votingEnabled, selectedUser: selectedUser)
+                                }
                 }
             }
-        }.hidden()
-        
-        List {
-            ForEach(songQueue.musicList) { song in
-                QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: isViewingUser, isDetailView: false, isUserQueue: false, votingEnabled: votingEnabled, selectedUser: selectedUser)
-                        }
-        }
-        
-        NowPlayingViewHost(isPlaying: isPlaying, songQueue: songQueue)
-        
-        /*Button(action: {
-          //these are the scopes that our app requests
-          spotify.appDel.appRemoteDidEstablishConnection(spotify.appDel.appRemote)
-          spotify.TestPlay()
-        }) {
-          Text("play that one about falling down the stairs")
-        }*/
-      }
-      .navigationBarHidden(true)
-    }.onAppear(perform: {
-            //isViewingUser.boolValue = false
             
-            //makes the first song in the queue to first to play
-            if nowPlaying == nil && songQueue.musicList.count > 0 /*&& (songsList ?? []).count > 0*/ {
-                nowPlaying = songQueue.musicList[0]
-                sharedSpotify.enqueue(songID: songQueue.musicList[0].id)
-                vetoSong(id: songQueue.musicList[0].id)
-            }
-            print("Updating Queue...")
-            updateQueue()
-            print("Queue Updated!")
-            //hostControllerHidden.boolValue = false
+            NowPlayingViewHost(isPlaying: isPlaying, songQueue: songQueue)
             
-    }).navigate(to: HostUserDetailView(user: selectedUser, songQueue: songQueue, votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue)), when: $isViewingUser.boolValue).navigationViewStyle(StackNavigationViewStyle())
+            /*Button(action: {
+              //these are the scopes that our app requests
+              spotify.appDel.appRemoteDidEstablishConnection(spotify.appDel.appRemote)
+              spotify.TestPlay()
+            }) {
+              Text("play that one about falling down the stairs")
+            }*/
+          }
+          .navigationBarHidden(true)
+        }.onAppear(perform: {
+                //isViewingUser.boolValue = false
+                
+                //makes the first song in the queue to first to play
+                if nowPlaying == nil && songQueue.musicList.count > 0 /*&& (songsList ?? []).count > 0*/ {
+                    nowPlaying = songQueue.musicList[0]
+                    sharedSpotify.enqueue(songID: songQueue.musicList[0].id)
+                    vetoSong(id: songQueue.musicList[0].id)
+                }
+                print("Updating Queue...")
+                updateQueue()
+                print("Queue Updated!")
+                //hostControllerHidden.boolValue = false
+                
+        }).navigate(to: HostUserDetailView(user: selectedUser, songQueue: songQueue, votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue)), when: $isViewingUser.boolValue).navigationViewStyle(StackNavigationViewStyle())
+    }
   }
 }
 
@@ -123,17 +124,18 @@ struct QueueEntry: View {
     @State var isUserQueue: Bool
     
     @State var showNav: Bool = false
-    //@ObservedObject var hostControllerHidden: ObservableBoolean
     @ObservedObject var votingEnabled: ObservableBoolean
     
     @State var selectedUser: user
     
     func upVoteSong(){
-        //TODO- Implement Upvoting
+        print("Upvote Song")
+        voteSong(vote: 1, id: curSong.id)
     }
     
     func downVoteSong(){
-        //TODO- Implement Downvoting
+        print("Downvote Song")
+        voteSong(vote: -1, id: curSong.id)
     }
     
     func vetoMusic(){
@@ -150,17 +152,13 @@ struct QueueEntry: View {
     }
     
     func viewUser(){
-        //print("Viewing User \(isViewingUser.boolValue)")
-        /*getUser(uid: curSong.id)(user, err) in
-            self.selectedUser = user!
-        }*/
-        
         getUser(uid: curSong.addedBy){(user, err) in
             selectedUser = user!
         }
         selectedSong = self.curSong
-        //hostControllerHidden.boolValue = true
-        //isViewingUser.boolValue = true
+        //displayHostController.boolValue = false
+        //displayHost = false
+        isViewingUser.boolValue = true
         //print("\(isViewingUser.boolValue)")
     }
     
@@ -189,39 +187,43 @@ struct QueueEntry: View {
                     Spacer()
                     
                     if votingEnabled.boolValue {
-                        if curSong.numVotes != nil {
-                            Text("0")
-                        } /*else {
-                            Text("\(curSong.numVotes!)")
-                        }*/
+                        Text("\(curSong.numVotes ?? 0)")
                         Button(action: {upVoteSong()}) {
-                            Image(systemName: "hand.thumbsup").resizable().frame(width: 30.0, height: 30.0)
+                            Image(systemName: "hand.thumbsup").resizable().frame(width: 30.0, height: 30.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
+                        }.onTapGesture {
+                            upVoteSong()
                         }
                         Button(action: {downVoteSong()}) {
-                            Image(systemName: "hand.thumbsdown").resizable().frame(width: 30.0, height: 30.0)
+                            Image(systemName: "hand.thumbsdown").resizable().frame(width: 30.0, height: 30.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
+                        }.onTapGesture {
+                            downVoteSong()
                         }
                     }
                     
                     Spacer()
                     Spacer()
                     
-                    /*Image(systemName: "chevron.right").resizable().frame(width: 10.0, height: 20.0).foregroundColor(/*@START_MENU_TOKEN@*/.gray/*@END_MENU_TOKEN@*/)*/
+                    Image(systemName: "chevron.right").resizable().frame(width: 10.0, height: 20.0).foregroundColor(Color.gray)
                     
                     
                     if opened && !isUserQueue {
                         HStack {
                             Button(action: {vetoMusic()}) {
-                                Text("Veto").scaleEffect(scale)
+                                Text("Veto").foregroundColor(Color.black).scaleEffect(scale)
                             }.padding(.all).background(Color.red).border(/*@START_MENU_TOKEN@*/Color.red/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/2/*@END_MENU_TOKEN@*/).onTapGesture {
                                 vetoMusic()
                             }.frame(width: 80, height: 80)
                             
                             if !isDetailView {
                                 Button(action: {viewUser()}) {
-                                    Text("User").scaleEffect(scale)
+                                    Text("User").foregroundColor(Color.black).scaleEffect(scale)
                                 }.padding(.all).border(/*@START_MENU_TOKEN@*/Color.black/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/).onTapGesture {
                                     viewUser()
                                 }.frame(width: 80, height: 80)
+                                
+                                /*NavigationLink(destination: HostUserDetailView(user: selectedUser, songQueue: songQueue, votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue), displayHostController: displayHostController)) {
+                                    Text("User").scaleEffect(scale)
+                                }.frame(width: 80, height: 80)*/
                             }
                         }
                         .padding(.leading)
@@ -231,17 +233,6 @@ struct QueueEntry: View {
         }.background(Color.white)
         .offset(CGSize(width: self.offset.width , height: 0))
         .animation(.spring())
-        /*.onTapGesture {
-          if !opened {
-            self.scale = 1
-            self.offset.width = -60
-            opened = true
-          } else {
-            self.scale = 0.5
-            self.offset = .zero
-            opened = false
-          }
-        }*/
         .gesture(DragGesture()
                   .onChanged { gesture in
                     if !isUserQueue {
@@ -376,11 +367,7 @@ struct NowPlayingViewHost: View {
                         }
                         
                         HStack {
-                            if nowPlaying != nil {
-                                /*Text("\(nowPlaying!.numVotes!)")*/
-                            } else {
-                                Text("0")
-                            }
+                            Text("\(nowPlaying?.numVotes ?? 0)")
                             
                             Spacer()
                             Button(action: {previousSong()}) {
