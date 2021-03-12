@@ -139,7 +139,7 @@ struct AddMusicView: View {
             //list of search results
             //TO-DO: have a function to print all artist names
             if currentSearch != "" {
-              ForEach((sharedSpotify.recentSearch?.tracks?.items ?? [songStub(album: albumStub(id: "", images: []), artists: [artistStub(href: "", id: "", name: "", type: "", uri: "")], available_markets: nil, disc_number: 0, duration_ms: 0, explicit: false, href: "", id: "", is_local: false, name: "Searching...", popularity: 0, preview_url: "", track_number: 0, type: "", uri: "")])) { song in
+              ForEach((sharedSpotify.recentSearch?.tracks?.items ?? [SpotifyTrack(album: SpotifyAlbum(id: "", images: []), artists: [SpotifyArtist(id: "", name: "", uri: "", type: "")], available_markets: nil, disc_number: 0, duration_ms: 0, explicit: false, href: "", id: "", name: "Searching...", popularity: 0, preview_url: "", track_number: 0, type: "", uri: "")])) { song in
                 if (song.album?.images?.count ?? 0 > 0) {
                     if (!explicitSongsAllowed && !song.explicit!) || explicitSongsAllowed {
                         SearchEntry(songTitle: song.name, songArtist: (song.artists?[0].name)!, songID: song.id, imageURL: (song.album?.images?[0].url) ?? nil, isExplicit: song.explicit!)
