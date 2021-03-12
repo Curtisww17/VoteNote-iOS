@@ -52,7 +52,7 @@ class room{
     //need to add allowed genres
     
     //normal constructor
-    init(name: String, desc: String? = "", anonUsr: Bool, capacity: Int, explicit: Bool, voting: Bool, spu: Int = -1, playlist: String?) {
+    init(name: String, desc: String? = "", anonUsr: Bool, capacity: Int, explicit: Bool, voting: Bool, spu: Int = -1, playlist: String? = nil) {
         self.name = name
         self.desc = desc
         self.anonUsr = anonUsr
@@ -120,9 +120,8 @@ class song: Identifiable, ObservableObject{
     let numVotes: Int?  //nuber of votes recived by the song
     let title: String   //name of the song
     let imageUrl: String
-    let isExplicit: Bool?
     //let timeStarted: Int
-    init(addedBy: String, artist: String, genres: [String], id: String, length: Int, numVotes: Int?, title: String, imageUrl: String, explicit: Bool?) {
+    init(addedBy: String, artist: String, genres: [String], id: String, length: Int, numVotes: Int?, title: String, imageUrl: String) {
         self.addedBy = addedBy
         self.artist = artist
         self.genres = genres
@@ -131,7 +130,6 @@ class song: Identifiable, ObservableObject{
         self.numVotes = numVotes
         self.title = title
         self.imageUrl = imageUrl
-        isExplicit = explicit ?? true
     }
     
     //firestore
@@ -144,7 +142,6 @@ class song: Identifiable, ObservableObject{
         numVotes = sng["numVotes"] as? Int
         title = sng["title"] as! String
         imageUrl = sng["imageurl"] as! String
-        isExplicit = sng["isExplicit"] as? Bool ?? true
     }
     
 }
@@ -474,7 +471,6 @@ func addsong(id: String){
             var title = ""
             var artist = ""
             var imageUrl = ""
-            var isExplicit = true
             
             if track != nil{
                 
@@ -484,7 +480,6 @@ func addsong(id: String){
                 length = (track?.duration_ms)!
                 title = track!.name
                 imageUrl = track?.album?.images?[0].url ?? ""
-                isExplicit = track?.explicit ?? true
             }
             
             
@@ -500,8 +495,7 @@ func addsong(id: String){
                                "length": length,
                                "addedBy": addedBy,
                                "imageurl": imageUrl,
-                               "numvotes": 0,
-                               "isExplicit": isExplicit] as [String : Any]
+                               "numvotes": 0] as [String : Any]
                     
                     //put the map into the queue
                     db.collection("room").document(docid!).updateData([
