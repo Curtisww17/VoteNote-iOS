@@ -16,7 +16,10 @@ struct HostUserDetailView: View {
     @State var shouldReturn: Bool = false
     @ObservedObject var votingEnabled: ObservableBoolean
     
+    
     func returnToQueue(){
+        //displayHostController.boolValue = true
+        //displayHost = true
         shouldReturn = true
     }
     
@@ -25,7 +28,7 @@ struct HostUserDetailView: View {
     }
     
   var body: some View {
-    return NavigationView {
+    return //NavigationView {
         ZStack {
             VStack {
                 HStack {
@@ -38,28 +41,30 @@ struct HostUserDetailView: View {
                     Spacer()
                 }
                 
-                Text(user.name)
-                    .font(.title)
-                
-                Section(header: Text("In Queue")) {
-                    List {
-                        ForEach(songQueue.musicList) { song in
-                            if song.addedBy == user.name { //we should probably have a better way to make this comparision
-                                QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: hostControllerHidden, isDetailView: true, isUserQueue: false, votingEnabled: votingEnabled, selectedUser: user)
+                Form {
+                    Text(user.name)
+                        .font(.title)
+                    
+                    Section(header: Text("In Queue")) {
+                        List {
+                            ForEach(songQueue.musicList) { song in
+                                if song.addedBy == getUID() { //we should probably have a better way to make this comparision
+                                    QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: hostControllerHidden, isDetailView: true, isUserQueue: false, votingEnabled: votingEnabled, selectedUser: user)
+                                }
                             }
                         }
                     }
-                }
-                
-                Button(action: {banUser()}) {
-                    Text("Ban User")
-                        .foregroundColor(Color.red)
+                    
+                    Button(action: {banUser()}) {
+                        Text("Ban User")
+                            .foregroundColor(Color.red)
+                    }
                 }
             }
-        }
+        //}
     }.navigate(to: Host_QueuePageView(votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue)), when: $shouldReturn).onAppear(perform: {
         shouldReturn = false
-    }).navigationViewStyle(StackNavigationViewStyle())
+    }).navigationBarHidden(true).navigationViewStyle(StackNavigationViewStyle())
   }
 }
 

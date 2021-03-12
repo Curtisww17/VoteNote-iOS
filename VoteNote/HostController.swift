@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 
+
 struct HostController: View {
   @ObservedObject var spotify = sharedSpotify
   @Binding var isInRoom: Bool
@@ -16,8 +17,9 @@ struct HostController: View {
   @State var roomDescription: String
   @State var votingEnabled: Bool
   @State var anonUsr: Bool
+  @State var roomCapacity: Int
   @State var songsPerUser: Int
-    @State var explicitSongsAllowed: Bool
+  @State var explicitSongsAllowed: Bool
   @State var notExited: Bool = false
   
   
@@ -27,7 +29,7 @@ struct HostController: View {
       isInRoom = true
     }
     return VStack {
-      //if !hostControllerHidden.boolValue {
+      //if displayHost {
       //Text("Hidden Howdy").hidden()
       //}
       VStack {
@@ -70,17 +72,17 @@ struct HostController: View {
           .animation(.default)
           .transition(.move(edge: .leading))
       } else {
-        Host_RoomPageView(roomName: roomName, roomDescription: roomDescription, roomCapacity: 5, songsPerUser: 5, votingEnabled: votingEnabled, anonUsr: $anonUsr, showNav: $showNav, notExited: $notExited)
+        Host_RoomPageView(roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser, votingEnabled: votingEnabled, anonUsr: $anonUsr, showNav: $showNav, notExited: $notExited)
           .animation(.default)
           .transition(.move(edge: .trailing))
         
         
         }
-      }
-      .navigationTitle("Lobby")
-      .navigationBarHidden(true).onAppear(perform: {
-        notExited = false
-      }).navigate(to: LandingPageView(), when: $notExited).navigationViewStyle(StackNavigationViewStyle())
+      //}
+      }.navigationTitle("Lobby")
+    .navigationBarHidden(true).onAppear(perform: {
+      notExited = false
+    }).navigate(to: LandingPageView(), when: $notExited).navigationViewStyle(StackNavigationViewStyle())
     }
   }
 
