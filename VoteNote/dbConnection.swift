@@ -414,7 +414,7 @@ func getUser(uid: String, completion: @escaping (user?, Error?) -> Void){
                             newusr.name = newusr.anon_name
                         }
                     }
-                    if (currentRoom!.anonUsr) {
+                    if (currentRoom?.anonUsr ?? false) {
                         newusr.name = newusr.anon_name
                     }
                     completion(newusr, nil)
