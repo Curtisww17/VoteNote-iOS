@@ -21,6 +21,9 @@ struct AddMusicView: View {
     }
   }
   @State private var isEditing = false
+  @State var songsPerUser: Int
+  @State var hasHitMaxSongs: Bool = false
+  @State var explicitSongsAllowed: Bool
   //@ObservedObject var spotify = sharedSpotify
   
   @Environment(\.presentationMode) var presentationMode
@@ -33,14 +36,38 @@ struct AddMusicView: View {
     if nowPlaying == nil && selectedSongs.count > 0 {
       print("Song Added")
       nowPlaying = selectedSongs[0]
-      sharedSpotify.enqueue(songID: selectedSongs[0].id)
+        sharedSpotify.enqueue(songID: selectedSongs[0].id)
       selectedSongs.remove(at: 0)
     }
     
+    var numAdded: Int = 0
+    //for future reference
+    /*var selectedUser: user
+    getUser(uid: getUID()){(user, err) in
+        selectedUser = user!
+    }*/
+    
+    getQueue(){(songs, err) in
+        if songs != nil {
+            for x in songs! {
+                if x.addedBy == getUID() {
+                    numAdded = numAdded + 1
+                }
+            }
+        }
+    }
+    
     for i in selectedSongs {
-      print("Added")
-      addsong(id: i.id) //there's an issue here
-      print("Done")
+        if numAdded < songsPerUser {
+          print("Added")
+          addsong(id: i.id)
+          numAdded = numAdded + 1
+          print("Done")
+        }
+    }
+    
+    if numAdded == songsPerUser {
+        hasHitMaxSongs = true
     }
     
     selectedSongs.removeAll()
@@ -49,7 +76,7 @@ struct AddMusicView: View {
   }
   
   var body: some View {
-    NavigationView {
+    //NavigationView {
       ZStack{
         VStack {
           
@@ -114,10 +141,14 @@ struct AddMusicView: View {
             if currentSearch != "" {
               ForEach((sharedSpotify.recentSearch?.tracks?.items ?? [songStub(album: albumStub(id: "", images: []), artists: [artistStub(href: "", id: "", name: "", type: "", uri: "")], available_markets: nil, disc_number: 0, duration_ms: 0, explicit: false, href: "", id: "", is_local: false, name: "Searching...", popularity: 0, preview_url: "", track_number: 0, type: "", uri: "")])) { song in
                 if (song.album?.images?.count ?? 0 > 0) {
-                SearchEntry(songTitle: song.name, songArtist: (song.artists?[0].name)!, songID: song.id, imageURL: (song.album?.images?[0].url) ?? nil)
+                    if (!explicitSongsAllowed && !song.explicit!) || explicitSongsAllowed {
+                        SearchEntry(songTitle: song.name, songArtist: (song.artists?[0].name)!, songID: song.id, imageURL: (song.album?.images?[0].url) ?? nil, isExplicit: song.explicit!)
+                    }
                 }
                 else {
-                  SearchEntry(songTitle: song.name, songArtist: (song.artists?[0].name)!, songID: song.id, imageURL: nil)
+                    if (!explicitSongsAllowed && !song.explicit!) || explicitSongsAllowed {
+                    SearchEntry(songTitle: song.name, songArtist: (song.artists?[0].name)!, songID: song.id, imageURL: nil, isExplicit: song.explicit!)
+                    }
                 }
               }
             }
@@ -125,9 +156,12 @@ struct AddMusicView: View {
         }
         
       }
-    }.navigationBarHidden(true).onAppear(perform: {
+    /*}.navigationBarHidden(true)*/.onAppear(perform: {
       selectedSongs.removeAll()
-    }).navigationViewStyle(StackNavigationViewStyle())
+      hasHitMaxSongs = false
+    }).navigationViewStyle(StackNavigationViewStyle()).alert(isPresented: $hasHitMaxSongs) {
+        Alert(title: Text("Limit Reached"), message: Text("You have reached your maximum number of songs added to the queue."), dismissButton: .default(Text("Ok")))
+    }
   }
 }
 
@@ -146,6 +180,7 @@ struct SearchEntry: View {
   @State var length: Int = 0
   @State var numVotes: Int? = 0
   @State var imageURL: String?
+  @State var isExplicit: Bool
   
   func selectSong() {
     selectedSong = !selectedSong
@@ -208,7 +243,7 @@ struct AddMusicView_PreviewsContainer: View {
   //@State var spotify: Spotify = Spotify()
   
   var body: some View {
-    AddMusicView()
+    AddMusicView(songsPerUser: 5, explicitSongsAllowed: false)
   }
 }
 
