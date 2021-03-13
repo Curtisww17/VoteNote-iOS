@@ -1,16 +1,17 @@
 //
-//  Host_UserAdminDetailView.swift
+//  User_UserAdminDetailView.swift
 //  VoteNote
 //
-//  Created by COMP401 on 2/26/21.
+//  Created by COMP401 on 3/13/21.
 //
+
 import Foundation
 import SwiftUI
 
 /**
-    The UI for viewing the details of a user as a host
+    The UI for viewing the details of a user as a user
  */
-struct HostUserDetailView: View {
+struct UserUserDetailView: View {
   @State var user: user
   @ObservedObject var songQueue: MusicQueue
   @ObservedObject var selectedSong: song = song(addedBy: "Nil User", artist: "", genres: [""], id: "", length: 0, numVotes: 0, title: "None Selected", imageUrl: "")
@@ -19,17 +20,10 @@ struct HostUserDetailView: View {
   @ObservedObject var votingEnabled: ObservableBoolean
     
     /**
-        Causes the user to return to the Hoest Queue page
+        Causes the user to return to the Host Queue page
      */
   func returnToQueue(){
     shouldReturn = true
-  }
-    
-    /**
-        Bans the selected user
-     */
-  func banSelectedUser(){
-    //banUser(uid: user.id)
   }
     
   var body: some View {
@@ -59,15 +53,10 @@ struct HostUserDetailView: View {
                             }
                         }
                     }
-                    
-                    Button(action: {banSelectedUser()}) {
-                        Text("Ban User")
-                            .foregroundColor(Color.red)
-                    }
                 }
             }
         //}
-    }.navigate(to: Host_QueuePageView(votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue)), when: $shouldReturn).onAppear(perform: {
+    }.navigate(to: User_QueuePageView(votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue)), when: $shouldReturn).onAppear(perform: {
         shouldReturn = false
     }).navigationBarHidden(true).navigationViewStyle(StackNavigationViewStyle())
   }
@@ -84,4 +73,3 @@ struct HostUserDetailView_Previews: PreviewProvider {
     User_QueuePageView_PreviewContainer()
   }
 }*/
-

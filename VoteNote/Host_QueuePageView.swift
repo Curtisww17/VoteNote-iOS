@@ -12,6 +12,9 @@ var nowPlaying: song?
 var isPlaying: Bool = false //should be false by default
 //TO-DO: enqueue next song when only so much time is left
 
+/**
+    The UI for the host's version of the Queue View
+ */
 struct Host_QueuePageView: View {
     @State var currentView = 0
     @ObservedObject var spotify = sharedSpotify
@@ -26,6 +29,9 @@ struct Host_QueuePageView: View {
     
     let refreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
   
+    /**
+        Updates the music queue after a specified time interval
+     */
     func updateQueue() {
         getQueue(){(songs, err) in
             if songs != nil {
@@ -74,20 +80,11 @@ struct Host_QueuePageView: View {
             }
             
             NowPlayingViewHost(isPlaying: isPlaying, songQueue: songQueue, isHost: isHost)
-            
-            /*Button(action: {
-              //these are the scopes that our app requests
-              spotify.appDel.appRemoteDidEstablishConnection(spotify.appDel.appRemote)
-              spotify.TestPlay()
-            }) {
-              Text("play that one about falling down the stairs")
-            }*/
           }
           .navigationBarHidden(true)
         }.onAppear(perform: {
-                //isViewingUser.boolValue = false
-                
-                //makes the first song in the queue to first to play
+
+                //makes the first song in the queue the first to play
                 if nowPlaying == nil && songQueue.musicList.count > 0 /*&& (songsList ?? []).count > 0*/ {
                     nowPlaying = songQueue.musicList[0]
                     sharedSpotify.enqueue(songID: songQueue.musicList[0].id)
@@ -96,20 +93,22 @@ struct Host_QueuePageView: View {
                 print("Updating Queue...")
                 updateQueue()
                 print("Queue Updated!")
-                //hostControllerHidden.boolValue = false
                 
         }).navigate(to: HostUserDetailView(user: selectedUser, songQueue: songQueue, votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue)), when: $isViewingUser.boolValue).navigationViewStyle(StackNavigationViewStyle())
     }
   }
 }
-
+/**
+    A class that stores a copy of a rooms music queue from the DB that can be accessed from the local device
+ */
 class MusicQueue: Identifiable, ObservableObject {
     var musicList: [song] = [song]()
 }
 
+/**
+    The UI template for a single entry in the song queue
+ */
 struct QueueEntry: View {
-    //TODO- Get current song info
-    //TODO- swiping for vetoing songs and viewing the user
     @State var curSong: song
     @State var selectedSong: song
     @State var showingExtras: Bool = false
@@ -129,16 +128,27 @@ struct QueueEntry: View {
     
     @State var selectedUser: user
     
+    /**
+        Calls the DB to upvote the current song
+     */
+    //TO-DO: limit number of upvotes
     func upVoteSong(){
         print("Upvote Song")
         voteSong(vote: 1, id: curSong.id)
     }
     
+    /**
+        Calls the DB to downvote the current song
+     */
+    //TO-DO: limit number of downvotes
     func downVoteSong(){
         print("Downvote Song")
         voteSong(vote: -1, id: curSong.id)
     }
     
+    /**
+        Calls the DB to veto the current song
+     */
     func vetoMusic(){
         vetoSong(id: curSong.id)
         
@@ -152,15 +162,15 @@ struct QueueEntry: View {
         }
     }
     
+    /**
+        Allows the user to view who posted the selected song
+     */
     func viewUser(){
         getUser(uid: curSong.addedBy){(user, err) in
             selectedUser = user!
         }
         selectedSong = self.curSong
-        //displayHostController.boolValue = false
-        //displayHost = false
         isViewingUser.boolValue = true
-        //print("\(isViewingUser.boolValue)")
     }
     
     var body: some View {
@@ -170,7 +180,6 @@ struct QueueEntry: View {
                 HStack {
                   RemoteImage(url: curSong.imageUrl)
                     .frame(width: 35, height: 35)
-//                    Image(systemName: "person.crop.square.fill").resizable().frame(width: 35.0, height: 35.0)
                     if !opened {
                         VStack {
                             HStack {
@@ -255,30 +264,36 @@ struct QueueEntry: View {
     }
 }
 
+/**
+    The UI for the now playing bar on the Queue page
+ */
 struct NowPlayingViewHost: View {
     @State var isMinimized: Bool = true //should start as true
     @State var isPlaying: Bool
-  @ObservedObject var songQueue: MusicQueue
+    @ObservedObject var songQueue: MusicQueue
     @ObservedObject var isHost: ObservableBoolean
-    //TODO- needs the title, artist, votes, and image of the current song, as well as the song itself
     
+    /**
+        Resumes the current song in the Spotify Queue
+     */
     func playSong(){
-        //TODO- check remaining time in song
-        //if nowPlaying != nil {
-            print("Play Song")
-            sharedSpotify.resume()
-            isPlaying = true
-        //}
+        print("Play Song")
+        sharedSpotify.resume()
+        isPlaying = true
     }
     
+    /**
+        Pauses the current song in the Spotify Queue
+     */
     func pauseSong(){
-        //if nowPlaying != nil {
-            sharedSpotify.pause()
-            print("Pause")
-            isPlaying = false
-        //}
+        sharedSpotify.pause()
+        print("Pause")
+        isPlaying = false
     }
     
+    /**
+        Skips the current song in the Spotify Queue
+     */
     func skipSong(){
         if /*nowPlaying != nil &&*/
             songQueue.musicList.count > 0 {
@@ -297,10 +312,16 @@ struct NowPlayingViewHost: View {
         }
     }
     
+    /**
+        Goes back to the previous song in the Spotify Queue
+     */
     func previousSong(){
         //TODO- implement going to previous song
     }
     
+    /**
+        Favorites the current song in the Spotify Queue
+     */
     func favoriteSong(){
         //TODO- implement song favoriting
     }
