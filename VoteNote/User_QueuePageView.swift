@@ -19,6 +19,7 @@ struct User_QueuePageView: View {
     @ObservedObject var songQueue: MusicQueue = MusicQueue()
     @ObservedObject var votingEnabled: ObservableBoolean
     @ObservedObject var selectedUser: user = user(name: "", profilePic: "")
+    @ObservedObject var isHost: ObservableBoolean = ObservableBoolean(boolValue: false)
     
     let refreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
   
@@ -70,7 +71,7 @@ struct User_QueuePageView: View {
                 }
             }
             
-            NowPlayingViewHost(isPlaying: isPlaying, songQueue: songQueue)
+            NowPlayingViewHost(isPlaying: isPlaying, songQueue: songQueue, isHost: isHost)
             
           }
           .navigationBarHidden(true)

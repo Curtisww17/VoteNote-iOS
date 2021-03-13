@@ -24,11 +24,8 @@ struct AddMusicView: View {
   @State var songsPerUser: Int
   @State var hasHitMaxSongs: Bool = false
   @State var explicitSongsAllowed: Bool
-  //@ObservedObject var spotify = sharedSpotify
   
   @Environment(\.presentationMode) var presentationMode
-  
-  //TO-DO: Have songs filtered by search
   
   func addMusic(){
     
@@ -36,7 +33,10 @@ struct AddMusicView: View {
     if nowPlaying == nil && selectedSongs.count > 0 {
       print("Song Added")
       nowPlaying = selectedSongs[0]
-        sharedSpotify.enqueue(songID: selectedSongs[0].id)
+      sharedSpotify.enqueue(songID: selectedSongs[0].id)
+      RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+      sharedSpotify.skip() //need to clear out queue still before playing, clear out one song for now
+      sharedSpotify.pause()
       selectedSongs.remove(at: 0)
     }
     

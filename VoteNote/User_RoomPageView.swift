@@ -96,7 +96,7 @@ struct User_RoomPageView: View {
                 if votingEnabled {
                     Text("Voting Enabled")
                 } else {
-                    Text("Voting Enabled")
+                    Text("Voting Disabled")
                 }
             }
             

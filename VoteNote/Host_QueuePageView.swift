@@ -22,6 +22,7 @@ struct Host_QueuePageView: View {
     @ObservedObject var selectedSong: song = song(addedBy: "Nil User", artist: "", genres: [""], id: "", length: 0, numVotes: 0, title: "None Selected", imageUrl: "")
     @ObservedObject var selectedUser: user = user(name: "", profilePic: "")
     @ObservedObject var votingEnabled: ObservableBoolean
+    @ObservedObject var isHost: ObservableBoolean = ObservableBoolean(boolValue: true)
     
     let refreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
   
@@ -72,7 +73,7 @@ struct Host_QueuePageView: View {
                 }
             }
             
-            NowPlayingViewHost(isPlaying: isPlaying, songQueue: songQueue)
+            NowPlayingViewHost(isPlaying: isPlaying, songQueue: songQueue, isHost: isHost)
             
             /*Button(action: {
               //these are the scopes that our app requests
@@ -258,11 +259,13 @@ struct NowPlayingViewHost: View {
     @State var isMinimized: Bool = true //should start as true
     @State var isPlaying: Bool
   @ObservedObject var songQueue: MusicQueue
+    @ObservedObject var isHost: ObservableBoolean
     //TODO- needs the title, artist, votes, and image of the current song, as well as the song itself
     
     func playSong(){
         //TODO- check remaining time in song
         //if nowPlaying != nil {
+            print("Play Song")
             sharedSpotify.resume()
             isPlaying = true
         //}
@@ -276,19 +279,21 @@ struct NowPlayingViewHost: View {
         //}
     }
     
-    //TO-DO: Add based on number of votes
     func skipSong(){
         if /*nowPlaying != nil &&*/
             songQueue.musicList.count > 0 {
             
+            print(songQueue.musicList.count)
             print("Current Number of Songs in Queue \(songQueue.musicList.count)")
             
             sharedSpotify.enqueue(songID: songQueue.musicList[0].id) //borked
+            RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
             sharedSpotify.skip()
+            vetoSong(id: nowPlaying!.id)
             nowPlaying = songQueue.musicList[0]
             songQueue.musicList.remove(at: 0)
-            //vetoSong(id: nowPlaying.id)
-            
+            sharedSpotify.pause()
+            isPlaying = false
         }
     }
     
@@ -303,7 +308,9 @@ struct NowPlayingViewHost: View {
     var body: some View {
         ZStack {
             Button(action: {
+                if isHost.boolValue {
                     isMinimized = !isMinimized
+                }
                 
             }) {
                 if isMinimized {
