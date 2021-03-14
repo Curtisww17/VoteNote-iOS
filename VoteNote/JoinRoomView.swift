@@ -26,6 +26,7 @@ struct JoinRoomView: View {
   @State var votingEnabled: Bool = true
   @State var explicitSongsAllowed: Bool = false
   @State var anonUsr: Bool = false
+  @State var prevJoinedRooms: [String] = []
   
   func join(c: String) {
     joinRoom(code: c){ (ret, message) in
@@ -43,6 +44,7 @@ struct JoinRoomView: View {
           anonUsr = ret!.anonUsr
           //songsPerUser = ret. //not in db room object
           self.joined = true
+          storePrevRoom(code: c)
         }
       }
     }
@@ -54,6 +56,7 @@ struct JoinRoomView: View {
     //return NavigationView {
     Form {
       //Color.white
+      Section() {
       HStack {
         Image(systemName: "qrcode")
           .foregroundColor(.accentColor)
@@ -88,10 +91,28 @@ struct JoinRoomView: View {
               })
               .frame(width: UIScreen.main.bounds.width * 0.8, height: 60, alignment: .center)
         }
+      }
+      if (prevJoinedRooms.count > 0) {
+      Section() {
+        NavigationLink(
+          destination: PreviouslyJoinedRoomsView(rooms: prevJoinedRooms),
+          label: {
+            Text("Previously Joined Rooms")
+          })
+      }
+      }
     }    .onAppear(perform: {
+      getPrevJoinedRooms(completion: {(codes, err) in
+        if err != nil {
+          prevJoinedRooms = codes ?? []
+        } else {
+          print(err as Any)
+        }
+      })
       if sharedSpotify.isJoiningThroughLink.count != 0 {
         join(c: sharedSpotify.isJoiningThroughLink)
       }
+      
     })
     .navigationBarHidden(true)
     .sheet(isPresented: $isShowingScanner) {
