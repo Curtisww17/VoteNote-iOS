@@ -572,12 +572,20 @@ func dequeue(id: String){
                 let queue: Dictionary? = doc?.data()["queue"] as? Dictionary<String, Any?>
                 if queue != nil {
                     //grab the song from the queue
-                    let sng: Dictionary = queue![id] as! Dictionary<String, Any?>
+                    let sng: Dictionary? = queue![id] as? Dictionary<String, Any?>
                     
-                    //put our thing in the history
-                    db.collection("room").document(docid).updateData([
-                        "history.\(id)": sng
-                    ])
+                    
+                    if sng != nil{
+                        //put our thing in the history
+                        db.collection("room").document(docid).updateData([
+                            "history.\(id)": sng!
+                        ])
+                        
+                        //remove the old song
+                        vetoSong(id: id)
+                    } else {
+                        print("\n\ninvalid song id recieved in dequeue")
+                    }
                     //completion(songout, nil)
                 }
                 //completion(nil, nil)
