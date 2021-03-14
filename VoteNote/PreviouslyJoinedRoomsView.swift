@@ -13,9 +13,11 @@ struct PreviouslyJoinedRoomsView: View {
   var body: some View {
     return HStack {
       Text("Destination")
-    }
-    .onAppear(){
-      
+//      List {
+//        ForEach(rooms) {currRoom in
+//          
+//        }
+//      }
     }
   }
 }
