@@ -103,13 +103,13 @@ struct JoinRoomView: View {
       }
       }
     }    .onAppear(perform: {
-//      getPrevJoinedRooms(completion: {(codes, err) in
-//        if err != nil {
-//          prevJoinedRooms = codes ?? []
-//        } else {
-//          print(err as Any)
-//        }
-//      })
+      getPrevJoinedRooms(completion: {(codes, err) in
+        if err != nil {
+          print(err as Any)
+        } else {
+          prevJoinedRooms = codes ?? []
+        }
+      })
       if sharedSpotify.isJoiningThroughLink.count != 0 {
         join(c: sharedSpotify.isJoiningThroughLink)
       }

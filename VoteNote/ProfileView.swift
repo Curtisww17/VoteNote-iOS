@@ -16,12 +16,16 @@ struct ProfileView: View {
   var body: some View {
     return VStack {
       if (spotify.loggedIn) {
+        if (sharedSpotify.currentUser!.images != nil) {
+          if (sharedSpotify.currentUser!.images!.count > 0) {
         HStack {
           Spacer()
           RemoteImage(url: sharedSpotify.currentUser!.images?[0].url ?? "")
             .frame(width: 150, height: 150)
             .clipShape(Circle())
           Spacer()
+        }
+          }
         }
         Text("\(spotify.currentUser?.display_name ?? "Unknown")")
           .font(.title)
