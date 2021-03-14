@@ -29,6 +29,9 @@ struct AddMusicView: View {
   
   @Environment(\.presentationMode) var presentationMode
     
+    /**
+        Adds the selected songs to the Queue
+     */
     func addMusic(){
         
         //set the first song if nothing is playing
