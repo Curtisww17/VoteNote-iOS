@@ -187,15 +187,21 @@ struct NowPlayingViewHost: View {
         if /*nowPlaying != nil &&*/
             songQueue.musicList.count > 0 {
             
+            print(songQueue.musicList[0].id)
+            
             print("Current Number of Songs in Queue \(songQueue.musicList.count)")
             
             sharedSpotify.enqueue(songID: songQueue.musicList[0].id) //borked
             //OperationQueue.main.waitUntilAllOperationsAreFinished()
             RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+            
             sharedSpotify.skip()
-            nowPlaying = songQueue.musicList[0]
             vetoSong(id: songQueue.musicList[0].id)
             songQueue.musicList.remove(at: 0)
+            
+            nowPlaying = songQueue.musicList[0]
+            
+            
         }
     }
     

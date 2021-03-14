@@ -148,6 +148,18 @@ class Spotify: ObservableObject {
     }
   }
   
+  func savedSongs(completion: @escaping (uniquePlaylist?) -> ()) -> (){
+    self.httpRequester.headerGet(url: "https://api.spotify.com/v1/me/tracks", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ]).onFinish = {
+      (response) in
+      do {
+        let decoder = JSONDecoder()
+        try completion( decoder.decode(uniquePlaylist.self, from: response.data))
+      } catch {
+        fatalError("Couldn't parse \(response.description)")
+      }
+    }
+  }
+  
   func isLoggedIn() -> Bool {
     if let rem: SPTAppRemote = self.appRemote {
       return rem.isConnected
