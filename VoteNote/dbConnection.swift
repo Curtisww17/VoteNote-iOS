@@ -49,10 +49,11 @@ class room{
     let code: String    //the room code, used for joining
     let spu: Int    //songs per user
     let playlist: String //playlist id thing
+    let host: String //uid of the host
     //need to add allowed genres
     
     //normal constructor
-    init(name: String, desc: String? = "", anonUsr: Bool, capacity: Int, explicit: Bool, voting: Bool, spu: Int = -1, playlist: String? = nil) {
+    init(name: String, desc: String? = "", anonUsr: Bool, capacity: Int, explicit: Bool, voting: Bool, spu: Int = -1, playlist: String? = nil, host: String = FAuth.currentUser!.uid) {
         self.name = name
         self.desc = desc
         self.anonUsr = anonUsr
@@ -63,6 +64,7 @@ class room{
         code = ""
         self.spu = spu
         self.playlist = playlist ?? ""
+        self.host = host
     }
     
     //constructor for firestore
@@ -77,6 +79,7 @@ class room{
         code = rm["code"] as! String
         spu = rm["spu"] as? Int ?? -1
         playlist = rm["playlist"] as? String ?? ""
+        host = rm["host"] as? String ?? ""
     }
 }
 
@@ -209,7 +212,8 @@ func joinRoom(code: String, completion:@escaping (room?, String?) -> Void){
     
     var joinedRoom: room? = nil
     
-    //this may be unneccesary
+    
+    
     let joiningQuery = db.collection("room").whereField("code", isEqualTo: upperCode)
     
     joiningQuery.getDocuments() { (query, err) in
@@ -239,6 +243,76 @@ func joinRoom(code: String, completion:@escaping (room?, String?) -> Void){
         
     }
     
+}
+
+/**
+ stores a room in the users previous rooms
+ 
+ - Parameter code: the code of the room to store
+ */
+func storePrevRoom(code: String){
+    let uid = FAuth.currentUser?.uid
+    
+    //db.collection("users").document(uid!).updateData(["prevRooms.\(code)": FieldValue.serverTimestamp()])
+    
+    db.collection("users").document(uid!).collection("prevRooms").addDocument(data: ["code": code, "time": FieldValue.serverTimestamp()])
+}
+
+func getPrevRooms(completion: @escaping ([String]?, Error?) -> Void){
+    let uid = FAuth.currentUser?.uid
+    
+    let  docRef = db.collection("users").document(uid!).collection("prevRooms").order(by: "time")
+    
+    docRef.getDocuments { (docs, err) in
+        if let err = err {
+            completion(nil, err)
+        } else {
+            var rooms: [String] = []
+            
+            for doc in docs!.documents {
+                rooms.append(doc.data()["code"] as? String ?? "")
+            }
+            
+        }
+    }
+}
+
+func getPrevJoinedRooms(completion: @escaping ([String]?, Error?) -> Void){
+    let uid = FAuth.currentUser?.uid
+    
+    let  docRef = db.collection("users").document(uid!).collection("prevRooms").order(by: "time").whereField("host", isNotEqualTo: uid!)
+    
+    docRef.getDocuments { (docs, err) in
+        if let err = err {
+            completion(nil, err)
+        } else {
+            var rooms: [String] = []
+            
+            for doc in docs!.documents {
+                rooms.append(doc.data()["code"] as? String ?? "")
+            }
+            
+        }
+    }
+}
+
+func getPrevHostedRooms(completion: @escaping ([String]?, Error?) -> Void){
+    let uid = FAuth.currentUser?.uid
+    
+    let  docRef = db.collection("users").document(uid!).collection("prevRooms").order(by: "time").whereField("host", isEqualTo: <#T##Any#>: uid!)
+    
+    docRef.getDocuments { (docs, err) in
+        if let err = err {
+            completion(nil, err)
+        } else {
+            var rooms: [String] = []
+            
+            for doc in docs!.documents {
+                rooms.append(doc.data()["code"] as? String ?? "")
+            }
+            
+        }
+    }
 }
 
 
@@ -320,7 +394,8 @@ func makeRoom(newRoom: room) -> Bool{
                                         "voting": newRoom.voting,
                                         "code": code,
                                         "spu": newRoom.spu,
-                                        "playlist": newRoom.playlist])
+                                        "playlist": newRoom.playlist,
+                                        "host": newRoom.host])
     
     //put the user who made the room into the room
     db.collection("users").document(usr!.uid).updateData(["currentRoom": code])
