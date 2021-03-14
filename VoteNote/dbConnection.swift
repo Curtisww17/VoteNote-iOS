@@ -277,6 +277,44 @@ func getPrevRooms(completion: @escaping ([String]?, Error?) -> Void){
     }
 }
 
+func getPrevJoinedRooms(completion: @escaping ([String]?, Error?) -> Void){
+    let uid = FAuth.currentUser?.uid
+    
+    let  docRef = db.collection("users").document(uid!).collection("prevRooms").order(by: "time").whereField("host", isNotEqualTo: uid!)
+    
+    docRef.getDocuments { (docs, err) in
+        if let err = err {
+            completion(nil, err)
+        } else {
+            var rooms: [String] = []
+            
+            for doc in docs!.documents {
+                rooms.append(doc.data()["code"] as? String ?? "")
+            }
+            
+        }
+    }
+}
+
+func getPrevHostedRooms(completion: @escaping ([String]?, Error?) -> Void){
+    let uid = FAuth.currentUser?.uid
+    
+    let  docRef = db.collection("users").document(uid!).collection("prevRooms").order(by: "time").whereField("host", isEqualTo: <#T##Any#>: uid!)
+    
+    docRef.getDocuments { (docs, err) in
+        if let err = err {
+            completion(nil, err)
+        } else {
+            var rooms: [String] = []
+            
+            for doc in docs!.documents {
+                rooms.append(doc.data()["code"] as? String ?? "")
+            }
+            
+        }
+    }
+}
+
 
 /**
  Get the room referenced by code
