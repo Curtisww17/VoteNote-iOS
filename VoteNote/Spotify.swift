@@ -25,6 +25,7 @@ class Spotify: ObservableObject {
   var currentUser: SpotifyUser?
   var recentSearch: SpotifySearchResults?
   var userPlaylists: _spotifyPlaylists?
+  var currentPlaylist: uniquePlaylist?
   
   var sessionManager: SPTSessionManager?
   var appRemote: SPTAppRemote?
@@ -264,7 +265,7 @@ struct SpotifyAlbum: Codable, Identifiable {
 }
 
 struct _spotifyPlaylists: Codable{
-  var items: [SpotifyPlaylist]?
+  var items: [Playlist]?
   var total: Int?
 }
 
@@ -296,6 +297,6 @@ struct playlistTrackTime: Codable{
 struct songTimeAdded: Codable{
   //var id = UUID()
   //var added_at: String
-  var track: songStub
+  var track: SpotifyTrack
   
 }
