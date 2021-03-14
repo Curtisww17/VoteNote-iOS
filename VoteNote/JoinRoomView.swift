@@ -83,7 +83,7 @@ struct JoinRoomView: View {
         isShowingJoinAlert.toggle()
       })
         if (isShowingJoinAlert) {
-            TextField("RoomCode", text: $code)
+            TextField("Room Code", text: $code)
               .textFieldStyle(RoundedBorderTextFieldStyle())
               Button(action: {
                 join(c: code)
@@ -103,13 +103,13 @@ struct JoinRoomView: View {
       }
       }
     }    .onAppear(perform: {
-      getPrevJoinedRooms(completion: {(codes, err) in
-        if err != nil {
-          prevJoinedRooms = codes ?? []
-        } else {
-          print(err as Any)
-        }
-      })
+//      getPrevJoinedRooms(completion: {(codes, err) in
+//        if err != nil {
+//          prevJoinedRooms = codes ?? []
+//        } else {
+//          print(err as Any)
+//        }
+//      })
       if sharedSpotify.isJoiningThroughLink.count != 0 {
         join(c: sharedSpotify.isJoiningThroughLink)
       }
