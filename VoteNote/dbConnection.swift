@@ -591,10 +591,21 @@ func dequeue(id: String){
  - Parameter id: the id of the song that is to be removed
  */
 func vetoSong(id: String){
+    
     getCurrRoom { (currRoom, err) in
         
-        //remove the song from the queue
-        db.collection("room").document(currRoom).updateData(["queue" : FieldValue.arrayRemove([id])])
+        let rm = db.collection("room").whereField("code", isEqualTo: currRoom).getDocuments { (doc, Err) in
+            if let err = err {
+                print("/n/nerror getting doc \(err.localizedDescription)")
+            }else if !doc!.isEmpty{
+                
+                let docid = doc?.documents[0].documentID
+                
+                //remove the song from the queue
+                db.collection("room").document(docid!).updateData(["queue.\(id)" : FieldValue.delete()])
+            }
+        }
+        
         
     }//end getCurrRoom
 }
