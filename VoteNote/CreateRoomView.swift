@@ -43,7 +43,8 @@ struct CreateRoomView: View {
         //TO-DO- send info to room, songs per user
         print("Room")
       let newRoom: room = room(name: roomName, desc: roomDescription, anonUsr: anonUsr, capacity: userCapacity, explicit: explicitSongsAllowed, voting: votingEnabled)
-        makeRoom(newRoom: newRoom)
+        let newcode = makeRoom(newRoom: newRoom)
+        storePrevRoom(code: newcode)
         madeRoom = true
         self.presentationMode.wrappedValue.dismiss()
     }
