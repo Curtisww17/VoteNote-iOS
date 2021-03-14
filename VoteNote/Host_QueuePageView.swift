@@ -292,6 +292,7 @@ struct NowPlayingViewHost: View {
         Pauses the current song in the Spotify Queue
      */
     func pauseSong(){
+        //if nowPlaying != nil {
         sharedSpotify.pause()
         print("Pause")
         isPlaying = false
@@ -308,7 +309,9 @@ struct NowPlayingViewHost: View {
             print("Current Number of Songs in Queue \(songQueue.musicList.count)")
             
             sharedSpotify.enqueue(songID: songQueue.musicList[0].id) //borked
+            //OperationQueue.main.waitUntilAllOperationsAreFinished()
             RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+            
             sharedSpotify.skip()
             dequeue(id: nowPlaying!.id)
             nowPlaying = songQueue.musicList[0]
