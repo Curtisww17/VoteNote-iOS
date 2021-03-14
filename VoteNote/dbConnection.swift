@@ -142,7 +142,7 @@ class song: Identifiable, ObservableObject{
         genres = []
         self.id = id
         length = sng["length"] as! Int
-        numVotes = sng["numVotes"] as? Int
+        numVotes = sng["numvotes"] as? Int
         title = sng["title"] as! String
         imageUrl = sng["imageurl"] as? String ?? ""
     }
@@ -258,6 +258,7 @@ func storePrevRoom(code: String){
     db.collection("users").document(uid!).collection("prevRooms").addDocument(data: ["code": code, "time": FieldValue.serverTimestamp()])
 }
 
+//TODO: this can probably be removed
 func getPrevRooms(completion: @escaping ([String]?, Error?) -> Void){
     let uid = FAuth.currentUser?.uid
     
@@ -270,17 +271,24 @@ func getPrevRooms(completion: @escaping ([String]?, Error?) -> Void){
             var rooms: [String] = []
             
             for doc in docs!.documents {
-                rooms.append(doc.data()["code"] as? String ?? "")
+                if doc.data()["host"] as? String ?? "" == uid! {
+                    rooms.append(doc.data()["code"] as? String ?? "")
+                }
             }
+            completion(rooms, nil)
             
         }
     }
 }
 
+/**
+ get the rooms that have previously been joined by the current
+ 
+ */
 func getPrevJoinedRooms(completion: @escaping ([String]?, Error?) -> Void){
     let uid = FAuth.currentUser?.uid
     
-    let  docRef = db.collection("users").document(uid!).collection("prevRooms").order(by: "time").whereField("host", isNotEqualTo: uid!)
+    let  docRef = db.collection("users").document(uid!).collection("prevRooms").order(by: "time")
     
     docRef.getDocuments { (docs, err) in
         if let err = err {
@@ -289,8 +297,11 @@ func getPrevJoinedRooms(completion: @escaping ([String]?, Error?) -> Void){
             var rooms: [String] = []
             
             for doc in docs!.documents {
-                rooms.append(doc.data()["code"] as? String ?? "")
+                if doc.data()["host"] as? String ?? "" != uid! {
+                    rooms.append(doc.data()["code"] as? String ?? "")
+                }
             }
+            completion(rooms, nil)
             
         }
     }
@@ -299,7 +310,7 @@ func getPrevJoinedRooms(completion: @escaping ([String]?, Error?) -> Void){
 func getPrevHostedRooms(completion: @escaping ([String]?, Error?) -> Void){
     let uid = FAuth.currentUser?.uid
     
-    let  docRef = db.collection("users").document(uid!).collection("prevRooms").order(by: "time").whereField("host", isEqualTo: <#T##Any#>: uid!)
+    let  docRef = db.collection("users").document(uid!).collection("prevRooms").whereField("host", isEqualTo: uid!).order(by: "time")
     
     docRef.getDocuments { (docs, err) in
         if let err = err {
@@ -372,7 +383,7 @@ func leaveRoom() -> Bool{
  
  - Parameter newRoom: a room object which will be used to make a new room
  */
-func makeRoom(newRoom: room) -> Bool{
+func makeRoom(newRoom: room) -> String{
     let code: String
     let usr = FAuth.currentUser
     
@@ -400,7 +411,7 @@ func makeRoom(newRoom: room) -> Bool{
     //put the user who made the room into the room
     db.collection("users").document(usr!.uid).updateData(["currentRoom": code])
     //this will need to be modified to allow for adding a room with a queue
-    return true
+    return code
 }
 
 
