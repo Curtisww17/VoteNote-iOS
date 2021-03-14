@@ -60,7 +60,7 @@ struct LandingPageView: View {
     }
     .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading).onAppear(perform: {
       spotify.pause()
-      spotify.initializeAnon()
+      //spotify.initializeAnon()
     })
     .navigationViewStyle(StackNavigationViewStyle())
     

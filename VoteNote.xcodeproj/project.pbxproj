@@ -27,6 +27,7 @@
 		4485731525BF8727006C5C07 /* User_RoomPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4485731425BF8727006C5C07 /* User_RoomPageView.swift */; };
 		4485733425C22F0E006C5C07 /* SpotifyiOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4485733325C22F0E006C5C07 /* SpotifyiOS.framework */; };
 		44A2831325F7F97E00DDF229 /* AnonymousLists.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44A2831225F7F97E00DDF229 /* AnonymousLists.swift */; };
+		44A2834025FBB99D00DDF229 /* RemoteImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44A2833F25FBB99D00DDF229 /* RemoteImage.swift */; };
 		44C07DAE25E565B200D3667A /* QRCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44C07DAD25E565B200D3667A /* QRCode.swift */; };
 		44C07DB325E5664100D3667A /* RoomCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44C07DB225E5664100D3667A /* RoomCodeView.swift */; };
 		44C07DB825E566BE00D3667A /* CurrentRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44C07DB725E566BE00D3667A /* CurrentRoom.swift */; };
@@ -37,6 +38,7 @@
 		44F8D5DA25DB512C00D2B461 /* UsersListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44F8D5D925DB512C00D2B461 /* UsersListView.swift */; };
 		44F8D5DF25DB51DA00D2B461 /* UserDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44F8D5DE25DB51DA00D2B461 /* UserDetailView.swift */; };
 		671BABC925D895B500964AAF /* httpRequester.swift in Sources */ = {isa = PBXBuildFile; fileRef = 671BABC825D895B500964AAF /* httpRequester.swift */; };
+		674280A625FD6AB200B06405 /* User_UserAdminDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674280A525FD6AB200B06405 /* User_UserAdminDetailView.swift */; };
 		67C1C10825F6F67D006A878B /* Host_UserAdminDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67C1C10725F6F67D006A878B /* Host_UserAdminDetailView.swift */; };
 		67DC8DA625DB3F63008C07F8 /* AddMusicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67DC8DA525DB3F63008C07F8 /* AddMusicView.swift */; };
 		88FB562525C73562007114C7 /* (null) in Resources */ = {isa = PBXBuildFile; };
@@ -96,6 +98,7 @@
 		4485731F25C225DD006C5C07 /* VoteNote-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "VoteNote-Bridging-Header.h"; sourceTree = "<group>"; };
 		4485733325C22F0E006C5C07 /* SpotifyiOS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpotifyiOS.framework; sourceTree = "<group>"; };
 		44A2831225F7F97E00DDF229 /* AnonymousLists.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnonymousLists.swift; sourceTree = "<group>"; };
+		44A2833F25FBB99D00DDF229 /* RemoteImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteImage.swift; sourceTree = "<group>"; };
 		44C07DAD25E565B200D3667A /* QRCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCode.swift; sourceTree = "<group>"; };
 		44C07DB225E5664100D3667A /* RoomCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomCodeView.swift; sourceTree = "<group>"; };
 		44C07DB725E566BE00D3667A /* CurrentRoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentRoom.swift; sourceTree = "<group>"; };
@@ -105,6 +108,7 @@
 		44F8D5D925DB512C00D2B461 /* UsersListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsersListView.swift; sourceTree = "<group>"; };
 		44F8D5DE25DB51DA00D2B461 /* UserDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDetailView.swift; sourceTree = "<group>"; };
 		671BABC825D895B500964AAF /* httpRequester.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = httpRequester.swift; sourceTree = "<group>"; tabWidth = 2; };
+		674280A525FD6AB200B06405 /* User_UserAdminDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User_UserAdminDetailView.swift; sourceTree = "<group>"; };
 		67C1C10725F6F67D006A878B /* Host_UserAdminDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Host_UserAdminDetailView.swift; sourceTree = "<group>"; };
 		67DC8DA525DB3F63008C07F8 /* AddMusicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddMusicView.swift; sourceTree = "<group>"; };
 		88FB569525CAF48A007114C7 /* dbConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dbConnection.swift; sourceTree = "<group>"; };
@@ -192,6 +196,7 @@
 				4485730F25BF8390006C5C07 /* Host_RoomPageView.swift */,
 				4485731425BF8727006C5C07 /* User_RoomPageView.swift */,
 				67C1C10725F6F67D006A878B /* Host_UserAdminDetailView.swift */,
+				674280A525FD6AB200B06405 /* User_UserAdminDetailView.swift */,
 				445F0AF225C72EE700EF80F5 /* Spotify.swift */,
 				88FB569525CAF48A007114C7 /* dbConnection.swift */,
 				671BABC825D895B500964AAF /* httpRequester.swift */,
@@ -204,6 +209,7 @@
 				44C07DB225E5664100D3667A /* RoomCodeView.swift */,
 				44C07DB725E566BE00D3667A /* CurrentRoom.swift */,
 				44A2831225F7F97E00DDF229 /* AnonymousLists.swift */,
+				44A2833F25FBB99D00DDF229 /* RemoteImage.swift */,
 			);
 			path = VoteNote;
 			sourceTree = "<group>";
@@ -516,6 +522,8 @@
 				44C07DAE25E565B200D3667A /* QRCode.swift in Sources */,
 				44F8D59F25D9A61200D2B461 /* HostController.swift in Sources */,
 				44F8D59A25D8BCD500D2B461 /* EnvironmentVariables.swift in Sources */,
+				674280A625FD6AB200B06405 /* User_UserAdminDetailView.swift in Sources */,
+				44A2834025FBB99D00DDF229 /* RemoteImage.swift in Sources */,
 				671BABC925D895B500964AAF /* httpRequester.swift in Sources */,
 				44F8D5DA25DB512C00D2B461 /* UsersListView.swift in Sources */,
 				67DC8DA625DB3F63008C07F8 /* AddMusicView.swift in Sources */,

@@ -8,10 +8,12 @@
 import Foundation
 import SwiftUI
 
+/**
+    The UI for the host's version of the Queue View
+ */
 struct User_QueuePageView: View {
     @State var currentView = 0
-  @ObservedObject var spotify = sharedSpotify
-  //@State var songsList: [song]?
+    @ObservedObject var spotify = sharedSpotify
     @State var queueRefreshSeconds = 60
     @State var voteUpdateSeconds = 10
     @ObservedObject var isViewingUser: ObservableBoolean = ObservableBoolean(boolValue: false)
@@ -19,9 +21,13 @@ struct User_QueuePageView: View {
     @ObservedObject var songQueue: MusicQueue = MusicQueue()
     @ObservedObject var votingEnabled: ObservableBoolean
     @ObservedObject var selectedUser: user = user(name: "", profilePic: "")
+    @ObservedObject var isHost: ObservableBoolean = ObservableBoolean(boolValue: false)
     
     let refreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
   
+    /**
+        Updates the music queue after a specified time interval
+     */
     func updateQueue() {
         getQueue(){(songs, err) in
             if songs != nil {
@@ -70,14 +76,13 @@ struct User_QueuePageView: View {
                 }
             }
             
-            NowPlayingViewHost(isPlaying: isPlaying, songQueue: songQueue)
+            NowPlayingViewHost(isPlaying: isPlaying, songQueue: songQueue, isHost: isHost)
             
           }
           .navigationBarHidden(true)
         }.onAppear(perform: {
-                //isViewingUser.boolValue = false
-                
-                //makes the first song in the queue to first to play
+
+                //makes the first song in the queue the first to play
                 if nowPlaying == nil && songQueue.musicList.count > 0 /*&& (songsList ?? []).count > 0*/ {
                     nowPlaying = songQueue.musicList[0]
                     sharedSpotify.enqueue(songID: songQueue.musicList[0].id)
@@ -87,10 +92,9 @@ struct User_QueuePageView: View {
                 updateQueue()
                 print("Queue Updated!")
                 
-        }).navigate(to: HostUserDetailView(user: selectedUser, songQueue: songQueue, votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue)), when: $isViewingUser.boolValue).navigationViewStyle(StackNavigationViewStyle())
+        }).navigate(to: UserUserDetailView(user: selectedUser, songQueue: songQueue, votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue)), when: $isViewingUser.boolValue).navigationViewStyle(StackNavigationViewStyle())
     }
   }
-  //}
 }
 
 /*struct User_QueuePageView_PreviewContainer: View {

@@ -1,16 +1,17 @@
 //
-//  Host_UserAdminDetailView.swift
+//  User_UserAdminDetailView.swift
 //  VoteNote
 //
-//  Created by COMP401 on 2/26/21.
+//  Created by COMP401 on 3/13/21.
 //
+
 import Foundation
 import SwiftUI
 
 /**
-    The UI for viewing the details of a user as a host
+    The UI for viewing the details of a user as a user
  */
-struct HostUserDetailView: View {
+struct UserUserDetailView: View {
   @State var user: user
   @ObservedObject var songQueue: MusicQueue
   @ObservedObject var selectedSong: song = song(addedBy: "Nil User", artist: "", genres: [""], id: "", length: 0, numVotes: 0, title: "None Selected", imageUrl: "")
@@ -19,36 +20,32 @@ struct HostUserDetailView: View {
   @ObservedObject var votingEnabled: ObservableBoolean
   @ObservedObject var songHistory: MusicQueue = MusicQueue()
   @State var voteUpdateSeconds = 10
-    
-  let refreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-    
-    func updateHistory() {
-        getHistory(){(songs, err) in
-            if songs != nil {
-                if songs!.count > 0 {
-                    songHistory.musicList.removeAll()
-                    var count: Int = 0
-                    while count < songs!.count {
-                        songHistory.musicList.append(songs![count])
-                        count = count + 1
-                    }
-                }
-            }
-        }
-    }
+      
+    let refreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+      
+    /**
+        Updates the music queue after a specified time interval
+     */
+      func updateHistory() {
+          getHistory(){(songs, err) in
+              if songs != nil {
+                  if songs!.count > 0 {
+                      songHistory.musicList.removeAll()
+                      var count: Int = 0
+                      while count < songs!.count {
+                          songHistory.musicList.append(songs![count])
+                          count = count + 1
+                      }
+                  }
+              }
+          }
+      }
     
     /**
-        Causes the user to return to the Hoest Queue page
+        Causes the user to return to the Host Queue page
      */
   func returnToQueue(){
     shouldReturn = true
-  }
-    
-    /**
-        Bans the selected user
-     */
-  func banSelectedUser(){
-    //banUser(uid: user.id)
   }
     
   var body: some View {
@@ -73,7 +70,7 @@ struct HostUserDetailView: View {
                         List {
                             ForEach(songQueue.musicList) { song in
                                 if song.addedBy == getUID() { //we should probably have a better way to make this comparision
-                                    QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: hostControllerHidden, isDetailView: true, isUserQueue: false, votingEnabled: votingEnabled, selectedUser: user)
+                                    QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: hostControllerHidden, isDetailView: true, isUserQueue: true, votingEnabled: votingEnabled, selectedUser: user)
                                 }
                             }
                         }
@@ -83,15 +80,10 @@ struct HostUserDetailView: View {
                         List {
                             ForEach(songHistory.musicList) { song in
                                 if song.addedBy == getUID() { //we should probably have a better way to make this comparision
-                                    QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songHistory, isViewingUser: hostControllerHidden, isDetailView: true, isUserQueue: false, votingEnabled: ObservableBoolean(boolValue: false), selectedUser: user)
+                                    QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songHistory, isViewingUser: hostControllerHidden, isDetailView: true, isUserQueue: true, votingEnabled: ObservableBoolean(boolValue: false), selectedUser: user)
                                 }
                             }
                         }
-                    }
-                    
-                    Button(action: {banSelectedUser()}) {
-                        Text("Ban User")
-                            .foregroundColor(Color.red)
                     }
                 }
                 
@@ -108,12 +100,11 @@ struct HostUserDetailView: View {
                         }
                     }
                 }.hidden().frame(width: 0, height: 0)
-                
             }
         //}
-        }.onAppear(perform: {
-            updateHistory()
-        }).navigate(to: Host_QueuePageView(votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue)), when: $shouldReturn).onAppear(perform: {
+    }.onAppear(perform: {
+        updateHistory()
+    }).navigate(to: User_QueuePageView(votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue)), when: $shouldReturn).onAppear(perform: {
         shouldReturn = false
     }).navigationBarHidden(true).navigationViewStyle(StackNavigationViewStyle())
   }
@@ -130,4 +121,3 @@ struct HostUserDetailView_Previews: PreviewProvider {
     User_QueuePageView_PreviewContainer()
   }
 }*/
-

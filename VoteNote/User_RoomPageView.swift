@@ -8,6 +8,9 @@
 import Foundation
 import SwiftUI
 
+/**
+    The UI for the user's version of the Room View
+ */
 struct User_RoomPageView: View {
   @State var currentView = 1
   @State var roomName: String
@@ -21,7 +24,9 @@ struct User_RoomPageView: View {
   
   @Binding var showNav: Bool
   
-  
+    /**
+        Causes the current user to leave the room
+     */
   func exitRoom() {
       leaveRoom()
       notExited = true
@@ -96,7 +101,7 @@ struct User_RoomPageView: View {
                 if votingEnabled {
                     Text("Voting Enabled")
                 } else {
-                    Text("Voting Enabled")
+                    Text("Voting Disabled")
                 }
             }
             
