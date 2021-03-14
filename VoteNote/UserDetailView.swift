@@ -11,6 +11,6 @@ import SwiftUI
 struct UserDetailView: View {
   let user: user
   var body: some View {
-    Text(user.name)
+    Text(user.name).navigationViewStyle(StackNavigationViewStyle())
   }
 }

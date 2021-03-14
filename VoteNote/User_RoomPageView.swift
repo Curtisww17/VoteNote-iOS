@@ -8,15 +8,30 @@
 import Foundation
 import SwiftUI
 
+/**
+    The UI for the user's version of the Room View
+ */
 struct User_RoomPageView: View {
   @State var currentView = 1
   @State var roomName: String
   @State var roomDescription: String
   @State var roomCapacity: Int
   @State var songsPerUser: Int
+    @State var votingEnabled: Bool
+  @Binding var anonUsr: Bool
   @ObservedObject var currentRoom: CurrentRoom = CurrentRoom()
+  @Binding var notExited: Bool
   
   @Binding var showNav: Bool
+  
+    /**
+        Causes the current user to leave the room
+     */
+  func exitRoom() {
+      leaveRoom()
+      notExited = true
+  }
+  
   
   var body: some View {
     //return NavigationView {
@@ -65,7 +80,11 @@ struct User_RoomPageView: View {
           }
           
           Section(header: Text("Room Settings")) {
-            Text(roomDescription)
+            if roomDescription == "" {
+                Text("A VoteNote room")
+            } else {
+                Text(roomDescription)
+            }
             HStack{
               Text("Room Capacity")
               Spacer()
@@ -77,13 +96,47 @@ struct User_RoomPageView: View {
               Spacer()
               Text("\(songsPerUser)")
             }
+            
+            HStack{
+                if votingEnabled {
+                    Text("Voting Enabled")
+                } else {
+                    Text("Voting Disabled")
+                }
+            }
+            
+            HStack{
+              Text("Anonymize All Users:")
+              Spacer()
+                if anonUsr {
+                    Text("True")
+                } else {
+                    Text("False")
+                }
+            }
+          }
+          
+          Section() {
+            Button(action: {
+                exitRoom()
+            }, label: {
+              HStack {
+                Spacer()
+                Text("Leave Room")
+                    .foregroundColor(Color.red)
+                Spacer()
+              }
+            })
+            .padding(.vertical)
           }
         }
       }
       .navigationTitle("Room")
       .navigationBarHidden(true)
     }
+    
   }
+  
   
 }
 
