@@ -29,9 +29,6 @@ struct HostController: View {
       isInRoom = true
     }
     return VStack {
-      //if displayHost {
-      //Text("Hidden Howdy").hidden()
-      //}
       VStack {
         HStack {
           Spacer()
@@ -77,14 +74,13 @@ struct HostController: View {
           .transition(.move(edge: .trailing))
         
         
-        }
-      //}
-      }.navigationTitle("Lobby")
+      }
+    }.navigationTitle("Lobby")
     .navigationBarHidden(true).onAppear(perform: {
       notExited = false
     }).navigate(to: LandingPageView(), when: $notExited).navigationViewStyle(StackNavigationViewStyle())
-    }
   }
+}
 
 /*struct HostController_PreviewContainer: View {
  @State var isInRoom: Bool = true
