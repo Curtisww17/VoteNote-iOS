@@ -275,6 +275,7 @@ func getPrevRooms(completion: @escaping ([String]?, Error?) -> Void){
                     rooms.append(doc.data()["code"] as? String ?? "")
                 }
             }
+            completion(rooms, nil)
             
         }
     }
@@ -300,6 +301,7 @@ func getPrevJoinedRooms(completion: @escaping ([String]?, Error?) -> Void){
                     rooms.append(doc.data()["code"] as? String ?? "")
                 }
             }
+            completion(rooms, nil)
             
         }
     }
