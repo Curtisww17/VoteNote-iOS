@@ -28,9 +28,6 @@ struct UserController: View {
       isInRoom = true
     }
     return VStack {
-        //if !hostControllerHidden.boolValue {
-            //Text("Hidden Howdy").hidden()
-        //}
         VStack {
       HStack {
         Spacer()

@@ -17,8 +17,6 @@ struct LoginWithSpotifyView: View {
       Image("Logo")
       Spacer()
       Button(action: {
-
-        //these are the scopes that our app requests
         sharedSpotify.login()
       }, label: {
         ZStack {
@@ -37,7 +35,6 @@ struct LoginWithSpotifyView: View {
       Spacer()
       
     }.onAppear(perform: {sharedSpotify.pause()})
-    //.frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
   }
 }
 
