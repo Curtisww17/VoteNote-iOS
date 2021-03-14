@@ -142,7 +142,7 @@ class song: Identifiable, ObservableObject{
         genres = []
         self.id = id
         length = sng["length"] as! Int
-        numVotes = sng["numVotes"] as? Int
+        numVotes = sng["numvotes"] as? Int
         title = sng["title"] as! String
         imageUrl = sng["imageurl"] as? String ?? ""
     }
