@@ -9,15 +9,14 @@ import Foundation
 import SwiftUI
 
 
-
+/**
+ This class is for keeping track of the current room's qr code. Swift is weird so I had to
+ make this in a separate class
+ */
 class CurrentRoom: ObservableObject {
   @Published var roomCode: String
   @Published var roomQR: UIImage?
   
-//  init(roomCode: String) {
-//    self.roomCode = roomCode
-//    self.roomQR = generateQRCode(from: roomCode)
-//  }
   
   init() {
     roomCode = ""

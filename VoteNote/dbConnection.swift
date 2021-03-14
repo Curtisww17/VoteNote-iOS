@@ -253,15 +253,36 @@ func joinRoom(code: String, completion:@escaping (room?, String?) -> Void){
 func storePrevRoom(code: String){
     let uid = FAuth.currentUser?.uid
     
-    //db.collection("users").document(uid!).updateData(["prevRooms.\(code)": FieldValue.serverTimestamp()])
     
-    db.collection("users").document(uid!).collection("prevRooms").addDocument(data: ["code": code, "time": FieldValue.serverTimestamp()])
+    
+    let joiningQuery = db.collection("room").whereField("code", isEqualTo: code)
+    
+    joiningQuery.getDocuments() { (query, err) in
+        if let err = err{
+            print("err gerring documents \(err)")
+        }
+        else if query!.isEmpty { //make sure the querey returns a room
+            print("err")
+        } else {
+            
+            let rm = query?.documents[0].documentID
+            
+            //if we didn't find the document
+            if rm == nil{
+                print("err")
+            } else {
+                db.collection("users").document(uid!).collection("prevRooms").addDocument(data: ["id": rm , "time": FieldValue.serverTimestamp()])
+            }
+            
+        }
+        
+    }//end joiningquerey
 }
 
 //TODO: this can probably be removed
 func getPrevRooms(completion: @escaping ([String]?, Error?) -> Void){
     let uid = FAuth.currentUser?.uid
-    
+        
     let  docRef = db.collection("users").document(uid!).collection("prevRooms").order(by: "time")
     
     docRef.getDocuments { (docs, err) in
@@ -298,7 +319,9 @@ func getPrevJoinedRooms(completion: @escaping ([String]?, Error?) -> Void){
             
             for doc in docs!.documents {
                 if doc.data()["host"] as? String ?? "" != uid! {
-                    rooms.append(doc.data()["code"] as? String ?? "")
+                    let id = doc.data()["id"] as? String ?? ""
+                    rooms.append(id)
+                    
                 }
             }
             completion(rooms, nil)
@@ -310,7 +333,7 @@ func getPrevJoinedRooms(completion: @escaping ([String]?, Error?) -> Void){
 func getPrevHostedRooms(completion: @escaping ([String]?, Error?) -> Void){
     let uid = FAuth.currentUser?.uid
     
-    let  docRef = db.collection("users").document(uid!).collection("prevRooms").whereField("host", isEqualTo: uid!).order(by: "time")
+    let  docRef = db.collection("users").document(uid!).collection("prevRooms").order(by: "time")
     
     docRef.getDocuments { (docs, err) in
         if let err = err {
@@ -319,8 +342,13 @@ func getPrevHostedRooms(completion: @escaping ([String]?, Error?) -> Void){
             var rooms: [String] = []
             
             for doc in docs!.documents {
-                rooms.append(doc.data()["code"] as? String ?? "")
+                if doc.data()["host"] as? String ?? "" == uid! {
+                    let id = doc.data()["id"] as? String ?? ""
+                    rooms.append(id)
+                    
+                }
             }
+            completion(rooms, nil)
             
         }
     }
