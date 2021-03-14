@@ -142,7 +142,7 @@ class song: Identifiable, ObservableObject{
         genres = []
         self.id = id
         length = sng["length"] as! Int
-        numVotes = sng["numVotes"] as? Int
+        numVotes = sng["numvotes"] as? Int
         title = sng["title"] as! String
         imageUrl = sng["imageurl"] as? String ?? ""
     }
@@ -275,6 +275,7 @@ func getPrevRooms(completion: @escaping ([String]?, Error?) -> Void){
                     rooms.append(doc.data()["code"] as? String ?? "")
                 }
             }
+            completion(rooms, nil)
             
         }
     }
@@ -300,6 +301,7 @@ func getPrevJoinedRooms(completion: @escaping ([String]?, Error?) -> Void){
                     rooms.append(doc.data()["code"] as? String ?? "")
                 }
             }
+            completion(rooms, nil)
             
         }
     }
