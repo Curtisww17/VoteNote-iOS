@@ -41,7 +41,7 @@ struct User_QueuePageView: View {
                     
                     if votingEnabled.boolValue {
                         if self.songQueue.musicList[0].numVotes != nil && self.songQueue.musicList[1].numVotes != nil {
-                            self.songQueue.musicList.sort { $0.numVotes! < $1.numVotes! }
+                            self.songQueue.musicList.sort { $0.numVotes! > $1.numVotes! }
                         }
                     }
                 }

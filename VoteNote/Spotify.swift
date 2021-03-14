@@ -25,6 +25,7 @@ class Spotify: ObservableObject {
   var currentUser: SpotifyUser?
   var recentSearch: SpotifySearchResults?
   var userPlaylists: _spotifyPlaylists?
+  var currentPlaylist: uniquePlaylist?
   
   var sessionManager: SPTSessionManager?
   var appRemote: SPTAppRemote?
@@ -140,8 +141,41 @@ class Spotify: ObservableObject {
           }
       }
       RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+      
+      //print("!!!!"+(self.userPlaylists?.items?[0].name ?? ""))
     }
   
+  func playlistSongs(completion: @escaping (uniquePlaylist?) -> (), id: String) -> (){
+    self.httpRequester.headerGet(url: "https://api.spotify.com/v1/playlists/\(id)", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ]).onFinish = {
+      (response) in
+      do {
+        let decoder = JSONDecoder()
+        try completion( decoder.decode(uniquePlaylist.self, from: response.data))
+      } catch {
+        fatalError("Couldn't parse \(response.description)")
+      }
+    }
+  }
+  
+  func savedSongs(completion: @escaping (uniquePlaylist?) -> ()) -> (){
+    self.httpRequester.headerGet(url: "https://api.spotify.com/v1/me/tracks", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ]).onFinish = {
+      (response) in
+      do {
+        let decoder = JSONDecoder()
+        try completion( decoder.decode(uniquePlaylist.self, from: response.data))
+      } catch {
+        fatalError("Couldn't parse \(response.description)")
+      }
+    }
+  }
+  
+  func isLoggedIn() -> Bool {
+    if let rem: SPTAppRemote = self.appRemote {
+      return rem.isConnected
+    }
+    return false
+    // return loggedIn
+  }
   func getCurrentUser(completion: @escaping (SpotifyUser?) -> ()) {
     self.httpRequester.headerGet(url: "https://api.spotify.com/v1/me", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? "")" ]).onFinish = { (response) in
       do {
@@ -231,16 +265,38 @@ struct SpotifyAlbum: Codable, Identifiable {
 }
 
 struct _spotifyPlaylists: Codable{
-  var items: [SpotifyPlaylist]?
+  var items: [Playlist]?
   var total: Int?
 }
 
-struct SpotifyPlaylist: Codable{
-  var collaborative: Bool?
+struct Playlist: Codable, Identifiable{
   var description: String?
-  var id: String?
+  var id: String
   var images: [SpotifyImage]?
   var name: String?
   var type: String?
   var uri: String?
+}
+
+struct uniquePlaylist: Codable, Identifiable{
+  var collaborative: Bool?
+  var description: String?
+  var href: String?
+  var id: String
+  var name: String?
+  var images: [SpotifyImage]?
+  var owner: SpotifyUser?
+  var tracks: playlistTrackTime?
+}
+
+struct playlistTrackTime: Codable{
+  var href: String?
+  var items: [songTimeAdded]?
+}
+
+struct songTimeAdded: Codable{
+  //var id = UUID()
+  //var added_at: String
+  var track: SpotifyTrack
+  
 }
