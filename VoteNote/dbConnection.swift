@@ -141,7 +141,7 @@ class song: Identifiable, ObservableObject{
         length = sng["length"] as! Int
         numVotes = sng["numVotes"] as? Int
         title = sng["title"] as! String
-        imageUrl = sng["imageurl"] as! String
+        imageUrl = sng["imageurl"] as? String ?? ""
     }
     
 }
@@ -222,6 +222,8 @@ func joinRoom(code: String, completion:@escaping (room?, String?) -> Void){
             db.collection("users").document(usr!.uid).updateData(["currentRoom": upperCode])
             //increase count of people in room
             
+            //if joining a nonexistent room this will crash rn
+            //TODO: fix this crash
             let rm = query?.documents[0].data()
             
             //check if banned
@@ -559,19 +561,21 @@ func dequeue(id: String){
         
         
         //grab our room
-        db.collection("room").document(currRoom).getDocument { (doc, err) in
+        db.collection("room").whereField("code", isEqualTo: currRoom).getDocuments { (docs, err) in
             if let err = err {
                 print("Error getting song \(err)")
                 //completion(nil, err)
-            } else{
+            } else if (!(docs?.isEmpty ?? true)){
+                let doc = docs?.documents[0]
+                let docid = doc!.documentID
                 //grab the queue
-                let queue: Dictionary? = doc?.data()?["queue"] as? Dictionary<String, Any?>
+                let queue: Dictionary? = doc?.data()["queue"] as? Dictionary<String, Any?>
                 if queue != nil {
                     //grab the song from the queue
                     let sng: Dictionary = queue![id] as! Dictionary<String, Any?>
                     
                     //put our thing in the history
-                    db.collection("room").document(currRoom).updateData([
+                    db.collection("room").document(docid).updateData([
                         "history.\(id)": sng
                     ])
                     //completion(songout, nil)
@@ -589,10 +593,21 @@ func dequeue(id: String){
  - Parameter id: the id of the song that is to be removed
  */
 func vetoSong(id: String){
+    
     getCurrRoom { (currRoom, err) in
         
-        //remove the song from the queue
-        db.collection("room").document(currRoom).updateData(["queue" : FieldValue.arrayRemove([id])])
+        let rm = db.collection("room").whereField("code", isEqualTo: currRoom).getDocuments { (doc, Err) in
+            if let err = err {
+                print("/n/nerror getting doc \(err.localizedDescription)")
+            }else if !doc!.isEmpty{
+                
+                let docid = doc?.documents[0].documentID
+                
+                //remove the song from the queue
+                db.collection("room").document(docid!).updateData(["queue.\(id)" : FieldValue.delete()])
+            }
+        }
+        
         
     }//end getCurrRoom
 }
@@ -612,7 +627,17 @@ func vetoSong(id: String){
 func voteSong(vote: Int, id: String){
     getCurrRoom { (currRoom, err) in
         
-        db.collection("room").document(currRoom).updateData(["queue.id": FieldValue.increment(Int64(vote))])
+        let rm = db.collection("room").whereField("code", isEqualTo: currRoom).getDocuments { (doc, Err) in
+            if let err = err {
+                print("/n/nerror getting doc \(err.localizedDescription)")
+            }else if !doc!.isEmpty{
+                
+                let docid = doc?.documents[0].documentID
+                
+                db.collection("room").document(docid!).updateData(["queue.\(id).numvotes": FieldValue.increment(Int64(vote))])
+            }
+        }
+        
         
     }//end getCurrRoom
 }
