@@ -135,6 +135,7 @@ struct QueueEntry: View {
     func upVoteSong(){
         print("Upvote Song")
         voteSong(vote: 1, id: curSong.id)
+        print("Number of Votes for selected song: \(curSong.numVotes)")
     }
     
     /**
@@ -197,7 +198,12 @@ struct QueueEntry: View {
                     Spacer()
                     
                     if votingEnabled.boolValue {
-                        Text("\(curSong.numVotes ?? 0)")
+                        if curSong.numVotes == nil || curSong.numVotes == 0 {
+                            Text("\(0)")
+                        } else {
+                            Text("\(curSong.numVotes!)")
+                        }
+                        //Text("\(curSong.numVotes ?? 0)")
                         Button(action: {upVoteSong()}) {
                             Image(systemName: "hand.thumbsup").resizable().frame(width: 30.0, height: 30.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
                         }.onTapGesture {
