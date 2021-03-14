@@ -209,7 +209,8 @@ func joinRoom(code: String, completion:@escaping (room?, String?) -> Void){
     
     var joinedRoom: room? = nil
     
-    //this may be unneccesary
+    
+    
     let joiningQuery = db.collection("room").whereField("code", isEqualTo: upperCode)
     
     joiningQuery.getDocuments() { (query, err) in
@@ -239,6 +240,38 @@ func joinRoom(code: String, completion:@escaping (room?, String?) -> Void){
         
     }
     
+}
+
+/**
+ stores a room in the users previous rooms
+ 
+ - Parameter code: the code of the room to store
+ */
+func storePrevRoom(code: String){
+    let uid = FAuth.currentUser?.uid
+    
+    //db.collection("users").document(uid!).updateData(["prevRooms.\(code)": FieldValue.serverTimestamp()])
+    
+    db.collection("users").document(uid!).collection("prevRooms").addDocument(data: ["code": code, "time": FieldValue.serverTimestamp()])
+}
+
+func getPrevRooms(completion: @escaping ([String]?, Error?) -> Void){
+    let uid = FAuth.currentUser?.uid
+    
+    let  docRef = db.collection("users").document(uid!).collection("prevRooms").order(by: "time")
+    
+    docRef.getDocuments { (docs, err) in
+        if let err = err {
+            completion(nil, err)
+        } else {
+            var rooms: [String] = []
+            
+            for doc in docs!.documents {
+                rooms.append(doc.data()["code"] as? String ?? "")
+            }
+            
+        }
+    }
 }
 
 
