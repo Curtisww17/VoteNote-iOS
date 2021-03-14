@@ -141,7 +141,7 @@ class song: Identifiable, ObservableObject{
         length = sng["length"] as! Int
         numVotes = sng["numVotes"] as? Int
         title = sng["title"] as! String
-        imageUrl = sng["imageurl"] as! String
+        imageUrl = sng["imageurl"] as? String ?? ""
     }
     
 }
@@ -222,6 +222,8 @@ func joinRoom(code: String, completion:@escaping (room?, String?) -> Void){
             db.collection("users").document(usr!.uid).updateData(["currentRoom": upperCode])
             //increase count of people in room
             
+            //if joining a nonexistent room this will crash rn
+            //TODO: fix this crash
             let rm = query?.documents[0].data()
             
             //check if banned
@@ -612,7 +614,17 @@ func vetoSong(id: String){
 func voteSong(vote: Int, id: String){
     getCurrRoom { (currRoom, err) in
         
-        db.collection("room").document(currRoom).updateData(["queue.id": FieldValue.increment(Int64(vote))])
+        let rm = db.collection("room").whereField("code", isEqualTo: currRoom).getDocuments { (doc, Err) in
+            if let err = err {
+                print("/n/nerror getting doc \(err.localizedDescription)")
+            }else if !doc!.isEmpty{
+                
+                let docid = doc?.documents[0].documentID
+                
+                db.collection("room").document(docid!).updateData(["queue.\(id).numvotes": FieldValue.increment(Int64(vote))])
+            }
+        }
+        
         
     }//end getCurrRoom
 }
