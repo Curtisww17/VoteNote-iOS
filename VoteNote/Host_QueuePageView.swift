@@ -304,7 +304,7 @@ struct NowPlayingViewHost: View {
             sharedSpotify.enqueue(songID: songQueue.musicList[0].id) //borked
             RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
             sharedSpotify.skip()
-            vetoSong(id: nowPlaying!.id)
+            dequeue(id: nowPlaying!.id)
             nowPlaying = songQueue.musicList[0]
             songQueue.musicList.remove(at: 0)
             sharedSpotify.pause()
