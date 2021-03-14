@@ -299,7 +299,7 @@ func getPrevJoinedRooms(completion: @escaping ([String]?, Error?) -> Void){
 func getPrevHostedRooms(completion: @escaping ([String]?, Error?) -> Void){
     let uid = FAuth.currentUser?.uid
     
-    let  docRef = db.collection("users").document(uid!).collection("prevRooms").order(by: "time").whereField("host", isEqualTo: <#T##Any#>: uid!)
+    let  docRef = db.collection("users").document(uid!).collection("prevRooms").order(by: "time").whereField("host", isEqualTo: uid!)
     
     docRef.getDocuments { (docs, err) in
         if let err = err {
@@ -372,7 +372,7 @@ func leaveRoom() -> Bool{
  
  - Parameter newRoom: a room object which will be used to make a new room
  */
-func makeRoom(newRoom: room) -> Bool{
+func makeRoom(newRoom: room) -> String{
     let code: String
     let usr = FAuth.currentUser
     
@@ -400,7 +400,7 @@ func makeRoom(newRoom: room) -> Bool{
     //put the user who made the room into the room
     db.collection("users").document(usr!.uid).updateData(["currentRoom": code])
     //this will need to be modified to allow for adding a room with a queue
-    return true
+    return code
 }
 
 
