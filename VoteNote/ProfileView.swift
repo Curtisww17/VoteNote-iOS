@@ -11,13 +11,47 @@ import SwiftUI
 
 struct ProfileView: View {
   @ObservedObject var spotify: Spotify = sharedSpotify
-  @State var currentUser: SpotifyUser?
+  @State var isAnon: Bool = sharedSpotify.isAnon
   
   var body: some View {
     return VStack {
+      if (spotify.loggedIn) {
+        HStack {
+          Spacer()
+          RemoteImage(url: sharedSpotify.currentUser!.images?[0].url ?? "")
+            .frame(width: 150, height: 150)
+            .clipShape(Circle())
+          Spacer()
+        }
+        Text("\(spotify.currentUser?.display_name ?? "Unknown")")
+          .font(.title)
+      }
       Form {
-        if(spotify.loggedIn) {
-          Text("logged in as \(sharedSpotify.currentUser?.display_name ?? "Unknown")")
+        HStack {
+          Text("Anonymize Me")
+          Toggle(isOn: $isAnon, label: {})
+            .onChange(of: self.isAnon) { newValue in
+              print("anon")
+                setAnon(isAnon: isAnon)
+                spotify.isAnon = isAnon
+            }
+        }
+        .frame(height:50)
+        if (spotify.isAnon) {
+          HStack {
+            Text("Display Name: \(spotify.anon_name)")
+            Spacer()
+          Image(systemName: "arrow.clockwise")
+            .onTapGesture {
+              let newName = generateAnonName()
+              setAnonName(name: newName)
+              spotify.anon_name = newName
+            }
+          }
+          .frame(height: 50)
+        } else {
+          Text("Display Name: \(spotify.currentUser!.display_name ?? "Unknown")")
+            .frame(height: 50)
         }
         if (spotify.loggedIn) {
           HStack {
@@ -33,5 +67,10 @@ struct ProfileView: View {
       }
       
     }.navigationViewStyle(StackNavigationViewStyle())
+//    .onAppear(perform: {
+//      sharedSpotify.getAlbumArt(for: "0weAUscowxeqDtpCgtbpgp", completion: { image in
+//        print ("hi")
+//      })
+//    })
   }
 }
