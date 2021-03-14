@@ -561,19 +561,21 @@ func dequeue(id: String){
         
         
         //grab our room
-        db.collection("room").document(currRoom).getDocument { (doc, err) in
+        db.collection("room").whereField("code", isEqualTo: currRoom).getDocuments { (docs, err) in
             if let err = err {
                 print("Error getting song \(err)")
                 //completion(nil, err)
-            } else{
+            } else if (!(docs?.isEmpty ?? true)){
+                let doc = docs?.documents[0]
+                let docid = doc!.documentID
                 //grab the queue
-                let queue: Dictionary? = doc?.data()?["queue"] as? Dictionary<String, Any?>
+                let queue: Dictionary? = doc?.data()["queue"] as? Dictionary<String, Any?>
                 if queue != nil {
                     //grab the song from the queue
                     let sng: Dictionary = queue![id] as! Dictionary<String, Any?>
                     
                     //put our thing in the history
-                    db.collection("room").document(currRoom).updateData([
+                    db.collection("room").document(docid).updateData([
                         "history.\(id)": sng
                     ])
                     //completion(songout, nil)
