@@ -39,6 +39,7 @@ struct JoinRoomView: View {
           roomName = ret!.name
           roomDescription = (ret?.desc)!
           roomCapacity = ret!.capacity
+          songsPerUser = ret!.spu
           votingEnabled = ret!.voting
           explicitSongsAllowed = ret!.explicit
           anonUsr = ret!.anonUsr
