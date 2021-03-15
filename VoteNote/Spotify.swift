@@ -183,8 +183,8 @@ class Spotify: ObservableObject {
     }
   }
   
-  /*func createPlaylist() {
-    self.httpRequester.headerParamPUT(url: "https://api.spotify.com/v1/users/\(self.getCurrentUser(completion: <#T##(SpotifyUser?) -> ()#>).)/playlists", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? "")" ], param: <#T##[String : String]#>)
+  /*func createPlaylist(id: String, playlistData: String) {
+    self.httpRequester.headerParamPUT(url: "https://api.spotify.com/v1/users/\(id)/playlists", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? "")" ], param: <#T##[String : String]#>)
   }*/
   
   func likeSong(id: String){
