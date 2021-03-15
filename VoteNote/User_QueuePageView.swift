@@ -19,7 +19,7 @@ struct User_QueuePageView: View {
     @ObservedObject var isViewingUser: ObservableBoolean = ObservableBoolean(boolValue: false)
     @ObservedObject var selectedSong: song = song(addedBy: "Nil User", artist: "", genres: [""], id: "", length: 0, numVotes: 0, title: "None Selected", imageUrl: "")
     @ObservedObject var songQueue: MusicQueue = MusicQueue()
-    @ObservedObject var songHistory: MusicQueue = MusicQueue()
+    @ObservedObject var songHistory: MusicQueue
     @ObservedObject var votingEnabled: ObservableBoolean
     @ObservedObject var selectedUser: user = user(name: "", profilePic: "")
     @ObservedObject var isHost: ObservableBoolean = ObservableBoolean(boolValue: false)

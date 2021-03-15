@@ -22,7 +22,7 @@ struct Host_RoomPageView: View {
   @Binding var showNav: Bool
   @ObservedObject var currentRoom: CurrentRoom = CurrentRoom()
   @Binding var notExited: Bool
-    @ObservedObject var songHistory: MusicQueue
+  @ObservedObject var songHistory: MusicQueue
   
     /**
         Causes the current user to leave the room
