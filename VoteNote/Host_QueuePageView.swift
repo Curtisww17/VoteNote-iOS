@@ -21,7 +21,7 @@ struct Host_QueuePageView: View {
     //@State var historyRefreshSeconds = 30
     @State var queueRefreshSeconds = 10
     @ObservedObject var songQueue: MusicQueue = MusicQueue()
-    @ObservedObject var songHistory: MusicQueue = MusicQueue()
+    var songHistory: MusicQueue
     @ObservedObject var isViewingUser: ObservableBoolean = ObservableBoolean(boolValue: false)
     @ObservedObject var selectedSong: song = song(addedBy: "Nil User", artist: "", genres: [""], id: "", length: 0, numVotes: 0, title: "None Selected", imageUrl: "")
     @ObservedObject var selectedUser: user = user(name: "", profilePic: "")

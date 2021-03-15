@@ -22,6 +22,7 @@ struct Host_RoomPageView: View {
   @Binding var showNav: Bool
   @ObservedObject var currentRoom: CurrentRoom = CurrentRoom()
   @Binding var notExited: Bool
+    @ObservedObject var songHistory: MusicQueue
   
     /**
         Causes the current user to leave the room
@@ -51,7 +52,7 @@ struct Host_RoomPageView: View {
           }
           
           Section() {
-            NavigationLink(destination: QueueHistoryView()
+            NavigationLink(destination: QueueHistoryView( songHistory: songHistory)
                             .onAppear(perform: {
                               showNav = false
                             })
