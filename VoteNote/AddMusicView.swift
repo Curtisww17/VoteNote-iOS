@@ -125,9 +125,9 @@ struct AddMusicView: View {
                     NavigationLink(destination: playListView(songsPerUser: songsPerUser, myPlaylists: sharedSpotify.userPlaylists?.items ?? [Playlist(id: "")])) {
                            Text("View My Playlists")
                        }
-                    /*NavigationLink(destination: likedSongsView()){
+                    NavigationLink(destination: likedSongsView(songsPerUser: songsPerUser)){
                      Text("Liked Songs")
-                     }*/
+                     }
                 }
                 if currentSearch != "" {
                   ForEach((sharedSpotify.recentSearch?.tracks?.items ?? [SpotifyTrack(album: SpotifyAlbum(id: "", images: []), artists: [SpotifyArtist(id: "", name: "", uri: "", type: "")], available_markets: nil, disc_number: 0, duration_ms: 0, explicit: false, href: "", id: "", name: "Searching...", popularity: 0, preview_url: "", track_number: 0, type: "", uri: "")])) { song in
@@ -232,14 +232,14 @@ struct likedSongsView: View{
                 }
                 
                 List{
-                    ForEach((sharedSpotify.currentPlaylist?.tracks?.items ?? [songTimeAdded(track: SpotifyTrack(album: nil, id: "", name: ""))]), id: \.track.id){ songs in
+                    ForEach((sharedSpotify.usersSavedSongs?.items ?? [songTimeAdded(track: SpotifyTrack(album: nil, id: "", name: ""))]), id: \.track.id){ songs in
                         SearchEntry(songTitle: songs.track.name, songArtist: (songs.track.artists?[0].name) ?? "", songID: songs.track.id, imageURL: songs.track.album?.images?[0].url, isExplicit: false, songsPerUser: songsPerUser)
                     }
                 }
             }
         }.onAppear(perform: {
             
-            sharedSpotify.savedSongs(completion: {playlistSongs in sharedSpotify.currentPlaylist = playlistSongs})
+            sharedSpotify.savedSongs(completion: {playlistSongs in sharedSpotify.usersSavedSongs = playlistSongs})
         })
     }
 }

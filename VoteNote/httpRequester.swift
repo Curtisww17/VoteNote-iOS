@@ -66,6 +66,15 @@ class HttpRequester: ObservableObject {
     HTTP.PUT(url)
   }
   
+  func headerParamPUT(url: String, header: [String: String], param: [String: String]) -> HTTP{
+    HTTP.PUT(url, parameters: param, headers: header) { response in
+      if let err = response.error {
+        print("error: \(err.localizedDescription)")
+        return //also notify app of failure as needed
+      }
+    }!
+  }
+  
   
 }
 
