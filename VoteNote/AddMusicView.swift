@@ -133,6 +133,9 @@ struct AddMusicView: View {
                     NavigationLink(destination: likedSongsView(songsPerUser: songsPerUser)){
                      Text("Liked Songs")
                      }
+                    NavigationLink(destination: recomendedView(songsPerUser: songsPerUser)){
+                        Text("Reccomended")
+                    }
                 }
                 if currentSearch != "" {
                   ForEach((sharedSpotify.recentSearch?.tracks?.items ?? [SpotifyTrack(album: SpotifyAlbum(id: "", images: []), artists: [SpotifyArtist(id: "", name: "", uri: "", type: "")], available_markets: nil, disc_number: 0, duration_ms: 0, explicit: false, href: "", id: "", name: "Searching...", popularity: 0, preview_url: "", track_number: 0, type: "", uri: "")])) { song in
@@ -182,6 +185,70 @@ struct playListView: View {
         }
 
     }
+}
+
+struct recomendedView: View{
+    @State var songsPerUser: Int
+    @State private var isEditing = false
+    @Environment(\.presentationMode) var presentationMode
+    func addMusic(){
+        
+        //select the first song if nothing is playing
+        if nowPlaying == nil && selectedSongs.count > 0 {
+            print("Song Added")
+            nowPlaying = selectedSongs[0]
+            sharedSpotify.enqueue(songID: selectedSongs[0].id)
+            selectedSongs.remove(at: 0)
+        }
+        
+        for i in selectedSongs {
+            print("Added")
+            addsong(id: i.id) //there's an issue here
+            print("Done")
+        }
+        
+        selectedSongs.removeAll()
+        
+        self.presentationMode.wrappedValue.dismiss()
+    }
+    
+    var body: some View{
+        ZStack{
+            VStack{
+                HStack {
+                    
+                    if isEditing {
+                        Button(action: {
+                            self.isEditing = false
+                            
+                            // Dismiss the keyboard
+                            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                        }) {
+                            Text("Cancel")
+                        }
+                        .padding(.trailing, 10)
+                        .transition(.move(edge: .trailing))
+                        .animation(.default)
+                    }
+                    
+                    Button(action: {addMusic()}) {
+                        Text("Add Songs")
+                    }
+                    .padding(.trailing)
+                }
+                
+                List{
+                    ForEach((sharedSpotify.recommendedSongs?.tracks ?? [SpotifyTrack(album: nil, id: "", name: "")]), id: \.id){ songs in
+                        SearchEntry(songTitle: songs.name, songArtist: (songs.artists?[0].name) ?? "", songID: songs.id, imageURL: songs.album?.images?[0].url, isExplicit: false, songsPerUser: songsPerUser)
+                    }
+                }
+            }
+        }.onAppear(perform: {
+            
+            sharedSpotify.recomendations(artistSeed: "4NHQUGzhtTLFvgF5SZesLK", genre: "classical", trackSeed: "0c6xIDDpzE81m2q797ordA",completion: {playlistSongs in sharedSpotify.recommendedSongs = playlistSongs})
+        })
+    }
+    
 }
 
 struct likedSongsView: View{

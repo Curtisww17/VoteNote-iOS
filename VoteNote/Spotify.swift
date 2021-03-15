@@ -27,6 +27,7 @@ class Spotify: ObservableObject {
   var userPlaylists: _spotifyPlaylists?
   var currentPlaylist: uniquePlaylist?
   var usersSavedSongs: playlistTrackTime?
+  var recommendedSongs: reccomndations?
   
   var sessionManager: SPTSessionManager?
   var appRemote: SPTAppRemote?
@@ -170,6 +171,18 @@ class Spotify: ObservableObject {
     }
   }
   
+  func recomendations(artistSeed: String, genre: String, trackSeed: String,completion: @escaping (reccomndations?) -> ()) ->() {
+    self.httpRequester.headerGet(url: "https://api.spotify.com/v1/recommendations?limit=10&seed_genres=\(artistSeed)&seed_genres=\(genre)&seed_tracks=\(trackSeed)", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ]).onFinish = {
+      (response) in
+      do {
+        let decoder = JSONDecoder()
+        try completion( decoder.decode(reccomndations.self, from: response.data))
+      } catch {
+        fatalError("Couldn't parse \(response.description)")
+      }
+    }
+  }
+  
   /*func createPlaylist() {
     self.httpRequester.headerParamPUT(url: "https://api.spotify.com/v1/users/\(self.getCurrentUser(completion: <#T##(SpotifyUser?) -> ()#>).)/playlists", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? "")" ], param: <#T##[String : String]#>)
   }*/
@@ -300,4 +313,8 @@ struct songTimeAdded: Codable{
   //var added_at: String
   var track: SpotifyTrack
   
+}
+
+struct reccomndations: Codable{
+  var tracks: [SpotifyTrack]
 }
