@@ -353,6 +353,9 @@ struct NowPlayingViewHost: View {
      */
     func favoriteSong(){
         //TODO- implement song favoriting
+        if(nowPlaying != nil){
+            sharedSpotify.likeSong(id: nowPlaying!.id)
+        }
     }
 
     var body: some View {

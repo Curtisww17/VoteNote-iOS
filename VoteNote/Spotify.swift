@@ -34,7 +34,7 @@ class Spotify: ObservableObject {
   
   
   //scopes that we request access for, add more as needed
-  let SCOPES: SPTScope = [ .userReadRecentlyPlayed, .userTopRead, .streaming, .userReadEmail, .appRemoteControl, .playlistModifyPrivate, .playlistModifyPublic, .playlistReadPrivate, .userModifyPlaybackState, .userReadPlaybackState, .userReadCurrentlyPlaying, .userLibraryRead]
+  let SCOPES: SPTScope = [ .userReadRecentlyPlayed, .userTopRead, .streaming, .userReadEmail, .appRemoteControl, .playlistModifyPrivate, .playlistModifyPublic, .playlistReadPrivate, .userModifyPlaybackState, .userReadPlaybackState, .userReadCurrentlyPlaying, .userLibraryRead, .userLibraryModify]
   
   @Published var loggedIn: Bool
   @Published var isAnon: Bool
@@ -186,6 +186,17 @@ class Spotify: ObservableObject {
   /*func createPlaylist() {
     self.httpRequester.headerParamPUT(url: "https://api.spotify.com/v1/users/\(self.getCurrentUser(completion: <#T##(SpotifyUser?) -> ()#>).)/playlists", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? "")" ], param: <#T##[String : String]#>)
   }*/
+  
+  func likeSong(id: String){
+    self.httpRequester.headerPUT(url: "https://api.spotify.com/v1/me/tracks?ids=\(id)",header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ]).onFinish = {
+      (response) in
+      do{
+        print(response.description)
+      } catch {
+        fatalError("bad response \(response.description)")
+      }
+    }
+  }
   
   
   
