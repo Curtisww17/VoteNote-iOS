@@ -46,7 +46,7 @@ struct HostUserDetailView: View {
         Bans the selected user
      */
   func banSelectedUser(){
-    //banUser(uid: user.id)
+    banUser(uid: user.uid!)
   }
     
   var body: some View {
