@@ -51,6 +51,20 @@ struct Host_RoomPageView: View {
           }
           
           Section() {
+            NavigationLink(destination: QueueHistoryView()
+                            .onAppear(perform: {
+                              showNav = false
+                            })
+                            .onDisappear(perform: {
+                              showNav = true
+                            }), label: {
+                              HStack {
+                                Image(systemName: "clock")
+                                  .foregroundColor(Color.accentColor)
+                                  .padding()
+                                Text("History")
+                              }
+                            })
             NavigationLink(destination: UsersListView()
                             .onAppear(perform: {
                               showNav = false
