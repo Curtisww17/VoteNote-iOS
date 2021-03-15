@@ -28,6 +28,8 @@ struct Host_QueuePageView: View {
     @ObservedObject var votingEnabled: ObservableBoolean
     @ObservedObject var isHost: ObservableBoolean = ObservableBoolean(boolValue: true)
     
+
+    
     let refreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
   
     /**
@@ -298,6 +300,7 @@ struct NowPlayingViewHost: View {
     @State var isPlaying: Bool
     @ObservedObject var songQueue: MusicQueue
     @ObservedObject var isHost: ObservableBoolean
+    @State var saved: Bool = false
     
     /**
         Resumes the current song in the Spotify Queue
@@ -352,9 +355,9 @@ struct NowPlayingViewHost: View {
         Favorites the current song in the Spotify Queue
      */
     func favoriteSong(){
-        //TODO- implement song favoriting
         if(nowPlaying != nil){
             sharedSpotify.likeSong(id: nowPlaying!.id)
+            saved = !saved
         }
     }
 
@@ -453,8 +456,14 @@ struct NowPlayingViewHost: View {
                             }
                             Spacer()
                             Button(action: {favoriteSong()}) {
+                                if(!saved){
                                 Image(systemName: "heart")
                                     .foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
+                                } else {
+                                    Image(systemName: "heart.fill")
+                                        .foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
+                                }
+                                
                             }
                         }
                         .padding(.all)
