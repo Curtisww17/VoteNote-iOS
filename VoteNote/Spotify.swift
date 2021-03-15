@@ -26,13 +26,14 @@ class Spotify: ObservableObject {
   var recentSearch: SpotifySearchResults?
   var userPlaylists: _spotifyPlaylists?
   var currentPlaylist: uniquePlaylist?
+  var usersSavedSongs: playlistTrackTime?
   
   var sessionManager: SPTSessionManager?
   var appRemote: SPTAppRemote?
   
   
   //scopes that we request access for, add more as needed
-  let SCOPES: SPTScope = [ .userReadRecentlyPlayed, .userTopRead, .streaming, .userReadEmail, .appRemoteControl, .playlistModifyPrivate, .playlistModifyPublic, .playlistReadPrivate, .userModifyPlaybackState, .userReadPlaybackState, .userReadCurrentlyPlaying]
+  let SCOPES: SPTScope = [ .userReadRecentlyPlayed, .userTopRead, .streaming, .userReadEmail, .appRemoteControl, .playlistModifyPrivate, .playlistModifyPublic, .playlistReadPrivate, .userModifyPlaybackState, .userReadPlaybackState, .userReadCurrentlyPlaying, .userLibraryRead]
   
   @Published var loggedIn: Bool
   @Published var isAnon: Bool
@@ -156,25 +157,26 @@ class Spotify: ObservableObject {
     }
   }
   
-  func savedSongs(completion: @escaping (uniquePlaylist?) -> ()) -> (){
+  func savedSongs(completion: @escaping (playlistTrackTime?) -> ()) -> (){
     self.httpRequester.headerGet(url: "https://api.spotify.com/v1/me/tracks", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ]).onFinish = {
       (response) in
       do {
         let decoder = JSONDecoder()
-        try completion( decoder.decode(uniquePlaylist.self, from: response.data))
+        try completion( decoder.decode(playlistTrackTime.self, from: response.data))
       } catch {
+        print("\(self.appRemote?.connectionParameters.accessToken ?? "")")
         fatalError("Couldn't parse \(response.description)")
       }
     }
   }
   
-  func isLoggedIn() -> Bool {
-    if let rem: SPTAppRemote = self.appRemote {
-      return rem.isConnected
-    }
-    return false
-    // return loggedIn
-  }
+  /*func createPlaylist() {
+    self.httpRequester.headerParamPUT(url: "https://api.spotify.com/v1/users/\(self.getCurrentUser(completion: <#T##(SpotifyUser?) -> ()#>).)/playlists", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? "")" ], param: <#T##[String : String]#>)
+  }*/
+  
+  
+  
+
   func getCurrentUser(completion: @escaping (SpotifyUser?) -> ()) {
     self.httpRequester.headerGet(url: "https://api.spotify.com/v1/me", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? "")" ]).onFinish = { (response) in
       do {

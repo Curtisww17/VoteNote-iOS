@@ -38,6 +38,7 @@
 		44F8D5DA25DB512C00D2B461 /* UsersListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44F8D5D925DB512C00D2B461 /* UsersListView.swift */; };
 		44F8D5DF25DB51DA00D2B461 /* UserDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44F8D5DE25DB51DA00D2B461 /* UserDetailView.swift */; };
 		671BABC925D895B500964AAF /* httpRequester.swift in Sources */ = {isa = PBXBuildFile; fileRef = 671BABC825D895B500964AAF /* httpRequester.swift */; };
+		67222A2A25FEE5CE0021D963 /* QueueHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67222A2925FEE5CE0021D963 /* QueueHistoryView.swift */; };
 		674280A625FD6AB200B06405 /* User_UserAdminDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674280A525FD6AB200B06405 /* User_UserAdminDetailView.swift */; };
 		67C1C10825F6F67D006A878B /* Host_UserAdminDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67C1C10725F6F67D006A878B /* Host_UserAdminDetailView.swift */; };
 		67DC8DA625DB3F63008C07F8 /* AddMusicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67DC8DA525DB3F63008C07F8 /* AddMusicView.swift */; };
@@ -108,6 +109,7 @@
 		44F8D5D925DB512C00D2B461 /* UsersListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsersListView.swift; sourceTree = "<group>"; };
 		44F8D5DE25DB51DA00D2B461 /* UserDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDetailView.swift; sourceTree = "<group>"; };
 		671BABC825D895B500964AAF /* httpRequester.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = httpRequester.swift; sourceTree = "<group>"; tabWidth = 2; };
+		67222A2925FEE5CE0021D963 /* QueueHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueHistoryView.swift; sourceTree = "<group>"; };
 		674280A525FD6AB200B06405 /* User_UserAdminDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User_UserAdminDetailView.swift; sourceTree = "<group>"; };
 		67C1C10725F6F67D006A878B /* Host_UserAdminDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Host_UserAdminDetailView.swift; sourceTree = "<group>"; };
 		67DC8DA525DB3F63008C07F8 /* AddMusicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddMusicView.swift; sourceTree = "<group>"; };
@@ -210,6 +212,7 @@
 				44A2831225F7F97E00DDF229 /* AnonymousLists.swift */,
 				44A2833F25FBB99D00DDF229 /* RemoteImage.swift */,
 				44A2834A25FE83A500DDF229 /* PreviouslyJoinedRoomsView.swift */,
+				67222A2925FEE5CE0021D963 /* QueueHistoryView.swift */,
 			);
 			path = VoteNote;
 			sourceTree = "<group>";
@@ -532,6 +535,7 @@
 				448572F525BF7A61006C5C07 /* ProfileView.swift in Sources */,
 				448572AE25BF421E006C5C07 /* AppDelegate.swift in Sources */,
 				448572B025BF421E006C5C07 /* SceneDelegate.swift in Sources */,
+				67222A2A25FEE5CE0021D963 /* QueueHistoryView.swift in Sources */,
 				44A2834B25FE83A500DDF229 /* PreviouslyJoinedRoomsView.swift in Sources */,
 				448572F025BF7603006C5C07 /* JoinRoomView.swift in Sources */,
 				448572E625BF737D006C5C07 /* LandingPageView.swift in Sources */,
