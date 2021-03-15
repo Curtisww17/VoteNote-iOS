@@ -11,13 +11,13 @@ import SwiftUI
 struct PreviouslyJoinedRoomsView: View {
   @State var rooms: [String]
   var body: some View {
-    return HStack {
+    return VStack {
       Text("Destination")
-//      List {
-//        ForEach(rooms) {currRoom in
-//          
-//        }
-//      }
+      List {
+        ForEach(rooms, id: \.self) {currRoom in
+          Text(currRoom)
+        }
+      }
     }
   }
 }

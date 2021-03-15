@@ -19,6 +19,7 @@ struct User_QueuePageView: View {
     @ObservedObject var isViewingUser: ObservableBoolean = ObservableBoolean(boolValue: false)
     @ObservedObject var selectedSong: song = song(addedBy: "Nil User", artist: "", genres: [""], id: "", length: 0, numVotes: 0, title: "None Selected", imageUrl: "")
     @ObservedObject var songQueue: MusicQueue = MusicQueue()
+    @ObservedObject var songHistory: MusicQueue = MusicQueue()
     @ObservedObject var votingEnabled: ObservableBoolean
     @ObservedObject var selectedUser: user = user(name: "", profilePic: "")
     @ObservedObject var isHost: ObservableBoolean = ObservableBoolean(boolValue: false)
@@ -40,9 +41,26 @@ struct User_QueuePageView: View {
                     }
                     
                     if votingEnabled.boolValue {
-                        if self.songQueue.musicList[0].numVotes != nil && self.songQueue.musicList[1].numVotes != nil {
-                            self.songQueue.musicList.sort { $0.numVotes! > $1.numVotes! }
+                        if self.songQueue.musicList.count > 1 {
+                            if self.songQueue.musicList[0].numVotes != nil && self.songQueue.musicList[1].numVotes != nil {
+                                self.songQueue.musicList.sort { $0.numVotes! > $1.numVotes! }
+                            }
                         }
+                    }
+                }
+            }
+        }
+    }
+    
+    func updateHistory() {
+        getHistory(){(songs, err) in
+            if songs != nil {
+                if songs!.count > 0 {
+                    songHistory.musicList.removeAll()
+                    var count: Int = 0
+                    while count < songs!.count {
+                        songHistory.musicList.append(songs![count])
+                        count = count + 1
                     }
                 }
             }
@@ -54,29 +72,30 @@ struct User_QueuePageView: View {
     GeometryReader { geo in
         ZStack {
           VStack {
-            HStack {
-                Text("\(voteUpdateSeconds)").font(.largeTitle).multilineTextAlignment(.trailing).onReceive(refreshTimer) {
-                    _ in
-                    if self.voteUpdateSeconds > 0 {
-                        self.voteUpdateSeconds -= 1
-                    } else {
-                        self.voteUpdateSeconds = 10
-                        print("Updating Queue")
-                        
-                        updateQueue()
-                    }
-                }
-            }.hidden().frame(width: 0, height: 0)
             Form {
                 
                 List {
                     ForEach(songQueue.musicList) { song in
-                        QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: isViewingUser, isDetailView: false, isUserQueue: false, votingEnabled: votingEnabled, selectedUser: selectedUser)
+                        QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: isViewingUser, isDetailView: false, isUserQueue: false, isHistoryView: false, votingEnabled: votingEnabled, selectedUser: selectedUser)
                                 }
                 }
             }
             
+            Text("\(voteUpdateSeconds)").font(.largeTitle).multilineTextAlignment(.trailing).onReceive(refreshTimer) {
+                _ in
+                if self.voteUpdateSeconds > 0 {
+                    self.voteUpdateSeconds -= 1
+                } else {
+                    self.voteUpdateSeconds = 10
+                    print("Updating Queue")
+                        
+                    updateQueue()
+                    updateHistory()
+                }
+            }.hidden().frame(width: 0, height: 0)
+            
             NowPlayingViewHost(isPlaying: isPlaying, songQueue: songQueue, isHost: isHost)
+                .padding(.bottom)
             
           }
           .navigationBarHidden(true)
@@ -92,7 +111,7 @@ struct User_QueuePageView: View {
                 updateQueue()
                 print("Queue Updated!")
                 
-        }).navigate(to: UserUserDetailView(user: selectedUser, songQueue: songQueue, votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue)), when: $isViewingUser.boolValue).navigationViewStyle(StackNavigationViewStyle())
+        }).navigate(to: UserUserDetailView(user: selectedUser, songQueue: songQueue, votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue), songHistory: songHistory), when: $isViewingUser.boolValue).navigationViewStyle(StackNavigationViewStyle())
     }
   }
 }

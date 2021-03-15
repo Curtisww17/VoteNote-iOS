@@ -18,13 +18,13 @@ struct ProfileView: View {
       if (spotify.loggedIn) {
         if (sharedSpotify.currentUser!.images != nil) {
           if (sharedSpotify.currentUser!.images!.count > 0) {
-        HStack {
-          Spacer()
-          RemoteImage(url: sharedSpotify.currentUser!.images?[0].url ?? "")
-            .frame(width: 150, height: 150)
-            .clipShape(Circle())
-          Spacer()
-        }
+            HStack {
+              Spacer()
+              RemoteImage(url: sharedSpotify.currentUser!.images?[0].url ?? "")
+                .frame(width: 150, height: 150)
+                .clipShape(Circle())
+              Spacer()
+            }
           }
         }
         Text("\(spotify.currentUser?.display_name ?? "Unknown")")
@@ -36,8 +36,8 @@ struct ProfileView: View {
           Toggle(isOn: $isAnon, label: {})
             .onChange(of: self.isAnon) { newValue in
               print("anon")
-                setAnon(isAnon: isAnon)
-                spotify.isAnon = isAnon
+              setAnon(isAnon: isAnon)
+              spotify.isAnon = isAnon
             }
         }
         .frame(height:50)
@@ -45,12 +45,12 @@ struct ProfileView: View {
           HStack {
             Text("Display Name: \(spotify.anon_name)")
             Spacer()
-          Image(systemName: "arrow.clockwise")
-            .onTapGesture {
-              let newName = generateAnonName()
-              setAnonName(name: newName)
-              spotify.anon_name = newName
-            }
+            Image(systemName: "arrow.clockwise")
+              .onTapGesture {
+                let newName = generateAnonName()
+                setAnonName(name: newName)
+                spotify.anon_name = newName
+              }
           }
           .frame(height: 50)
         } else {
@@ -71,10 +71,5 @@ struct ProfileView: View {
       }
       
     }.navigationViewStyle(StackNavigationViewStyle())
-//    .onAppear(perform: {
-//      sharedSpotify.getAlbumArt(for: "0weAUscowxeqDtpCgtbpgp", completion: { image in
-//        print ("hi")
-//      })
-//    })
   }
 }

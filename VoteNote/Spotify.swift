@@ -109,7 +109,6 @@ class Spotify: ObservableObject {
     })
   }
   
-  //includes 
   func getPlayerState(){
     self.appRemote?.playerAPI?.getPlayerState({ (_, error) in
       print(error as Any)

@@ -29,6 +29,9 @@ struct AddMusicView: View {
   
   @Environment(\.presentationMode) var presentationMode
     
+    /**
+        Adds the selected songs to the Queue
+     */
     func addMusic(){
         
         //set the first song if nothing is playing
@@ -36,7 +39,9 @@ struct AddMusicView: View {
           print("Song Added")
           nowPlaying = selectedSongs[0]
           sharedSpotify.enqueue(songID: selectedSongs[0].id)
+          addsong(id: selectedSongs[0].id)
           RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+          dequeue(id: selectedSongs[0].id)
           sharedSpotify.skip() //need to clear out queue still before playing, clears out one song for now
           sharedSpotify.pause()
           selectedSongs.remove(at: 0)

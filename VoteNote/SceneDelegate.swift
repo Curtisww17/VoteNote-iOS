@@ -77,7 +77,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate,
     guard let url = URLContexts.first?.url else {
       return
     }
-    //print(url)
     self.sessionManager.application(UIApplication.shared, open: url, options: [:])
     
     let parameters = appRemote.authorizationParameters(from: url)
@@ -85,11 +84,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate,
     if let access_token = parameters?[SPTAppRemoteAccessTokenKey] {
       appRemote.connectionParameters.accessToken = access_token
       self.accessToken = access_token
-      //print("\(self.accessToken!)")
     } else if let error = parameters?[SPTAppRemoteErrorDescriptionKey] {
       // Show the error
       print(error)
-      //print("\(parameters?[SPTAppRemoteErrorDescriptionKey])")
     }
     if let room_code = parameters?["room_code"] {
       print(room_code)
