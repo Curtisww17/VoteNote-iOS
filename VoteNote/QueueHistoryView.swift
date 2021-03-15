@@ -15,6 +15,18 @@ struct QueueHistoryView: View {
     var body: some View{
         ZStack{
             VStack{
+                /*Button(action: sharedSpotify.createPlaylist(id: sharedSpotify.currentUser(completion: { user in
+                    sharedSpotify.currentUser = user
+                    //login user to db
+                    firebaseLogin(name: (user?.display_name)!)
+                  }), playlistData: {"""
+                    "name": "New Playlist",
+                    "description": "New playlist description",
+                    "public": false"""
+                  })) {
+                    Text("create Playlist")
+                }*/
+                
                 Section(header: Text("History")) {
                     List {
                         ForEach(songHistory.musicList) { song in
