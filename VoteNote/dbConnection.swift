@@ -88,6 +88,7 @@ class user: Identifiable, ObservableObject {
     var profilePic: String //link to pfp
     var isAnon: Bool?       //is the user anonymized
     var anon_name: String  //the user's anonymous name
+    let uid: String?
     
     //TODO: refactor this out
     init(name: String, profilePic: String){
@@ -95,6 +96,7 @@ class user: Identifiable, ObservableObject {
         self.profilePic = profilePic
         isAnon = false
         anon_name = ""
+        uid = nil
     }
     
     //default
@@ -103,6 +105,7 @@ class user: Identifiable, ObservableObject {
         self.profilePic = profilePic
         self.isAnon = isAnon
         self.anon_name = anon_name
+        uid = nil
     }
     
     //for firestore
@@ -111,6 +114,7 @@ class user: Identifiable, ObservableObject {
         profilePic = usr["profilePic"] as! String
         isAnon = usr["isAnon"] as? Bool ?? false
         anon_name = usr["anon_name"] as? String ?? ""
+        uid = usr["uid"] as? String
     }
 }
 
@@ -279,28 +283,6 @@ func storePrevRoom(code: String){
     }//end joiningquerey
 }
 
-//TODO: this can probably be removed
-func getPrevRooms(completion: @escaping ([String]?, Error?) -> Void){
-    let uid = FAuth.currentUser?.uid
-        
-    let  docRef = db.collection("users").document(uid!).collection("prevRooms").order(by: "time")
-    
-    docRef.getDocuments { (docs, err) in
-        if let err = err {
-            completion(nil, err)
-        } else {
-            var rooms: [String] = []
-            
-            for doc in docs!.documents {
-                if doc.data()["host"] as? String ?? "" == uid! {
-                    rooms.append(doc.data()["code"] as? String ?? "")
-                }
-            }
-            completion(rooms, nil)
-            
-        }
-    }
-}
 
 /**
  get the rooms that have previously been joined by the current
@@ -490,6 +472,8 @@ func getUsers(completion: @escaping ([user]?, Error?) -> Void){
                 else{
                     //iterate through user documents and get their data
                     for usr in query!.documents{
+                        var usrdata = usr.data()
+                        usrdata["uid"] = usr.documentID
                         let newusr = user(usr: usr.data())
                         if (newusr.isAnon != nil) {
                             if newusr.isAnon! {
