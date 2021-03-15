@@ -18,9 +18,10 @@ var isPlaying: Bool = false //should be false by default
 struct Host_QueuePageView: View {
     @State var currentView = 0
     @ObservedObject var spotify = sharedSpotify
-    @State var queueRefreshSeconds = 60
-    @State var voteUpdateSeconds = 10
+    //@State var historyRefreshSeconds = 30
+    @State var queueRefreshSeconds = 10
     @ObservedObject var songQueue: MusicQueue = MusicQueue()
+    @ObservedObject var songHistory: MusicQueue = MusicQueue()
     @ObservedObject var isViewingUser: ObservableBoolean = ObservableBoolean(boolValue: false)
     @ObservedObject var selectedSong: song = song(addedBy: "Nil User", artist: "", genres: [""], id: "", length: 0, numVotes: 0, title: "None Selected", imageUrl: "")
     @ObservedObject var selectedUser: user = user(name: "", profilePic: "")
@@ -55,33 +56,48 @@ struct Host_QueuePageView: View {
         }
     }
     
+    func updateHistory() {
+        getHistory(){(songs, err) in
+            if songs != nil {
+                if songs!.count > 0 {
+                    songHistory.musicList.removeAll()
+                    var count: Int = 0
+                    while count < songs!.count {
+                        songHistory.musicList.append(songs![count])
+                        count = count + 1
+                    }
+                }
+            }
+        }
+    }
+    
   var body: some View {
     GeometryReader { geo in
         ZStack {
           VStack {
-            HStack {
-                Text("\(voteUpdateSeconds)").font(.largeTitle).multilineTextAlignment(.trailing).onReceive(refreshTimer) {
-                    _ in
-                    if self.voteUpdateSeconds > 0 {
-                        self.voteUpdateSeconds -= 1
-                    } else {
-                        self.voteUpdateSeconds = 10
-                        print("Updating Queue")
-                        
-                        updateQueue()
-                    }
-                }
-            }.hidden().frame(width: 0, height: 0)
             Form {
-                
                 List {
                     ForEach(songQueue.musicList) { song in
-                        QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: isViewingUser, isDetailView: false, isUserQueue: false, votingEnabled: votingEnabled, selectedUser: selectedUser)
+                        QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: isViewingUser, isDetailView: false, isUserQueue: false, isHistoryView: false, votingEnabled: votingEnabled, selectedUser: selectedUser)
                                 }
                 }
             }
             
+            Text("\(queueRefreshSeconds)").font(.largeTitle).multilineTextAlignment(.trailing).onReceive(refreshTimer) {
+                _ in
+                if self.queueRefreshSeconds > 0 {
+                    self.queueRefreshSeconds -= 1
+                } else {
+                    self.queueRefreshSeconds = 10
+                    print("Updating Queue")
+                        
+                    updateQueue()
+                    updateHistory()
+                }
+            }.hidden().frame(width: 0, height: 0)
+            
             NowPlayingViewHost(isPlaying: isPlaying, songQueue: songQueue, isHost: isHost)
+                .padding(.bottom)
           }
           .navigationBarHidden(true)
         }.onAppear(perform: {
@@ -96,7 +112,7 @@ struct Host_QueuePageView: View {
                 updateQueue()
                 print("Queue Updated!")
                 
-        }).navigate(to: HostUserDetailView(user: selectedUser, songQueue: songQueue, votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue)), when: $isViewingUser.boolValue).navigationViewStyle(StackNavigationViewStyle())
+        }).navigate(to: HostUserDetailView(user: selectedUser, songQueue: songQueue, votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue), songHistory: songHistory), when: $isViewingUser.boolValue).navigationViewStyle(StackNavigationViewStyle())
     }
   }
 }
@@ -124,6 +140,7 @@ struct QueueEntry: View {
     @ObservedObject var isViewingUser: ObservableBoolean
     @State var isDetailView: Bool
     @State var isUserQueue: Bool
+    @State var isHistoryView: Bool
     
     @State var showNav: Bool = false
     @ObservedObject var votingEnabled: ObservableBoolean
@@ -205,7 +222,6 @@ struct QueueEntry: View {
                         } else {
                             Text("\(curSong.numVotes!)")
                         }
-                        //Text("\(curSong.numVotes ?? 0)")
                         Button(action: {upVoteSong()}) {
                             Image(systemName: "hand.thumbsup").resizable().frame(width: 30.0, height: 30.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
                         }.onTapGesture {
@@ -221,10 +237,12 @@ struct QueueEntry: View {
                     Spacer()
                     Spacer()
                     
-                    Image(systemName: "chevron.right").resizable().frame(width: 10.0, height: 20.0).foregroundColor(Color.gray)
+                    if !isHistoryView {
+                        Image(systemName: "chevron.right").resizable().frame(width: 10.0, height: 20.0).foregroundColor(Color.gray)
+                    }
                     
                     
-                    if opened && !isUserQueue {
+                    if opened && !isUserQueue && !isHistoryView {
                         HStack {
                             Button(action: {vetoMusic()}) {
                                 Text("Veto").foregroundColor(Color.black).scaleEffect(scale)
@@ -315,9 +333,9 @@ struct NowPlayingViewHost: View {
             RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
             
             sharedSpotify.skip()
-            dequeue(id: nowPlaying!.id)
             nowPlaying = songQueue.musicList[0]
-            songQueue.musicList.remove(at: 0)
+            //songQueue.musicList.remove(at: 0)
+            dequeue(id: songQueue.musicList[0].id)
             sharedSpotify.pause()
             isPlaying = false
         }
