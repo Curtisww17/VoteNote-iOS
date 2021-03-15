@@ -244,13 +244,15 @@ struct QueueEntry: View {
                     }
                     
                     
-                    if opened && !isUserQueue && !isHistoryView {
+                    if opened && !isHistoryView {
                         HStack {
-                            Button(action: {vetoMusic()}) {
-                                Text("Veto").foregroundColor(Color.black).scaleEffect(scale)
-                            }.padding(.all).background(Color.red).border(/*@START_MENU_TOKEN@*/Color.red/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/2/*@END_MENU_TOKEN@*/).onTapGesture {
-                                vetoMusic()
-                            }.frame(width: 80, height: 80)
+                            if !isUserQueue {
+                                Button(action: {vetoMusic()}) {
+                                    Text("Veto").foregroundColor(Color.black).scaleEffect(scale)
+                                }.padding(.all).background(Color.red).border(/*@START_MENU_TOKEN@*/Color.red/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/2/*@END_MENU_TOKEN@*/).onTapGesture {
+                                    vetoMusic()
+                                }.frame(width: 80, height: 80)
+                            }
                             
                             if !isDetailView {
                                 Button(action: {viewUser()}) {
@@ -273,7 +275,7 @@ struct QueueEntry: View {
         .animation(.spring())
         .gesture(DragGesture()
                   .onChanged { gesture in
-                    if !isUserQueue {
+                    if !isHistoryView {
                         self.offset.width = gesture.translation.width
                     }
                   }
