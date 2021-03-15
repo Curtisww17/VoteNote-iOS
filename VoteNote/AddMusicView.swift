@@ -124,8 +124,7 @@ struct AddMusicView: View {
               }
               
               List {
-                //list of search results
-                //TO-DO: have a function to print all artist names
+                //if you havent searched anything display options to see songs
                 if( currentSearch == ""){
                     NavigationLink(destination: playListView(songsPerUser: songsPerUser, myPlaylists: sharedSpotify.userPlaylists?.items ?? [Playlist(id: "")])) {
                            Text("View My Playlists")
@@ -137,6 +136,7 @@ struct AddMusicView: View {
                         Text("Reccomended")
                     }
                 }
+                //if you have searched something display search results
                 if currentSearch != "" {
                   ForEach((sharedSpotify.recentSearch?.tracks?.items ?? [SpotifyTrack(album: SpotifyAlbum(id: "", images: []), artists: [SpotifyArtist(id: "", name: "", uri: "", type: "")], available_markets: nil, disc_number: 0, duration_ms: 0, explicit: false, href: "", id: "", name: "Searching...", popularity: 0, preview_url: "", track_number: 0, type: "", uri: "")])) { song in
                     if (song.album?.images?.count ?? 0 > 0) {
@@ -162,6 +162,7 @@ struct AddMusicView: View {
     
 }
 
+//view users locally saved playlists
 struct playListView: View {
     @State var songsPerUser: Int
     @State var myPlaylists: [Playlist]
@@ -175,18 +176,15 @@ struct playListView: View {
                             Text(playlistEntry(playlistName: list.name!, playlistID: list.id, playlistDesc: list.description!).playlistName)
                         }
                         //myPlaylist: sharedSpotify.currentPlaylist ?? uniquePlaylist(id: "" ),
-                        
-                        
                     }
-                    
                     //[playlistStub(items: [Playlist(collaborative: false, description: "", id: "", images: nil, name: "", type: "", uri: "")])]
                 }
             }
         }
-
     }
 }
 
+//view recommened songs to add to the queue
 struct recomendedView: View{
     @State var songsPerUser: Int
     @State private var isEditing = false
@@ -251,6 +249,7 @@ struct recomendedView: View{
     
 }
 
+//view songs (spotify) liked by the user to add them to the queue
 struct likedSongsView: View{
     
     @State var songsPerUser: Int
@@ -316,6 +315,7 @@ struct likedSongsView: View{
     }
 }
 
+//view songs in a playlist to add to a queue
 struct uniquePlaylistView: View{
     
     //@State var myPlaylist: uniquePlaylist
@@ -382,6 +382,7 @@ struct uniquePlaylistView: View{
 }
 }
 
+//formatting for displaying songs in user playlists
 struct playlistEntry: View{
     
     @State var playlistName: String

@@ -22,6 +22,7 @@ class Spotify: ObservableObject {
   //is empty if the user is not joining through link, otherwise its the room code
   @Published var isJoiningThroughLink: String
   
+  //objects where data requested from spotify api goes into so app can reference it locally
   var currentUser: SpotifyUser?
   var recentSearch: SpotifySearchResults?
   var userPlaylists: _spotifyPlaylists?
@@ -87,36 +88,42 @@ class Spotify: ObservableObject {
     }
   }
   
+  //pauses spotify player
   func pause() {
     self.appRemote?.playerAPI?.pause({ (_, error) in
       print(error as Any)
     })
   }
   
+  //resumes spotify player
   func resume(){
     self.appRemote?.playerAPI?.resume({ (_, error) in
       print(error as Any)
     })
   }
   
+  //enqueues song specified to spotify queue for the current user
   func enqueue(songID: String){
     self.appRemote?.playerAPI?.enqueueTrackUri("spotify:track:"+songID, callback: { (_, error) in
       print(error as Any)
     })
   }
   
+  //skips current song being played and starts playing enqueued song
   func skip(){
     self.appRemote?.playerAPI?.skip(toNext: { (_, error) in
       print(error as Any)
     })
   }
   
+  //returns the state that the spotify player is in
   func getPlayerState(){
     self.appRemote?.playerAPI?.getPlayerState({ (_, error) in
       print(error as Any)
     })
   }
   
+  //requests spotify for a list of songs given a query (can be song or artist)
   func searchSong(completion: @escaping (SpotifySearchResults?) -> (), Query: String, limit: String, offset:String){
     self.httpRequester.headerParamGet(url: "https://api.spotify.com/v1/search", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ], param: ["q" : Query, "type": "track,artist", "limit": limit]).onFinish = {
       (response) in
@@ -131,6 +138,7 @@ class Spotify: ObservableObject {
     RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
   }
   
+  //requests spotify for list of current user's playlists
     func userPlaylists(completion: @escaping (_spotifyPlaylists?) -> (), limit: String){
       self.httpRequester.headerGet(url: "https://api.spotify.com/v1/me/playlists", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ]).onFinish = {
         (response) in
@@ -142,10 +150,10 @@ class Spotify: ObservableObject {
           }
       }
       RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
-      
-      //print("!!!!"+(self.userPlaylists?.items?[0].name ?? ""))
+    
     }
   
+  //requests songs that are in a specific playlist
   func playlistSongs(completion: @escaping (uniquePlaylist?) -> (), id: String) -> (){
     self.httpRequester.headerGet(url: "https://api.spotify.com/v1/playlists/\(id)", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ]).onFinish = {
       (response) in
@@ -158,6 +166,7 @@ class Spotify: ObservableObject {
     }
   }
   
+  //requests the saved/liked songs that the user has
   func savedSongs(completion: @escaping (playlistTrackTime?) -> ()) -> (){
     self.httpRequester.headerGet(url: "https://api.spotify.com/v1/me/tracks", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ]).onFinish = {
       (response) in
@@ -171,6 +180,7 @@ class Spotify: ObservableObject {
     }
   }
   
+  //requests spotify for songs recommeneded based on artist, genre, and songs
   func recomendations(artistSeed: String, genre: String, trackSeed: String,completion: @escaping (reccomndations?) -> ()) ->() {
     self.httpRequester.headerGet(url: "https://api.spotify.com/v1/recommendations?limit=10&seed_genres=\(artistSeed)&seed_genres=\(genre)&seed_tracks=\(trackSeed)", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ]).onFinish = {
       (response) in
@@ -183,6 +193,8 @@ class Spotify: ObservableObject {
     }
   }
   
+  //creates a palylist on spotify for the user based on a json object
+  //currently not working/implemented
   func createPlaylist(id: String, playlistData: String) {
     self.httpRequester.headerPUT(url: "https://api.spotify.com/v1/users/\(id)/playlists --data \(playlistData)", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? "")" ]).onFinish = {
       (response) in
@@ -194,6 +206,7 @@ class Spotify: ObservableObject {
     }
   }
   
+  //adds specified to users liked/saved songs
   func likeSong(id: String){
     self.httpRequester.headerPUT(url: "https://api.spotify.com/v1/me/tracks?ids=\(id)",header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ]).onFinish = {
       (response) in
@@ -207,7 +220,7 @@ class Spotify: ObservableObject {
   
   
   
-
+  //reutnrs the current spotify user
   func getCurrentUser(completion: @escaping (SpotifyUser?) -> ()) {
     self.httpRequester.headerGet(url: "https://api.spotify.com/v1/me", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? "")" ]).onFinish = { (response) in
       do {
@@ -219,6 +232,7 @@ class Spotify: ObservableObject {
     }
   }
   
+  //gets information on a song based of off a song uri
   func getTrackInfo(track_uri: String, completion: @escaping (SpotifyTrack?) -> ()) {
     self.httpRequester.headerGet(url: "https://api.spotify.com/v1/tracks/\(track_uri)", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? "")" ]).onFinish = { (response) in
       do {
@@ -327,8 +341,6 @@ struct playlistTrackTime: Codable{
 }
 
 struct songTimeAdded: Codable{
-  //var id = UUID()
-  //var added_at: String
   var track: SpotifyTrack
   
 }

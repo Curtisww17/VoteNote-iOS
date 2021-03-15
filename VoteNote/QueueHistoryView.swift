@@ -15,6 +15,8 @@ struct QueueHistoryView: View {
     var body: some View{
         ZStack{
             VStack{
+                
+                //button to add history as a playlist on spotify
                 /*Button(action: sharedSpotify.createPlaylist(id: sharedSpotify.currentUser(completion: { user in
                     sharedSpotify.currentUser = user
                     //login user to db
@@ -27,6 +29,7 @@ struct QueueHistoryView: View {
                     Text("create Playlist")
                 }*/
                 
+                //lists all songs previously played in the room
                 Section(header: Text("History")) {
                     List {
                         ForEach(songHistory.musicList) { song in
