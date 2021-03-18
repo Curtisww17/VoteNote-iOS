@@ -129,7 +129,7 @@ struct CreateRoomView: View {
     .navigate(to: HostController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription, votingEnabled: votingEnabled, anonUsr: anonUsr, roomCapacity: userCapacity, songsPerUser: songsPerUser, explicitSongsAllowed: explicitSongsAllowed), when: $madeRoom)
     .onAppear(perform: {
       sharedSpotify.pause()
-      getPrevJoinedRooms(completion: {(codes, err) in
+      getPrevHostedRooms(completion: {(codes, err) in
         if err != nil {
           print(err as Any)
         } else {

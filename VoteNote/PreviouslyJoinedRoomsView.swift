@@ -53,6 +53,7 @@ struct PreviouslyJoinedRoomsView: View {
             join(c: currRoom.code)
           }, label: {
             Text(currRoom.name)
+              .foregroundColor(.primary)
           })
         }
       }

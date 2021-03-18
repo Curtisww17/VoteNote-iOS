@@ -325,7 +325,7 @@ func getPrevHostedRooms(completion: @escaping ([String]?, Error?) -> Void){
             var rooms: [String] = []
             
             for doc in docs!.documents {
-                if doc.data()["host"] as? String ?? "" == uid! {
+                if doc.data()["host"] as? String ?? "" != uid! {
                     let id = doc.data()["code"] as? String ?? ""
                     rooms.append(id)
                     

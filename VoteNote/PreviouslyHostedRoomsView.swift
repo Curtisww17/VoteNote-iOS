@@ -54,18 +54,21 @@ struct PreviouslyHostedRoomsView: View {
             join(c: currRoom.code)
           }, label: {
             Text(currRoom.name)
+              .foregroundColor(.primary)
           })
         }
       }
       .navigationBarBackButtonHidden(true)
     }
+    .navigate(to: HostController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription, votingEnabled: votingEnabled, anonUsr: anonUsr, roomCapacity: roomCapacity, songsPerUser: songsPerUser, explicitSongsAllowed: explicitSongsAllowed), when: $joined)
     .onAppear(perform: {
-      for code in codes {
-        getRoom(code: code, completion: { (prevRoom, err) in
-          previousRooms.append(prevRoom!)
-                })
+      if (previousRooms.count == 0) {
+        for code in codes {
+          getRoom(code: code, completion: { (prevRoom, err) in
+            previousRooms.append(prevRoom!)
+                  })
+        }
       }
     })
-    .navigate(to: HostController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription, votingEnabled: votingEnabled, anonUsr: anonUsr, roomCapacity: roomCapacity, songsPerUser: songsPerUser, explicitSongsAllowed: explicitSongsAllowed), when: $joined)
   }
 }
