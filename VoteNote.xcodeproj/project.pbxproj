@@ -29,6 +29,7 @@
 		44A2831325F7F97E00DDF229 /* AnonymousLists.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44A2831225F7F97E00DDF229 /* AnonymousLists.swift */; };
 		44A2834025FBB99D00DDF229 /* RemoteImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44A2833F25FBB99D00DDF229 /* RemoteImage.swift */; };
 		44A2834B25FE83A500DDF229 /* PreviouslyJoinedRoomsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44A2834A25FE83A500DDF229 /* PreviouslyJoinedRoomsView.swift */; };
+		44A283562602D34100DDF229 /* PreviouslyHostedRoomsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44A283552602D34100DDF229 /* PreviouslyHostedRoomsView.swift */; };
 		44C07DAE25E565B200D3667A /* QRCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44C07DAD25E565B200D3667A /* QRCode.swift */; };
 		44C07DB325E5664100D3667A /* RoomCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44C07DB225E5664100D3667A /* RoomCodeView.swift */; };
 		44C07DB825E566BE00D3667A /* CurrentRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44C07DB725E566BE00D3667A /* CurrentRoom.swift */; };
@@ -101,6 +102,7 @@
 		44A2831225F7F97E00DDF229 /* AnonymousLists.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnonymousLists.swift; sourceTree = "<group>"; };
 		44A2833F25FBB99D00DDF229 /* RemoteImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteImage.swift; sourceTree = "<group>"; };
 		44A2834A25FE83A500DDF229 /* PreviouslyJoinedRoomsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviouslyJoinedRoomsView.swift; sourceTree = "<group>"; };
+		44A283552602D34100DDF229 /* PreviouslyHostedRoomsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviouslyHostedRoomsView.swift; sourceTree = "<group>"; };
 		44C07DAD25E565B200D3667A /* QRCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCode.swift; sourceTree = "<group>"; };
 		44C07DB225E5664100D3667A /* RoomCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomCodeView.swift; sourceTree = "<group>"; };
 		44C07DB725E566BE00D3667A /* CurrentRoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentRoom.swift; sourceTree = "<group>"; };
@@ -213,6 +215,7 @@
 				44A2833F25FBB99D00DDF229 /* RemoteImage.swift */,
 				44A2834A25FE83A500DDF229 /* PreviouslyJoinedRoomsView.swift */,
 				67222A2925FEE5CE0021D963 /* QueueHistoryView.swift */,
+				44A283552602D34100DDF229 /* PreviouslyHostedRoomsView.swift */,
 			);
 			path = VoteNote;
 			sourceTree = "<group>";
@@ -532,6 +535,7 @@
 				88FB569625CAF48B007114C7 /* dbConnection.swift in Sources */,
 				44C07DB825E566BE00D3667A /* CurrentRoom.swift in Sources */,
 				44A2831325F7F97E00DDF229 /* AnonymousLists.swift in Sources */,
+				44A283562602D34100DDF229 /* PreviouslyHostedRoomsView.swift in Sources */,
 				448572F525BF7A61006C5C07 /* ProfileView.swift in Sources */,
 				448572AE25BF421E006C5C07 /* AppDelegate.swift in Sources */,
 				448572B025BF421E006C5C07 /* SceneDelegate.swift in Sources */,

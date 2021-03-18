@@ -72,6 +72,7 @@ struct UserController: View {
         
       }
     }
+    .navigationBarBackButtonHidden(true)
     .navigationBarHidden(true).onAppear(perform: {
         notExited = false
     }).navigate(to: LandingPageView(), when: $notExited).navigationViewStyle(StackNavigationViewStyle())

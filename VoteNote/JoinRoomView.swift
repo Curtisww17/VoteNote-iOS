@@ -33,7 +33,7 @@ struct JoinRoomView: View {
       if message != nil {
         //TODO: popup that they cannot join the room
       }else{
-        
+        storePrevRoom(code: c)
         self.joined = true
         if ret != nil {
           roomName = ret!.name
@@ -44,9 +44,7 @@ struct JoinRoomView: View {
           explicitSongsAllowed = ret!.explicit
           anonUsr = ret!.anonUsr
           //songsPerUser = ret. //not in db room object
-          self.joined = true
-          storePrevRoom(code: c)
-        }
+          self.joined = true        }
       }
     }
   }
@@ -90,16 +88,16 @@ struct JoinRoomView: View {
           .frame(width: UIScreen.main.bounds.width * 0.8, height: 60, alignment: .center)
         }
       }
-      /* Not implemented yet
+      // Not implemented yet
        if (prevJoinedRooms.count > 0) {
        Section() {
        NavigationLink(
-       destination: PreviouslyJoinedRoomsView(rooms: prevJoinedRooms),
+        destination: PreviouslyJoinedRoomsView(codes: prevJoinedRooms, isInRoom: $isInRoom).navigationBarHidden(true).navigationBarBackButtonHidden(true),
        label: {
        Text("Previously Joined Rooms")
        })
        }
-       }*/
+       }
     }
     .onAppear(perform: {
       getPrevJoinedRooms(completion: {(codes, err) in

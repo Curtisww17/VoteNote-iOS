@@ -36,6 +36,7 @@ struct CreateRoomView: View {
   @State var madeRoom: Bool = false
   @State var anonUsr: Bool = false
   @State var explicitSongsAllowed: Bool = false
+  @State var prevHostedRooms: [String] = []
   
   @Environment(\.presentationMode) var presentationMode
   
@@ -100,6 +101,17 @@ struct CreateRoomView: View {
             }
             .padding(.trailing)
           }
+          
+          if (prevHostedRooms.count > 0) {
+            Section() {
+              NavigationLink(
+                destination: PreviouslyHostedRoomsView(codes: prevHostedRooms, isInRoom: $isInRoom)
+                  .navigationBarBackButtonHidden(true).navigationBarHidden(true),
+                label: {
+                  Text("Previously Hosted Rooms")
+                })
+            }
+          }
         }
         
         if self.roomName != "" {
@@ -117,7 +129,13 @@ struct CreateRoomView: View {
     .navigate(to: HostController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription, votingEnabled: votingEnabled, anonUsr: anonUsr, roomCapacity: userCapacity, songsPerUser: songsPerUser, explicitSongsAllowed: explicitSongsAllowed), when: $madeRoom)
     .onAppear(perform: {
       sharedSpotify.pause()
-      
+      getPrevJoinedRooms(completion: {(codes, err) in
+        if err != nil {
+          print(err as Any)
+        } else {
+          prevHostedRooms = codes ?? []
+        }
+      })
     })
     .navigationViewStyle(StackNavigationViewStyle())
   }

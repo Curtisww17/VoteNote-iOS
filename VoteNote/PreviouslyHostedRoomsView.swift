@@ -1,14 +1,15 @@
 //
-//  PreviouslyJoinedRoomsView.swift
+//  PreviouslyHostedRoomsView.swift
 //  VoteNote
 //
-//  Created by Wesley Curtis on 3/14/21.
+//  Created by Wesley Curtis on 3/17/21.
 //
 
 import Foundation
 import SwiftUI
 
-struct PreviouslyJoinedRoomsView: View {
+
+struct PreviouslyHostedRoomsView: View {
   @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
   @State var codes: [String]
   @State var previousRooms: [room] = []
@@ -56,8 +57,8 @@ struct PreviouslyJoinedRoomsView: View {
           })
         }
       }
+      .navigationBarBackButtonHidden(true)
     }
-    .navigate(to: UserController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser, votingEnabled: votingEnabled, anonUsr: anonUsr, explicitSongsAllowed: explicitSongsAllowed), when: $joined)
     .onAppear(perform: {
       for code in codes {
         getRoom(code: code, completion: { (prevRoom, err) in
@@ -65,5 +66,6 @@ struct PreviouslyJoinedRoomsView: View {
                 })
       }
     })
+    .navigate(to: HostController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription, votingEnabled: votingEnabled, anonUsr: anonUsr, roomCapacity: roomCapacity, songsPerUser: songsPerUser, explicitSongsAllowed: explicitSongsAllowed), when: $joined)
   }
 }

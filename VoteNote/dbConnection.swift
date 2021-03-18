@@ -256,10 +256,11 @@ func joinRoom(code: String, completion:@escaping (room?, String?) -> Void){
  */
 func storePrevRoom(code: String){
     let uid = FAuth.currentUser?.uid
+  
+    let upperCode = code.uppercased()
     
     
-    
-    let joiningQuery = db.collection("room").whereField("code", isEqualTo: code)
+    let joiningQuery = db.collection("room").whereField("code", isEqualTo: upperCode)
     
     joiningQuery.getDocuments() { (query, err) in
         if let err = err{
@@ -275,7 +276,7 @@ func storePrevRoom(code: String){
             if rm == nil{
                 print("err")
             } else {
-                db.collection("users").document(uid!).collection("prevRooms").addDocument(data: ["id": rm , "time": FieldValue.serverTimestamp()])
+                db.collection("users").document(uid!).collection("prevRooms").addDocument(data: ["code": upperCode , "time": FieldValue.serverTimestamp()])
             }
             
         }
@@ -301,7 +302,7 @@ func getPrevJoinedRooms(completion: @escaping ([String]?, Error?) -> Void){
             
             for doc in docs!.documents {
                 if doc.data()["host"] as? String ?? "" != uid! {
-                    let id = doc.data()["id"] as? String ?? ""
+                  let id = doc.data()["code"] as? String ?? ""
                     rooms.append(id)
                     
                 }
@@ -325,7 +326,7 @@ func getPrevHostedRooms(completion: @escaping ([String]?, Error?) -> Void){
             
             for doc in docs!.documents {
                 if doc.data()["host"] as? String ?? "" == uid! {
-                    let id = doc.data()["id"] as? String ?? ""
+                    let id = doc.data()["code"] as? String ?? ""
                     rooms.append(id)
                     
                 }
