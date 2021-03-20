@@ -97,7 +97,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate,
   }
   
   func playerStateDidChange(_ playerState: SPTAppRemotePlayerState) {
-    debugPrint("Track name: %@", playerState.track.name)
+    //debugPrint("Track name: %@", playerState.track.name)
+    sharedSpotify.isPaused = playerState.isPaused
+    
+    sharedSpotify.getTrackInfo(track_uri: playerState.track.uri, completion: {(currPlaying) in
+      if (currPlaying != nil) {
+        OperationQueue.main.addOperation {
+          sharedSpotify.currentlyPlaying = currPlaying
+        }
+      }
+                               })
   }
   
   

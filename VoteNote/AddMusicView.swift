@@ -29,34 +29,6 @@ struct AddMusicView: View {
   
   @Environment(\.presentationMode) var presentationMode
     
-    /**
-        Adds the selected songs to the Queue
-     */
-    func addMusic(){
-        
-        //set the first song if nothing is playing
-        if nowPlaying == nil && selectedSongs.count > 0 {
-          print("Song Added")
-          nowPlaying = selectedSongs[0]
-          sharedSpotify.enqueue(songID: selectedSongs[0].id)
-          addsong(id: selectedSongs[0].id)
-          RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
-          dequeue(id: selectedSongs[0].id)
-          sharedSpotify.skip() //need to clear out queue still before playing, clears out one song for now
-          sharedSpotify.pause()
-          selectedSongs.remove(at: 0)
-        }
-        
-        for i in selectedSongs {
-            print("Added")
-            addsong(id: i.id)
-            print("Done")
-        }
-        
-        selectedSongs.removeAll()
-        
-        self.presentationMode.wrappedValue.dismiss()
-      }
   
     /**
         Adds the selected songs to the music queue both locally and on the DB
@@ -117,7 +89,10 @@ struct AddMusicView: View {
                   .animation(.default)
                 }
                 
-                Button(action: {addMusic()}) {
+                Button(action: {songQueue.addMusic(songs: selectedSongs)
+                  selectedSongs.removeAll()
+                  presentationMode.wrappedValue.dismiss()
+                }) {
                   Text("Add Songs")
                 }
                 .padding(.trailing)
@@ -189,26 +164,7 @@ struct recomendedView: View{
     @State var songsPerUser: Int
     @State private var isEditing = false
     @Environment(\.presentationMode) var presentationMode
-    func addMusic(){
-        
-        //select the first song if nothing is playing
-        if nowPlaying == nil && selectedSongs.count > 0 {
-            print("Song Added")
-            nowPlaying = selectedSongs[0]
-            sharedSpotify.enqueue(songID: selectedSongs[0].id)
-            selectedSongs.remove(at: 0)
-        }
-        
-        for i in selectedSongs {
-            print("Added")
-            addsong(id: i.id) //there's an issue here
-            print("Done")
-        }
-        
-        selectedSongs.removeAll()
-        
-        self.presentationMode.wrappedValue.dismiss()
-    }
+    
     
     var body: some View{
         ZStack{
@@ -229,7 +185,10 @@ struct recomendedView: View{
                         .animation(.default)
                     }
                     
-                    Button(action: {addMusic()}) {
+                  Button(action: {songQueue.addMusic(songs: selectedSongs)
+                    selectedSongs.removeAll()
+                    presentationMode.wrappedValue.dismiss()
+                  }) {
                         Text("Add Songs")
                     }
                     .padding(.trailing)
@@ -256,26 +215,6 @@ struct likedSongsView: View{
     @State private var isEditing = false
     @Environment(\.presentationMode) var presentationMode
     
-    func addMusic(){
-        
-        //select the first song if nothing is playing
-        if nowPlaying == nil && selectedSongs.count > 0 {
-            print("Song Added")
-            nowPlaying = selectedSongs[0]
-            sharedSpotify.enqueue(songID: selectedSongs[0].id)
-            selectedSongs.remove(at: 0)
-        }
-        
-        for i in selectedSongs {
-            print("Added")
-            addsong(id: i.id) //there's an issue here
-            print("Done")
-        }
-        
-        selectedSongs.removeAll()
-        
-        self.presentationMode.wrappedValue.dismiss()
-    }
     
     var body: some View{
         ZStack{
@@ -296,7 +235,10 @@ struct likedSongsView: View{
                         .animation(.default)
                     }
                     
-                    Button(action: {addMusic()}) {
+                  Button(action: {songQueue.addMusic(songs: selectedSongs)
+                    selectedSongs.removeAll()
+                    presentationMode.wrappedValue.dismiss()
+                  }) {
                         Text("Add Songs")
                     }
                     .padding(.trailing)
@@ -324,26 +266,7 @@ struct uniquePlaylistView: View{
     @Environment(\.presentationMode) var presentationMode
     @State var songsPerUser: Int
     
-    func addMusic(){
-        
-        //select the first song if nothing is playing
-        if nowPlaying == nil && selectedSongs.count > 0 {
-            print("Song Added")
-            nowPlaying = selectedSongs[0]
-            sharedSpotify.enqueue(songID: selectedSongs[0].id)
-            selectedSongs.remove(at: 0)
-        }
-        
-        for i in selectedSongs {
-            print("Added")
-            addsong(id: i.id) //there's an issue here
-            print("Done")
-        }
-        
-        selectedSongs.removeAll()
-        
-        self.presentationMode.wrappedValue.dismiss()
-    }
+  
     
     var body: some View{
         ZStack{
@@ -364,7 +287,10 @@ struct uniquePlaylistView: View{
                         .animation(.default)
                     }
                     
-                    Button(action: {addMusic()}) {
+                  Button(action: {songQueue.addMusic(songs: selectedSongs)
+                    selectedSongs.removeAll()
+                    presentationMode.wrappedValue.dismiss()
+                  }) {
                         Text("Add Songs")
                     }
                     .padding(.trailing)

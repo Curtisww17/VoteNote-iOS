@@ -214,10 +214,6 @@ func joinRoom(code: String, completion:@escaping (room?, String?) -> Void){
     let usr = FAuth.currentUser
     
     
-    var joinedRoom: room? = nil
-    
-    
-    
     let joiningQuery = db.collection("room").whereField("code", isEqualTo: upperCode)
     
     joiningQuery.getDocuments() { (query, err) in
@@ -555,7 +551,7 @@ func banUser(uid: String){
  
  - Parameter id: the spotify id of the song to be added
  */
-func addsong(id: String){
+func addsong(id: String, completion: @escaping () -> () ){
 
     
     //TODO: get album art stuff
@@ -603,9 +599,11 @@ func addsong(id: String){
                         "queue.\(id)": sng
                     ])
                 }
+              completion()
             }
         }//end sharedSpotify
     }//end currRoom
+    
     
 }
 
@@ -703,7 +701,7 @@ func vetoSong(id: String){
     
     getCurrRoom { (currRoom, err) in
         
-        let rm = db.collection("room").whereField("code", isEqualTo: currRoom).getDocuments { (doc, Err) in
+        let _ = db.collection("room").whereField("code", isEqualTo: currRoom).getDocuments { (doc, Err) in
             if let err = err {
                 print("/n/nerror getting doc \(err.localizedDescription)")
             }else if !doc!.isEmpty{
@@ -734,7 +732,7 @@ func vetoSong(id: String){
 func voteSong(vote: Int, id: String){
     getCurrRoom { (currRoom, err) in
         
-        let rm = db.collection("room").whereField("code", isEqualTo: currRoom).getDocuments { (doc, Err) in
+        let _ = db.collection("room").whereField("code", isEqualTo: currRoom).getDocuments { (doc, Err) in
             if let err = err {
                 print("/n/nerror getting doc \(err.localizedDescription)")
             }else if !doc!.isEmpty{

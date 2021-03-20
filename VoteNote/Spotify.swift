@@ -40,6 +40,8 @@ class Spotify: ObservableObject {
   @Published var loggedIn: Bool
   @Published var isAnon: Bool
   @Published var anon_name: String
+  @Published var isPaused: Bool?
+  @Published var currentlyPlaying: SpotifyTrack?
   
   
   init() {
@@ -102,11 +104,16 @@ class Spotify: ObservableObject {
     })
   }
   
+  
   //enqueues song specified to spotify queue for the current user
-  func enqueue(songID: String){
+  func enqueue(songID: String, completion: @escaping () -> () ){
     self.appRemote?.playerAPI?.enqueueTrackUri("spotify:track:"+songID, callback: { (_, error) in
+      if (error != nil) {
       print(error as Any)
-    })
+      }
+      completion()
+    }
+    )
   }
   
   //skips current song being played and starts playing enqueued song
@@ -234,7 +241,12 @@ class Spotify: ObservableObject {
   
   //gets information on a song based of off a song uri
   func getTrackInfo(track_uri: String, completion: @escaping (SpotifyTrack?) -> ()) {
-    self.httpRequester.headerGet(url: "https://api.spotify.com/v1/tracks/\(track_uri)", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? "")" ]).onFinish = { (response) in
+    var track_id = track_uri
+    if (track_uri.contains("spotify")) {
+      track_id = String(track_uri.split(separator: ":").last!)
+    }
+    
+    self.httpRequester.headerGet(url: "https://api.spotify.com/v1/tracks/\(track_id)", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? "")" ]).onFinish = { (response) in
       do {
         let decoder = JSONDecoder()
         try completion( decoder.decode(SpotifyTrack.self, from: response.data))

@@ -8,10 +8,9 @@
 import Foundation
 import SwiftUI
 
-var nowPlaying: song?
 var isPlaying: Bool = false //should be false by default
 //TO-DO: enqueue next song when only so much time is left
-
+var songQueue: MusicQueue = MusicQueue()
 /**
     The UI for the host's version of the Queue View
  */
@@ -20,7 +19,7 @@ struct Host_QueuePageView: View {
     @ObservedObject var spotify = sharedSpotify
     //@State var historyRefreshSeconds = 30
     @State var queueRefreshSeconds = 10
-    @ObservedObject var songQueue: MusicQueue = MusicQueue()
+    //@ObservedObject var songQueue: MusicQueue = MusicQueue()
     var songHistory: MusicQueue
     @ObservedObject var isViewingUser: ObservableBoolean = ObservableBoolean(boolValue: false)
     @ObservedObject var selectedSong: song = song(addedBy: "Nil User", artist: "", genres: [""], id: "", length: 0, numVotes: 0, title: "None Selected", imageUrl: "")
@@ -47,9 +46,9 @@ struct Host_QueuePageView: View {
                     }
                     
                     if votingEnabled.boolValue {
-                        if self.songQueue.musicList.count > 1 {
-                            if self.songQueue.musicList[0].numVotes != nil && self.songQueue.musicList[1].numVotes != nil {
-                                self.songQueue.musicList.sort { $0.numVotes! > $1.numVotes! }
+                        if songQueue.musicList.count > 1 {
+                            if songQueue.musicList[0].numVotes != nil && songQueue.musicList[1].numVotes != nil {
+                                songQueue.musicList.sort { $0.numVotes! > $1.numVotes! }
                             }
                         }
                     }
@@ -105,11 +104,11 @@ struct Host_QueuePageView: View {
         }.onAppear(perform: {
 
                 //makes the first song in the queue the first to play
-                if nowPlaying == nil && songQueue.musicList.count > 0 /*&& (songsList ?? []).count > 0*/ {
+          /*if sharedSpotify.currentlyPlaying == nil && songQueue.musicList.count > 0 /*&& (songsList ?? []).count > 0*/ {
                     nowPlaying = songQueue.musicList[0]
                     sharedSpotify.enqueue(songID: songQueue.musicList[0].id)
                     vetoSong(id: songQueue.musicList[0].id)
-                }
+                }*/
                 print("Updating Queue...")
                 updateQueue()
                 print("Queue Updated!")
@@ -123,6 +122,87 @@ struct Host_QueuePageView: View {
  */
 class MusicQueue: Identifiable, ObservableObject {
     var musicList: [song] = [song]()
+  @Published var currentlyPlaying: song?
+  
+  public func skipSong() {
+    print(musicList.count)
+      if musicList.count > 0 {
+          
+          //print("Current Number of Songs in Queue \(songQueue.musicList.count)")
+          
+        sharedSpotify.enqueue(songID: self.musicList[0].id) {
+          sharedSpotify.skip()
+          
+          dequeue(id: self.musicList[0].id)
+        }
+        //borked
+          //OperationQueue.main.waitUntilAllOperationsAreFinished()
+          //RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+          //nowPlaying = songQueue.musicList[0]
+          //songQueue.musicList.remove(at: 0)
+        updateQueue()
+          //sharedSpotify.pause()
+          isPlaying = false
+      }
+      else {
+        sharedSpotify.skip()
+      }
+  }
+  
+  func updateQueue() {
+      getQueue(){(songs, err) in
+          if songs != nil {
+              if songs!.count > 0 {
+                self.musicList.removeAll()
+                  var count: Int = 0
+                  while count < songs!.count {
+                    self.musicList.append(songs![count])
+                      count = count + 1
+                  }
+                if self.musicList.count > 1 {
+                  if self.musicList[0].numVotes != nil && self.musicList[1].numVotes != nil {
+                    self.musicList.sort { $0.numVotes! > $1.numVotes! }
+                          }
+                      }
+                  
+              }
+          }
+      }
+  }
+  
+  public func addMusic(songs: [song]){
+    
+    //set the first song if nothing is playing
+  if self.currentlyPlaying == nil && songs.count > 0 {
+      //print("Song Added")
+    self.currentlyPlaying = selectedSongs[0]
+    sharedSpotify.enqueue(songID: selectedSongs[0].id) {
+      sharedSpotify.skip()
+    }
+    addsong(id: songs[0].id) {
+      //RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+      dequeue(id: songs[0].id)
+    }
+      //sharedSpotify.skip() //need to clear out queue still before playing, clears out one song for now
+      //sharedSpotify.pause()
+      //songs.remove(at: 0)
+    
+    for i in songs.dropFirst() {
+        print("Added")
+      addsong(id: i.id){}
+        print("Done")
+    }
+  } else {
+    
+    for i in songs {
+        print("Added")
+      addsong(id: i.id){}
+        print("Done")
+    }
+  }
+    
+    
+  }
 }
 
 /**
@@ -327,23 +407,7 @@ struct NowPlayingViewHost: View {
         Skips the current song in the Spotify Queue
      */
     func skipSong(){
-        if /*nowPlaying != nil &&*/
-            songQueue.musicList.count > 0 {
-            
-            print(songQueue.musicList.count)
-            print("Current Number of Songs in Queue \(songQueue.musicList.count)")
-            
-            sharedSpotify.enqueue(songID: songQueue.musicList[0].id) //borked
-            //OperationQueue.main.waitUntilAllOperationsAreFinished()
-            RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
-            
-            sharedSpotify.skip()
-            nowPlaying = songQueue.musicList[0]
-            //songQueue.musicList.remove(at: 0)
-            dequeue(id: songQueue.musicList[0].id)
-            sharedSpotify.pause()
-            isPlaying = false
-        }
+      songQueue.skipSong()
     }
     
     /**
@@ -357,8 +421,8 @@ struct NowPlayingViewHost: View {
         Favorites the current song in the Spotify Queue
      */
     func favoriteSong(){
-        if(nowPlaying != nil){
-            sharedSpotify.likeSong(id: nowPlaying!.id)
+      if(sharedSpotify.currentlyPlaying != nil){
+        sharedSpotify.likeSong(id: sharedSpotify.currentlyPlaying!.id)
             saved = !saved
         }
     }
@@ -370,7 +434,7 @@ struct NowPlayingViewHost: View {
                     isMinimized = !isMinimized
                 }
                 
-            }) {
+            }, label: {
                 if isMinimized {
                     HStack {
                         Spacer()
@@ -379,24 +443,24 @@ struct NowPlayingViewHost: View {
                         Spacer()
                         Spacer()
                         Spacer()
-                      if (nowPlaying != nil) {
-                        RemoteImage(url: nowPlaying!.imageUrl)
+                      if (sharedSpotify.currentlyPlaying != nil) {
+                        RemoteImage(url: (sharedSpotify.currentlyPlaying!.album?.images![0].url)!)
                           .frame(width: 40, height: 40)
                       } else {
                         Image(systemName: "person.crop.square.fill").resizable().frame(width: 40.0, height: 40.0)
                       }
                         VStack {
                             HStack {
-                                if nowPlaying == nil {
+                              if sharedSpotify.currentlyPlaying == nil {
                                     Text("None Selected").padding(.leading)
                                 } else {
-                                    Text(nowPlaying!.title).padding(.leading)
+                                  Text(sharedSpotify.currentlyPlaying!.name).padding(.leading)
                                 }
                                 Spacer()
                             }
                             HStack {
-                                if nowPlaying != nil {
-                                    Text(nowPlaying!.artist).font(.caption)
+                              if sharedSpotify.currentlyPlaying != nil {
+                                Text(sharedSpotify.currentlyPlaying!.artists!.first!.name).font(.caption)
                                         .foregroundColor(Color.gray).padding(.leading)
                                 }
                                 Spacer()
@@ -408,43 +472,43 @@ struct NowPlayingViewHost: View {
                     .padding(.vertical)
                 } else {
                     VStack {
-                      if (nowPlaying != nil) {
-                        RemoteImage(url: nowPlaying!.imageUrl)
+                      if (sharedSpotify.currentlyPlaying != nil) {
+                        RemoteImage(url: sharedSpotify.currentlyPlaying!.album!.images![0].url)
                           .frame(width: 160, height: 160)
                       } else {
                         Image(systemName: "person.crop.square.fill").resizable().frame(width: 160.0, height: 160.0)
                       }
                         HStack {
                             Spacer()
-                            if nowPlaying == nil {
+                          if sharedSpotify.currentlyPlaying == nil {
                                 Text("None Selected")
                                     .padding(.leading)
                             } else {
-                                Text(nowPlaying!.title)
+                              Text(sharedSpotify.currentlyPlaying!.name)
                                     .padding(.leading)
                             }
                             Spacer()
                         }
                         
-                        if nowPlaying != nil {
-                            Text(nowPlaying!.artist)
+                      if sharedSpotify.currentlyPlaying != nil {
+                        Text(sharedSpotify.currentlyPlaying!.artists!.first!.name)
                                 .font(.caption)
                         }
                         
                         HStack {
-                            Text("\(nowPlaying?.numVotes ?? 0)")
+                          //Text("\(.numVotes ?? 0)")
                             
                             Spacer()
                             Button(action: {previousSong()}) {
                                 Image(systemName: "backward").resizable().frame(width: 25.0, height: 20.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
                             }
                             Spacer()
-                            Button(action: {if isPlaying {
+                          Button(action: {if !(sharedSpotify.isPaused ?? true) {
                                 pauseSong()
                             } else {
                                 playSong()
                             }}) {
-                                if isPlaying {
+                                if !(sharedSpotify.isPaused ?? true) {
                                     Image(systemName: "pause").resizable().frame(width: 20.0, height: 25.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
                                 } else {
                                     Image(systemName: "play")
@@ -472,7 +536,8 @@ struct NowPlayingViewHost: View {
                     }
                     .padding(.top)
                 }
-            }
+            })
+            
         }
     }
 }
