@@ -47,6 +47,21 @@ struct PreviouslyJoinedRoomsView: View {
   
   var body: some View {
     return VStack {
+      HStack {
+        Button(action: {
+          presentationMode.wrappedValue.dismiss()
+        }, label: {
+          HStack {
+            Image(systemName: "chevron.left")
+              .resizable()
+              .frame(width: 15, height: 20)
+              .padding(.leading)
+            Text("Back")
+          }
+        })
+        .frame(alignment: .leading)
+        Spacer()
+      }
       Form {
         ForEach(previousRooms, id: \.code) {currRoom in
           Button(action: {
