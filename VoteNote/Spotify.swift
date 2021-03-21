@@ -29,6 +29,7 @@ class Spotify: ObservableObject {
   var currentPlaylist: uniquePlaylist?
   var usersSavedSongs: playlistTrackTime?
   var recommendedSongs: reccomndations?
+  var songTimer: Int = 0
   
   var sessionManager: SPTSessionManager?
   var appRemote: SPTAppRemote?
@@ -251,6 +252,7 @@ class Spotify: ObservableObject {
         let decoder = JSONDecoder()
         try completion( decoder.decode(SpotifyTrack.self, from: response.data))
       } catch {
+        print(track_id)
         fatalError("Couldn't parse \(response.description)")
       }
     }

@@ -19,6 +19,7 @@ struct Host_QueuePageView: View {
     @ObservedObject var spotify = sharedSpotify
     //@State var historyRefreshSeconds = 30
     @State var queueRefreshSeconds = 10
+    @State var timeTracker = 0
     //@ObservedObject var songQueue: MusicQueue = MusicQueue()
     var songHistory: MusicQueue
     @ObservedObject var isViewingUser: ObservableBoolean = ObservableBoolean(boolValue: false)
@@ -26,6 +27,7 @@ struct Host_QueuePageView: View {
     @ObservedObject var selectedUser: user = user(name: "", profilePic: "")
     @ObservedObject var votingEnabled: ObservableBoolean
     @ObservedObject var isHost: ObservableBoolean = ObservableBoolean(boolValue: true)
+    
     
 
     
@@ -54,6 +56,18 @@ struct Host_QueuePageView: View {
                     }
                 }
             }
+        }
+        if(timeTracker == 2){
+            timeTracker == 0
+        }
+        if(songQueue.musicList.count > 0 && timeTracker == 0){
+            timeTracker = 1
+            print("timer stater for \((sharedSpotify.currentlyPlaying?.duration_ms ?? -1)/1000) seconds")
+            DispatchQueue.main.asyncAfter(deadline: .now() + (Double((sharedSpotify.currentlyPlaying?.duration_ms ?? 0))/1000.0)) {
+            print("song ended")
+            songQueue.skipSong()
+            timeTracker = true
+          }
         }
     }
     
@@ -408,6 +422,7 @@ struct NowPlayingViewHost: View {
      */
     func skipSong(){
       songQueue.skipSong()
+      RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
     }
     
     /**
