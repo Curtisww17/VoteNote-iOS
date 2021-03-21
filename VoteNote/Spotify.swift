@@ -29,6 +29,7 @@ class Spotify: ObservableObject {
   var currentPlaylist: uniquePlaylist?
   var usersSavedSongs: playlistTrackTime?
   var recommendedSongs: reccomndations?
+  var PlaylistBase: uniquePlaylist?
   
   var sessionManager: SPTSessionManager?
   var appRemote: SPTAppRemote?
@@ -149,7 +150,7 @@ class Spotify: ObservableObject {
             fatalError("Couldn't parse \(response.description)")
           }
       }
-      RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+      //RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
     
     }
   
