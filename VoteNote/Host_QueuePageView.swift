@@ -53,7 +53,19 @@ struct Host_QueuePageView: View {
                             }
                         }
                     }
+                } else if(sharedSpotify.PlaylistBase != nil && nowPlaying == nil){
+                    
+                    var newSong = sharedSpotify.PlaylistBase?.tracks?.items?[0].track
+                    sharedSpotify.enqueue(songID: newSong?.id ?? "")
+                    addsong(id: newSong?.id ?? "")
+                    RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+                    dequeue(id: newSong?.id ?? "")
+                    sharedSpotify.skip()
+                    nowPlaying = song(addedBy: getUID(), artist: newSong?.artists?[0].name ?? "", genres: [""], id: newSong?.id ?? "", length: newSong?.duration_ms ?? 0, numVotes: 0, title: newSong?.name ?? "", imageUrl: newSong?.album?.images?[0].url ?? "")
+                    //nowPlaying =
+                    addsong(id: sharedSpotify.PlaylistBase?.tracks?.items?[0].track.id ?? "")
                 }
+
             }
         }
     }
