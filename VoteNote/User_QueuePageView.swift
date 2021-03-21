@@ -102,11 +102,11 @@ struct User_QueuePageView: View {
         }.onAppear(perform: {
 
                 //makes the first song in the queue the first to play
-                if nowPlaying == nil && songQueue.musicList.count > 0 /*&& (songsList ?? []).count > 0*/ {
-                    nowPlaying = songQueue.musicList[0]
-                    sharedSpotify.enqueue(songID: songQueue.musicList[0].id)
-                    vetoSong(id: songQueue.musicList[0].id)
-                }
+//          if sharedSpotify.currentlyPlaying == nil && songQueue.musicList.count > 0 /*&& (songsList ?? []).count > 0*/ {
+//                    nowPlaying = songQueue.musicList[0]
+//                    sharedSpotify.enqueue(songID: songQueue.musicList[0].id)
+//                    vetoSong(id: songQueue.musicList[0].id)
+//                }
                 print("Updating Queue...")
                 updateQueue()
                 print("Queue Updated!")
