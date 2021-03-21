@@ -12,16 +12,14 @@ import SwiftUI
     The UI for viewing the details of a user as a user
  */
 struct UserUserDetailView: View {
-  @State var user: user
+  @ObservedObject var user: user
   @ObservedObject var songQueue: MusicQueue
   @ObservedObject var selectedSong: song = song(addedBy: "Nil User", artist: "", genres: [""], id: "", length: 0, numVotes: 0, title: "None Selected", imageUrl: "")
   @ObservedObject var hostControllerHidden: ObservableBoolean = ObservableBoolean(boolValue: false)
   @State var shouldReturn: Bool = false
   @ObservedObject var votingEnabled: ObservableBoolean
-  @ObservedObject var songHistory: MusicQueue = MusicQueue()
+  @ObservedObject var songHistory: MusicQueue
   @State var voteUpdateSeconds = 10
-      
-    let refreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
       
     /**
         Updates the music queue after a specified time interval
@@ -69,8 +67,8 @@ struct UserUserDetailView: View {
                     Section(header: Text("In Queue")) {
                         List {
                             ForEach(songQueue.musicList) { song in
-                                if song.addedBy == getUID() { //we should probably have a better way to make this comparision
-                                    QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: hostControllerHidden, isDetailView: true, isUserQueue: true, votingEnabled: votingEnabled, selectedUser: user)
+                                if song.addedBy == getUID() {
+                                    QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: hostControllerHidden, isDetailView: true, isUserQueue: true, isHistoryView: false, votingEnabled: votingEnabled, selectedUser: user)
                                 }
                             }
                         }
@@ -79,32 +77,18 @@ struct UserUserDetailView: View {
                     Section(header: Text("History")) {
                         List {
                             ForEach(songHistory.musicList) { song in
-                                if song.addedBy == getUID() { //we should probably have a better way to make this comparision
-                                    QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songHistory, isViewingUser: hostControllerHidden, isDetailView: true, isUserQueue: true, votingEnabled: ObservableBoolean(boolValue: false), selectedUser: user)
+                                if song.addedBy == getUID() {
+                                    QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songHistory, isViewingUser: hostControllerHidden, isDetailView: true, isUserQueue: true, isHistoryView: true, votingEnabled: ObservableBoolean(boolValue: false), selectedUser: user)
                                 }
                             }
                         }
                     }
                 }
-                
-                HStack {
-                    Text("\(voteUpdateSeconds)").font(.largeTitle).multilineTextAlignment(.trailing).onReceive(refreshTimer) {
-                        _ in
-                        if self.voteUpdateSeconds > 0 {
-                            self.voteUpdateSeconds -= 1
-                        } else {
-                            self.voteUpdateSeconds = 10
-                            print("Updating Queue")
-                            
-                            updateHistory()
-                        }
-                    }
-                }.hidden().frame(width: 0, height: 0)
             }
         //}
     }.onAppear(perform: {
         updateHistory()
-    }).navigate(to: User_QueuePageView(votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue)), when: $shouldReturn).onAppear(perform: {
+    }).navigate(to: User_QueuePageView(songHistory: songHistory, votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue)), when: $shouldReturn).onAppear(perform: {
         shouldReturn = false
     }).navigationBarHidden(true).navigationViewStyle(StackNavigationViewStyle())
   }

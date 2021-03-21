@@ -11,17 +11,15 @@ import SwiftUI
     The UI for viewing the details of a user as a host
  */
 struct HostUserDetailView: View {
-  @State var user: user
+  @ObservedObject var user: user
   @ObservedObject var songQueue: MusicQueue
   @ObservedObject var selectedSong: song = song(addedBy: "Nil User", artist: "", genres: [""], id: "", length: 0, numVotes: 0, title: "None Selected", imageUrl: "")
   @ObservedObject var hostControllerHidden: ObservableBoolean = ObservableBoolean(boolValue: false)
   @State var shouldReturn: Bool = false
   @ObservedObject var votingEnabled: ObservableBoolean
-  @ObservedObject var songHistory: MusicQueue = MusicQueue()
+  @ObservedObject var songHistory: MusicQueue
   @State var voteUpdateSeconds = 10
-    
-  let refreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-    
+
     func updateHistory() {
         getHistory(){(songs, err) in
             if songs != nil {
@@ -48,7 +46,7 @@ struct HostUserDetailView: View {
         Bans the selected user
      */
   func banSelectedUser(){
-    //banUser(uid: user.id)
+    banUser(uid: user.uid!)
   }
     
   var body: some View {
@@ -72,8 +70,8 @@ struct HostUserDetailView: View {
                     Section(header: Text("In Queue")) {
                         List {
                             ForEach(songQueue.musicList) { song in
-                                if song.addedBy == getUID() { //we should probably have a better way to make this comparision
-                                    QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: hostControllerHidden, isDetailView: true, isUserQueue: false, votingEnabled: votingEnabled, selectedUser: user)
+                                if song.addedBy == getUID() {
+                                    QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: hostControllerHidden, isDetailView: true, isUserQueue: false, isHistoryView: false, votingEnabled: votingEnabled, selectedUser: user)
                                 }
                             }
                         }
@@ -82,8 +80,8 @@ struct HostUserDetailView: View {
                     Section(header: Text("History")) {
                         List {
                             ForEach(songHistory.musicList) { song in
-                                if song.addedBy == getUID() { //we should probably have a better way to make this comparision
-                                    QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songHistory, isViewingUser: hostControllerHidden, isDetailView: true, isUserQueue: false, votingEnabled: ObservableBoolean(boolValue: false), selectedUser: user)
+                                if song.addedBy == getUID() {
+                                    QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songHistory, isViewingUser: hostControllerHidden, isDetailView: true, isUserQueue: false, isHistoryView: true, votingEnabled: ObservableBoolean(boolValue: false), selectedUser: user)
                                 }
                             }
                         }
@@ -94,26 +92,11 @@ struct HostUserDetailView: View {
                             .foregroundColor(Color.red)
                     }
                 }
-                
-                HStack {
-                    Text("\(voteUpdateSeconds)").font(.largeTitle).multilineTextAlignment(.trailing).onReceive(refreshTimer) {
-                        _ in
-                        if self.voteUpdateSeconds > 0 {
-                            self.voteUpdateSeconds -= 1
-                        } else {
-                            self.voteUpdateSeconds = 10
-                            print("Updating Queue")
-                            
-                            updateHistory()
-                        }
-                    }
-                }.hidden().frame(width: 0, height: 0)
-                
             }
         //}
         }.onAppear(perform: {
             updateHistory()
-        }).navigate(to: Host_QueuePageView(votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue)), when: $shouldReturn).onAppear(perform: {
+        }).navigate(to: Host_QueuePageView(songHistory: songHistory, votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue)), when: $shouldReturn).onAppear(perform: {
         shouldReturn = false
     }).navigationBarHidden(true).navigationViewStyle(StackNavigationViewStyle())
   }

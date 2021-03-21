@@ -33,7 +33,7 @@ struct JoinRoomView: View {
       if message != nil {
         //TODO: popup that they cannot join the room
       }else{
-        
+        storePrevRoom(code: c)
         self.joined = true
         if ret != nil {
           roomName = ret!.name
@@ -44,32 +44,27 @@ struct JoinRoomView: View {
           explicitSongsAllowed = ret!.explicit
           anonUsr = ret!.anonUsr
           //songsPerUser = ret. //not in db room object
-          self.joined = true
-          storePrevRoom(code: c)
-        }
+          self.joined = true        }
       }
     }
-    //print("\n\n\nyou joined \(c)\n\n\n")
   }
   
   
   var body: some View {
-    //return NavigationView {
     Form {
-      //Color.white
       Section() {
-      HStack {
-        Image(systemName: "qrcode")
-          .foregroundColor(.accentColor)
-        Text("Join with QR Code")
-        Spacer()
-        Image(systemName: "chevron.forward")
-          .frame(alignment: .trailing)
-      }
-      .frame(height: 60)
-      .onTapGesture {
-        self.isShowingScanner = true
-      }
+        HStack {
+          Image(systemName: "qrcode")
+            .foregroundColor(.accentColor)
+          Text("Join with QR Code")
+          Spacer()
+          Image(systemName: "chevron.forward")
+            .frame(alignment: .trailing)
+        }
+        .frame(height: 60)
+        .onTapGesture {
+          self.isShowingScanner = true
+        }
         HStack {
           Image(systemName: "textformat")
             .foregroundColor(.accentColor)
@@ -79,35 +74,37 @@ struct JoinRoomView: View {
             .frame(alignment: .trailing)
         }
         .frame(height: 60)
-      .onTapGesture(perform: {
-        isShowingJoinAlert.toggle()
-      })
+        .onTapGesture(perform: {
+          isShowingJoinAlert.toggle()
+        })
         if (isShowingJoinAlert) {
-            TextField("RoomCode", text: $code)
-              .textFieldStyle(RoundedBorderTextFieldStyle())
-              Button(action: {
-                join(c: code)
-              }, label: {
-                Text("Join")
-              })
-              .frame(width: UIScreen.main.bounds.width * 0.8, height: 60, alignment: .center)
+          TextField("Room Code", text: $code)
+            .textFieldStyle(RoundedBorderTextFieldStyle())
+          Button(action: {
+            join(c: code)
+          }, label: {
+            Text("Join")
+          })
+          .frame(width: UIScreen.main.bounds.width * 0.8, height: 60, alignment: .center)
         }
       }
-      if (prevJoinedRooms.count > 0) {
-      Section() {
-        NavigationLink(
-          destination: PreviouslyJoinedRoomsView(rooms: prevJoinedRooms),
-          label: {
-            Text("Previously Joined Rooms")
-          })
-      }
-      }
-    }    .onAppear(perform: {
+      // Not implemented yet
+       if (prevJoinedRooms.count > 0) {
+       Section() {
+       NavigationLink(
+        destination: PreviouslyJoinedRoomsView(codes: prevJoinedRooms, isInRoom: $isInRoom).navigationBarHidden(true).navigationBarBackButtonHidden(true),
+       label: {
+       Text("Previously Joined Rooms")
+       })
+       }
+       }
+    }
+    .onAppear(perform: {
       getPrevJoinedRooms(completion: {(codes, err) in
         if err != nil {
-          prevJoinedRooms = codes ?? []
-        } else {
           print(err as Any)
+        } else {
+          prevJoinedRooms = codes ?? []
         }
       })
       if sharedSpotify.isJoiningThroughLink.count != 0 {
@@ -119,7 +116,12 @@ struct JoinRoomView: View {
     .sheet(isPresented: $isShowingScanner) {
       CodeScannerView(codeTypes: [.qr], simulatedData: "1QCXT", completion: self.handleScan)
     }
-    /*}*/.navigate(to: UserController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser, votingEnabled: votingEnabled, anonUsr: anonUsr, explicitSongsAllowed: explicitSongsAllowed), when: $joined).onAppear(perform: {sharedSpotify.pause()}).navigationViewStyle(StackNavigationViewStyle())
+    .navigate(to: UserController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser, votingEnabled: votingEnabled, anonUsr: anonUsr, explicitSongsAllowed: explicitSongsAllowed), when: $joined)
+    .onAppear(perform: {
+      sharedSpotify.pause()
+      
+    })
+    .navigationViewStyle(StackNavigationViewStyle())
   }
   
   func handleScan(result: Result<String, CodeScannerView.ScanError>) {
@@ -129,7 +131,7 @@ struct JoinRoomView: View {
     switch result {
     case .success(let code):
       join(c: code)
-    case .failure(let error):
+    case .failure( _):
       print("Scanning failed")
     }
     

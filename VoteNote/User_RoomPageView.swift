@@ -23,6 +23,7 @@ struct User_RoomPageView: View {
   @Binding var notExited: Bool
   
   @Binding var showNav: Bool
+    @ObservedObject var songHistory: MusicQueue
   
     /**
         Causes the current user to leave the room
@@ -49,6 +50,20 @@ struct User_RoomPageView: View {
           }
           
           Section() {
+            NavigationLink(destination: QueueHistoryView( songHistory: songHistory)
+                            .onAppear(perform: {
+                              showNav = false
+                            })
+                            .onDisappear(perform: {
+                              showNav = true
+                            }), label: {
+                              HStack {
+                                Image(systemName: "clock")
+                                  .foregroundColor(Color.accentColor)
+                                  .padding()
+                                Text("History")
+                              }
+                            })
             NavigationLink(destination: UsersListView()
                             .onAppear(perform: {
                               showNav = false

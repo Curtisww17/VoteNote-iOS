@@ -15,15 +15,10 @@ struct RoomCodeView: View {
     return VStack {
       if currentRoom.roomQR != nil {
         Image(uiImage: currentRoom.roomQR!)
-        //.interpolation(.none)
-        //.resizable()
-        //.scaledToFit()
-        //.frame(width: 200, height: 200)
-        
       }
       Text(currentRoom.roomCode)
         .font(.title)
-        
+      
       Spacer()
       List {
         Button(action: {

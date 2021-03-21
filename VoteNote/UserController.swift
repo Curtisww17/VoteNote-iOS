@@ -20,6 +20,7 @@ struct UserController: View {
   @State var anonUsr: Bool
   @State var explicitSongsAllowed: Bool
   @State var notExited: Bool = false
+    @ObservedObject var songHistory: MusicQueue = MusicQueue()
     
   @State var currentView = 0
     
@@ -28,9 +29,6 @@ struct UserController: View {
       isInRoom = true
     }
     return VStack {
-        //if !hostControllerHidden.boolValue {
-            //Text("Hidden Howdy").hidden()
-        //}
         VStack {
       HStack {
         Spacer()
@@ -64,16 +62,17 @@ struct UserController: View {
       .frame(width: UIScreen.main.bounds.size.width, alignment: .top)
       
       if (currentView == 0) {
-        User_QueuePageView(votingEnabled: ObservableBoolean(boolValue: votingEnabled))
+        User_QueuePageView(songHistory: songHistory, votingEnabled: ObservableBoolean(boolValue: votingEnabled))
           .animation(.default)
           .transition(.move(edge: .leading))
       } else {
-        User_RoomPageView(roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser, votingEnabled: votingEnabled, anonUsr: $anonUsr, notExited: $notExited, showNav: $showNav)
+        User_RoomPageView(roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser, votingEnabled: votingEnabled, anonUsr: $anonUsr, notExited: $notExited, showNav: $showNav, songHistory: songHistory)
           .animation(.default)
           .transition(.move(edge: .trailing))
         
       }
     }
+    .navigationBarBackButtonHidden(true)
     .navigationBarHidden(true).onAppear(perform: {
         notExited = false
     }).navigate(to: LandingPageView(), when: $notExited).navigationViewStyle(StackNavigationViewStyle())

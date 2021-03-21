@@ -29,29 +29,6 @@ struct AddMusicView: View {
   
   @Environment(\.presentationMode) var presentationMode
     
-    func addMusic(){
-        
-        //set the first song if nothing is playing
-        if nowPlaying == nil && selectedSongs.count > 0 {
-          print("Song Added")
-          nowPlaying = selectedSongs[0]
-          sharedSpotify.enqueue(songID: selectedSongs[0].id)
-          RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
-          sharedSpotify.skip() //need to clear out queue still before playing, clears out one song for now
-          sharedSpotify.pause()
-          selectedSongs.remove(at: 0)
-        }
-        
-        for i in selectedSongs {
-            print("Added")
-            addsong(id: i.id)
-            print("Done")
-        }
-        
-        selectedSongs.removeAll()
-        
-        self.presentationMode.wrappedValue.dismiss()
-      }
   
     /**
         Adds the selected songs to the music queue both locally and on the DB
@@ -112,23 +89,29 @@ struct AddMusicView: View {
                   .animation(.default)
                 }
                 
-                Button(action: {addMusic()}) {
+                Button(action: {songQueue.addMusic(songs: selectedSongs)
+                  selectedSongs.removeAll()
+                  presentationMode.wrappedValue.dismiss()
+                }) {
                   Text("Add Songs")
                 }
                 .padding(.trailing)
               }
               
               List {
-                //list of search results
-                //TO-DO: have a function to print all artist names
+                //if you havent searched anything display options to see songs
                 if( currentSearch == ""){
                     NavigationLink(destination: playListView(songsPerUser: songsPerUser, myPlaylists: sharedSpotify.userPlaylists?.items ?? [Playlist(id: "")])) {
                            Text("View My Playlists")
                        }
-                    /*NavigationLink(destination: likedSongsView()){
+                    NavigationLink(destination: likedSongsView(songsPerUser: songsPerUser)){
                      Text("Liked Songs")
-                     }*/
+                     }
+                    NavigationLink(destination: recomendedView(songsPerUser: songsPerUser)){
+                        Text("Reccomended")
+                    }
                 }
+                //if you have searched something display search results
                 if currentSearch != "" {
                   ForEach((sharedSpotify.recentSearch?.tracks?.items ?? [SpotifyTrack(album: SpotifyAlbum(id: "", images: []), artists: [SpotifyArtist(id: "", name: "", uri: "", type: "")], available_markets: nil, disc_number: 0, duration_ms: 0, explicit: false, href: "", id: "", name: "Searching...", popularity: 0, preview_url: "", track_number: 0, type: "", uri: "")])) { song in
                     if (song.album?.images?.count ?? 0 > 0) {
@@ -154,6 +137,7 @@ struct AddMusicView: View {
     
 }
 
+//view users locally saved playlists
 struct playListView: View {
     @State var songsPerUser: Int
     @State var myPlaylists: [Playlist]
@@ -167,44 +151,20 @@ struct playListView: View {
                             Text(playlistEntry(playlistName: list.name!, playlistID: list.id, playlistDesc: list.description!).playlistName)
                         }
                         //myPlaylist: sharedSpotify.currentPlaylist ?? uniquePlaylist(id: "" ),
-                        
-                        
                     }
-                    
                     //[playlistStub(items: [Playlist(collaborative: false, description: "", id: "", images: nil, name: "", type: "", uri: "")])]
                 }
             }
         }
-
     }
 }
 
-struct likedSongsView: View{
-    
+//view recommened songs to add to the queue
+struct recomendedView: View{
     @State var songsPerUser: Int
     @State private var isEditing = false
     @Environment(\.presentationMode) var presentationMode
     
-    func addMusic(){
-        
-        //select the first song if nothing is playing
-        if nowPlaying == nil && selectedSongs.count > 0 {
-            print("Song Added")
-            nowPlaying = selectedSongs[0]
-            sharedSpotify.enqueue(songID: selectedSongs[0].id)
-            selectedSongs.remove(at: 0)
-        }
-        
-        for i in selectedSongs {
-            print("Added")
-            addsong(id: i.id) //there's an issue here
-            print("Done")
-        }
-        
-        selectedSongs.removeAll()
-        
-        self.presentationMode.wrappedValue.dismiss()
-    }
     
     var body: some View{
         ZStack{
@@ -225,25 +185,79 @@ struct likedSongsView: View{
                         .animation(.default)
                     }
                     
-                    Button(action: {addMusic()}) {
+                  Button(action: {songQueue.addMusic(songs: selectedSongs)
+                    selectedSongs.removeAll()
+                    presentationMode.wrappedValue.dismiss()
+                  }) {
                         Text("Add Songs")
                     }
                     .padding(.trailing)
                 }
                 
                 List{
-                    ForEach((sharedSpotify.currentPlaylist?.tracks?.items ?? [songTimeAdded(track: SpotifyTrack(album: nil, id: "", name: ""))]), id: \.track.id){ songs in
+                    ForEach((sharedSpotify.recommendedSongs?.tracks ?? [SpotifyTrack(album: nil, id: "", name: "")]), id: \.id){ songs in
+                        SearchEntry(songTitle: songs.name, songArtist: (songs.artists?[0].name) ?? "", songID: songs.id, imageURL: songs.album?.images?[0].url, isExplicit: false, songsPerUser: songsPerUser)
+                    }
+                }
+            }
+        }.onAppear(perform: {
+            
+            sharedSpotify.recomendations(artistSeed: "4NHQUGzhtTLFvgF5SZesLK", genre: "classical", trackSeed: "0c6xIDDpzE81m2q797ordA",completion: {playlistSongs in sharedSpotify.recommendedSongs = playlistSongs})
+        })
+    }
+    
+}
+
+//view songs (spotify) liked by the user to add them to the queue
+struct likedSongsView: View{
+    
+    @State var songsPerUser: Int
+    @State private var isEditing = false
+    @Environment(\.presentationMode) var presentationMode
+    
+    
+    var body: some View{
+        ZStack{
+            VStack{
+                HStack {
+                    
+                    if isEditing {
+                        Button(action: {
+                            self.isEditing = false
+                            
+                            // Dismiss the keyboard
+                            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                        }) {
+                            Text("Cancel")
+                        }
+                        .padding(.trailing, 10)
+                        .transition(.move(edge: .trailing))
+                        .animation(.default)
+                    }
+                    
+                  Button(action: {songQueue.addMusic(songs: selectedSongs)
+                    selectedSongs.removeAll()
+                    presentationMode.wrappedValue.dismiss()
+                  }) {
+                        Text("Add Songs")
+                    }
+                    .padding(.trailing)
+                }
+                
+                List{
+                    ForEach((sharedSpotify.usersSavedSongs?.items ?? [songTimeAdded(track: SpotifyTrack(album: nil, id: "", name: ""))]), id: \.track.id){ songs in
                         SearchEntry(songTitle: songs.track.name, songArtist: (songs.track.artists?[0].name) ?? "", songID: songs.track.id, imageURL: songs.track.album?.images?[0].url, isExplicit: false, songsPerUser: songsPerUser)
                     }
                 }
             }
         }.onAppear(perform: {
             
-            sharedSpotify.savedSongs(completion: {playlistSongs in sharedSpotify.currentPlaylist = playlistSongs})
+            sharedSpotify.savedSongs(completion: {playlistSongs in sharedSpotify.usersSavedSongs = playlistSongs})
         })
     }
 }
 
+//view songs in a playlist to add to a queue
 struct uniquePlaylistView: View{
     
     //@State var myPlaylist: uniquePlaylist
@@ -252,26 +266,7 @@ struct uniquePlaylistView: View{
     @Environment(\.presentationMode) var presentationMode
     @State var songsPerUser: Int
     
-    func addMusic(){
-        
-        //select the first song if nothing is playing
-        if nowPlaying == nil && selectedSongs.count > 0 {
-            print("Song Added")
-            nowPlaying = selectedSongs[0]
-            sharedSpotify.enqueue(songID: selectedSongs[0].id)
-            selectedSongs.remove(at: 0)
-        }
-        
-        for i in selectedSongs {
-            print("Added")
-            addsong(id: i.id) //there's an issue here
-            print("Done")
-        }
-        
-        selectedSongs.removeAll()
-        
-        self.presentationMode.wrappedValue.dismiss()
-    }
+  
     
     var body: some View{
         ZStack{
@@ -292,7 +287,10 @@ struct uniquePlaylistView: View{
                         .animation(.default)
                     }
                     
-                    Button(action: {addMusic()}) {
+                  Button(action: {songQueue.addMusic(songs: selectedSongs)
+                    selectedSongs.removeAll()
+                    presentationMode.wrappedValue.dismiss()
+                  }) {
                         Text("Add Songs")
                     }
                     .padding(.trailing)
@@ -310,6 +308,7 @@ struct uniquePlaylistView: View{
 }
 }
 
+//formatting for displaying songs in user playlists
 struct playlistEntry: View{
     
     @State var playlistName: String

@@ -88,6 +88,7 @@ class user: Identifiable, ObservableObject {
     var profilePic: String //link to pfp
     var isAnon: Bool?       //is the user anonymized
     var anon_name: String  //the user's anonymous name
+    let uid: String?
     
     //TODO: refactor this out
     init(name: String, profilePic: String){
@@ -95,6 +96,7 @@ class user: Identifiable, ObservableObject {
         self.profilePic = profilePic
         isAnon = false
         anon_name = ""
+        uid = nil
     }
     
     //default
@@ -103,6 +105,7 @@ class user: Identifiable, ObservableObject {
         self.profilePic = profilePic
         self.isAnon = isAnon
         self.anon_name = anon_name
+        uid = nil
     }
     
     //for firestore
@@ -111,6 +114,7 @@ class user: Identifiable, ObservableObject {
         profilePic = usr["profilePic"] as! String
         isAnon = usr["isAnon"] as? Bool ?? false
         anon_name = usr["anon_name"] as? String ?? ""
+        uid = usr["uid"] as? String
     }
 }
 
@@ -210,10 +214,6 @@ func joinRoom(code: String, completion:@escaping (room?, String?) -> Void){
     let usr = FAuth.currentUser
     
     
-    var joinedRoom: room? = nil
-    
-    
-    
     let joiningQuery = db.collection("room").whereField("code", isEqualTo: upperCode)
     
     joiningQuery.getDocuments() { (query, err) in
@@ -252,34 +252,34 @@ func joinRoom(code: String, completion:@escaping (room?, String?) -> Void){
  */
 func storePrevRoom(code: String){
     let uid = FAuth.currentUser?.uid
+  
+    let upperCode = code.uppercased()
     
-    //db.collection("users").document(uid!).updateData(["prevRooms.\(code)": FieldValue.serverTimestamp()])
     
-    db.collection("users").document(uid!).collection("prevRooms").addDocument(data: ["code": code, "time": FieldValue.serverTimestamp()])
-}
-
-//TODO: this can probably be removed
-func getPrevRooms(completion: @escaping ([String]?, Error?) -> Void){
-    let uid = FAuth.currentUser?.uid
+    let joiningQuery = db.collection("room").whereField("code", isEqualTo: upperCode)
     
-    let  docRef = db.collection("users").document(uid!).collection("prevRooms").order(by: "time")
-    
-    docRef.getDocuments { (docs, err) in
-        if let err = err {
-            completion(nil, err)
+    joiningQuery.getDocuments() { (query, err) in
+        if let err = err{
+            print("err gerring documents \(err)")
+        }
+        else if query!.isEmpty { //make sure the querey returns a room
+            print("err")
         } else {
-            var rooms: [String] = []
             
-            for doc in docs!.documents {
-                if doc.data()["host"] as? String ?? "" == uid! {
-                    rooms.append(doc.data()["code"] as? String ?? "")
-                }
+            let rm = query?.documents[0].documentID
+            
+            //if we didn't find the document
+            if rm == nil{
+                print("err")
+            } else {
+                db.collection("users").document(uid!).collection("prevRooms").addDocument(data: ["code": upperCode , "time": FieldValue.serverTimestamp()])
             }
-            completion(rooms, nil)
             
         }
-    }
+        
+    }//end joiningquerey
 }
+
 
 /**
  get the rooms that have previously been joined by the current
@@ -298,7 +298,9 @@ func getPrevJoinedRooms(completion: @escaping ([String]?, Error?) -> Void){
             
             for doc in docs!.documents {
                 if doc.data()["host"] as? String ?? "" != uid! {
-                    rooms.append(doc.data()["code"] as? String ?? "")
+                  let id = doc.data()["code"] as? String ?? ""
+                    rooms.append(id)
+                    
                 }
             }
             completion(rooms, nil)
@@ -310,7 +312,7 @@ func getPrevJoinedRooms(completion: @escaping ([String]?, Error?) -> Void){
 func getPrevHostedRooms(completion: @escaping ([String]?, Error?) -> Void){
     let uid = FAuth.currentUser?.uid
     
-    let  docRef = db.collection("users").document(uid!).collection("prevRooms").whereField("host", isEqualTo: uid!).order(by: "time")
+    let  docRef = db.collection("users").document(uid!).collection("prevRooms").order(by: "time")
     
     docRef.getDocuments { (docs, err) in
         if let err = err {
@@ -319,8 +321,13 @@ func getPrevHostedRooms(completion: @escaping ([String]?, Error?) -> Void){
             var rooms: [String] = []
             
             for doc in docs!.documents {
-                rooms.append(doc.data()["code"] as? String ?? "")
+                if doc.data()["host"] as? String ?? "" != uid! {
+                    let id = doc.data()["code"] as? String ?? ""
+                    rooms.append(id)
+                    
+                }
             }
+            completion(rooms, nil)
             
         }
     }
@@ -462,6 +469,8 @@ func getUsers(completion: @escaping ([user]?, Error?) -> Void){
                 else{
                     //iterate through user documents and get their data
                     for usr in query!.documents{
+                        var usrdata = usr.data()
+                        usrdata["uid"] = usr.documentID
                         let newusr = user(usr: usr.data())
                         if (newusr.isAnon != nil) {
                             if newusr.isAnon! {
@@ -542,7 +551,7 @@ func banUser(uid: String){
  
  - Parameter id: the spotify id of the song to be added
  */
-func addsong(id: String){
+func addsong(id: String, completion: @escaping () -> () ){
 
     
     //TODO: get album art stuff
@@ -590,9 +599,11 @@ func addsong(id: String){
                         "queue.\(id)": sng
                     ])
                 }
+              completion()
             }
         }//end sharedSpotify
     }//end currRoom
+    
     
 }
 
@@ -690,7 +701,7 @@ func vetoSong(id: String){
     
     getCurrRoom { (currRoom, err) in
         
-        let rm = db.collection("room").whereField("code", isEqualTo: currRoom).getDocuments { (doc, Err) in
+        let _ = db.collection("room").whereField("code", isEqualTo: currRoom).getDocuments { (doc, Err) in
             if let err = err {
                 print("/n/nerror getting doc \(err.localizedDescription)")
             }else if !doc!.isEmpty{
@@ -721,7 +732,7 @@ func vetoSong(id: String){
 func voteSong(vote: Int, id: String){
     getCurrRoom { (currRoom, err) in
         
-        let rm = db.collection("room").whereField("code", isEqualTo: currRoom).getDocuments { (doc, Err) in
+        let _ = db.collection("room").whereField("code", isEqualTo: currRoom).getDocuments { (doc, Err) in
             if let err = err {
                 print("/n/nerror getting doc \(err.localizedDescription)")
             }else if !doc!.isEmpty{

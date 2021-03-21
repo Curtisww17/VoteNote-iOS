@@ -9,13 +9,14 @@ import Foundation
 import SwiftHTTP
 import SwiftUI
 
+//impements SwiftHTTP so that we can make easy http requests to the spotify web api
 class HttpRequester: ObservableObject {
-  
   
   init(){
     
   }
   
+  //get without header or parameters
   func GET(url: String) -> HTTP{
     HTTP.GET(url) { response in
       if let err = response.error {
@@ -28,6 +29,7 @@ class HttpRequester: ObservableObject {
     }!
   }
   
+  //get with parameters and header
   func headerParamGet(url: String, header: [String: String], param: [String: String]) -> HTTP{
     HTTP.GET(url, parameters: param, headers: header) { response in
       if let err = response.error {
@@ -37,6 +39,7 @@ class HttpRequester: ObservableObject {
     }!
   }
   
+  //get with header
   func headerGet(url: String, header: [String: String] ) -> HTTP {
     
     HTTP.GET(url, headers: header) { response in
@@ -46,10 +49,6 @@ class HttpRequester: ObservableObject {
       }
       print("opt finished: \(response.description)")
     }!
-    
-    
-    
-    
   }
   
   //not done dont use
@@ -62,8 +61,30 @@ class HttpRequester: ObservableObject {
     }
   }
   
+  
+  //put no header or parameters
   func PUT(url: String){
     HTTP.PUT(url)
+  }
+  
+  //put with header and paramters
+  func headerParamPUT(url: String, header: [String: String], param: [String: String]) -> HTTP{
+    HTTP.PUT(url, parameters: param, headers: header) { response in
+      if let err = response.error {
+        print("error: \(err.localizedDescription)")
+        return //also notify app of failure as needed
+      }
+    }!
+  }
+  
+  //put with just header
+  func headerPUT(url: String, header: [String: String]) -> HTTP{
+    HTTP.PUT(url, headers: header) { response in
+      if let err = response.error {
+        print("error: \(err.localizedDescription)")
+        return //also notify app of failure as needed
+      }
+    }!
   }
   
   

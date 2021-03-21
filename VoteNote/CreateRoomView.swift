@@ -10,122 +10,147 @@ import SwiftUI
 
 
 struct CreateRoomView: View {
-    //TODO: Create second version of this view to take in info from an existing room
+  //TODO: Create second version of this view to take in info from an existing room
   @Binding var isInRoom: Bool
   @ObservedObject var spotify: Spotify
-    @State var showAlert: Bool = false
-    
-    @State var userCapacity: Int = 20 {
-        didSet {
-            if userCapacity < 1 {
-                userCapacity = 1
-            }
-        }
-    }
-  @State var songsPerUser: Int = 4 {
+  @State var showAlert: Bool = false
+  
+  @State var userCapacity: Int = 20 {
     didSet {
-        if songsPerUser < 1 {
-            songsPerUser = 1
-        }
+      if userCapacity < 1 {
+        userCapacity = 1
+      }
     }
   }
-    
+  @State var songsPerUser: Int = 4 {
+    didSet {
+      if songsPerUser < 1 {
+        songsPerUser = 1
+      }
+    }
+  }
+  
   @State var roomName: String = ""
   @State var roomDescription: String = ""
   @State var votingEnabled: Bool = true
-    @State var madeRoom: Bool = false
+  @State var madeRoom: Bool = false
   @State var anonUsr: Bool = false
-    @State var explicitSongsAllowed: Bool = false
-    
-    @Environment(\.presentationMode) var presentationMode
-    
-    func createRoom(){
-        //TO-DO- send info to room, songs per user
-        print("Room")
-      let newRoom: room = room(name: roomName, desc: roomDescription, anonUsr: anonUsr, capacity: userCapacity, explicit: explicitSongsAllowed, voting: votingEnabled, spu: songsPerUser)
-        let newcode = makeRoom(newRoom: newRoom)
-        storePrevRoom(code: newcode)
-        madeRoom = true
-        self.presentationMode.wrappedValue.dismiss()
-    }
-    
+  @State var explicitSongsAllowed: Bool = false
+  @State var prevHostedRooms: [String] = []
+  
+  @Environment(\.presentationMode) var presentationMode
+  
+  func createRoom(){
+    //TO-DO- send info to room, songs per user
+    print("Room")
+    let newRoom: room = room(name: roomName, desc: roomDescription, anonUsr: anonUsr, capacity: userCapacity, explicit: explicitSongsAllowed, voting: votingEnabled, spu: songsPerUser)
+    let newcode = makeRoom(newRoom: newRoom)
+    storePrevRoom(code: newcode)
+    madeRoom = true
+    self.presentationMode.wrappedValue.dismiss()
+  }
+  
   var body: some View {
     //return NavigationView {
-      ZStack {
-        Color.white
-        VStack {
-            
-            Form {
-                Section(header: Text("General Room Information")) {
-                    TextField("Room Name", text: $roomName)
-                    TextField("Room Description", text: $roomDescription)
-                }
-                
-                Section(header: Text("Settings")) {
-                    HStack {
-                        Text("User Capacity")
-                            .padding(.trailing)
-                        Stepper("\(userCapacity)", onIncrement: { userCapacity+=1}, onDecrement: { userCapacity-=1})
-                            .padding(.leading)
-                    }
-                    HStack {
-                        Text("Songs Per User")
-                            .padding(.trailing)
-                        Stepper("\(songsPerUser)", onIncrement: { songsPerUser+=1}, onDecrement: { songsPerUser-=1})
-                            .padding(.leading)
-                    }
-                  
-                    HStack {
-                        Text("Explicit Songs Allowed")
-                            
-                     Toggle(isOn: $explicitSongsAllowed) {
-                        Text("")
-                     }
-                    }
-                    .padding(.trailing)
-                    
-                  HStack {
-                      Text("Anonymous Users")
-                   Toggle(isOn: $anonUsr) {
-                      Text("")
-                   }
-                  }
-                  .padding(.trailing)
-                    
-                    HStack {
-                        Text("Voting Enabled")
-                     Toggle(isOn: $votingEnabled) {
-                        Text("")
-                     }
-                    }
-                    .padding(.trailing)
-                }
-            }
-            
-            if self.roomName != "" {
-                Button(action: {createRoom()}) {
-                    Text("Create Room")
-                        
-                }.padding()
-            }
+    ZStack {
+      Color.white
+      VStack {
+        
+        Form {
+          Section(header: Text("General Room Information")) {
+            TextField("Room Name", text: $roomName)
+            TextField("Room Description", text: $roomDescription)
+          }
           
-          Spacer()
+          Section(header: Text("Settings")) {
+            HStack {
+              Text("User Capacity")
+                .padding(.trailing)
+              Stepper("\(userCapacity)", onIncrement: { userCapacity+=1}, onDecrement: { userCapacity-=1})
+                .padding(.leading)
+            }
+            HStack {
+              Text("Songs Per User")
+                .padding(.trailing)
+              Stepper("\(songsPerUser)", onIncrement: { songsPerUser+=1}, onDecrement: { songsPerUser-=1})
+                .padding(.leading)
+            }
+            
+            HStack {
+              Text("Explicit Songs Allowed")
+              
+              Toggle(isOn: $explicitSongsAllowed) {
+                Text("")
+              }
+            }
+            .padding(.trailing)
+            
+            HStack {
+              Text("Anonymous Users")
+              Toggle(isOn: $anonUsr) {
+                Text("")
+              }
+            }
+            .padding(.trailing)
+            
+            HStack {
+              Text("Voting Enabled")
+              Toggle(isOn: $votingEnabled) {
+                Text("")
+              }
+            }
+            .padding(.trailing)
+          }
+          
+          if (prevHostedRooms.count > 0) {
+            Section() {
+              NavigationLink(
+                destination: PreviouslyHostedRoomsView(codes: prevHostedRooms, isInRoom: $isInRoom)
+                  .navigationBarBackButtonHidden(true).navigationBarHidden(true),
+                label: {
+                  Text("Previously Hosted Rooms")
+                })
+            }
+          }
         }
+        
+        if self.roomName != "" {
+          Button(action: {createRoom()}) {
+            Text("Create Room")
+            
+          }.padding()
+        }
+        
+        Spacer()
+      }
       //}
-      }.navigationBarHidden(true).navigate(to: HostController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription, votingEnabled: votingEnabled, anonUsr: anonUsr, roomCapacity: userCapacity, songsPerUser: songsPerUser, explicitSongsAllowed: explicitSongsAllowed), when: $madeRoom).onAppear(perform: {sharedSpotify.pause()}).navigationViewStyle(StackNavigationViewStyle())
+    }
+    .navigationBarHidden(true)
+    .navigate(to: HostController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription, votingEnabled: votingEnabled, anonUsr: anonUsr, roomCapacity: userCapacity, songsPerUser: songsPerUser, explicitSongsAllowed: explicitSongsAllowed), when: $madeRoom)
+    .onAppear(perform: {
+      sharedSpotify.pause()
+      getPrevHostedRooms(completion: {(codes, err) in
+        if err != nil {
+          print(err as Any)
+        } else {
+          prevHostedRooms = codes ?? []
+        }
+      })
+    })
+    .navigationViewStyle(StackNavigationViewStyle())
   }
 }
-  
+
 struct CreateRoomView_PreviewContainer: View {
-    
+  
   @State var songsPerUser: Int = 4
   @State var userCapacity: Int = 20
   @State var isInRoom = false
   @State var spotify: Spotify = Spotify()
-
-    var body: some View {
-        CreateRoomView(isInRoom: $isInRoom, spotify: spotify, userCapacity: userCapacity, songsPerUser: songsPerUser)
-    }
+  
+  var body: some View {
+    CreateRoomView(isInRoom: $isInRoom, spotify: spotify, userCapacity: userCapacity, songsPerUser: songsPerUser)
+  }
 }
 
 struct CreateRoomView_Previews: PreviewProvider {
@@ -138,27 +163,27 @@ struct CreateRoomView_Previews: PreviewProvider {
 //Derived from George_E on Stack Overflow
 //Available at: https://stackoverflow.com/questions/56437335/go-to-a-new-view-using-swiftui
 extension View {
-
-    /// Navigate to a new view.
-    /// - Parameters:
-    ///   - view: View to navigate to.
-    ///   - binding: Only navigates when this condition is `true`.
-    func navigate<NewView: View>(to view: NewView, when binding: Binding<Bool>) -> some View {
-        NavigationView {
-            ZStack {
-                self
-                    .navigationBarTitle("")
-                    .navigationBarHidden(true)
-
-                NavigationLink(
-                    destination: view
-                        .navigationBarTitle("")
-                        .navigationBarHidden(true),
-                    isActive: binding
-                ) {
-                    EmptyView()
-                }
-            }
+  
+  /// Navigate to a new view.
+  /// - Parameters:
+  ///   - view: View to navigate to.
+  ///   - binding: Only navigates when this condition is `true`.
+  func navigate<NewView: View>(to view: NewView, when binding: Binding<Bool>) -> some View {
+    NavigationView {
+      ZStack {
+        self
+          .navigationBarTitle("")
+          .navigationBarHidden(true)
+        
+        NavigationLink(
+          destination: view
+            .navigationBarTitle("")
+            .navigationBarHidden(true),
+          isActive: binding
+        ) {
+          EmptyView()
         }
+      }
     }
+  }
 }
