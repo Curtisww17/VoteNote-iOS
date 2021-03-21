@@ -261,7 +261,7 @@ class Spotify: ObservableObject {
     if (track_uri.contains("spotify")) {
       track_id = String(track_uri.split(separator: ":").last!)
     }
-    print(track_id)
+    
     self.httpRequester.headerGet(url: "https://api.spotify.com/v1/tracks/\(track_id)", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? "")" ]).onFinish = { (response) in
       do {
         let decoder = JSONDecoder()
