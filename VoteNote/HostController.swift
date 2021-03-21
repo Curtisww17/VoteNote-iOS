@@ -22,6 +22,8 @@ struct HostController: View {
   @State var explicitSongsAllowed: Bool
   @State var notExited: Bool = false
   @ObservedObject var songHistory: MusicQueue = MusicQueue()
+  @State var isTiming = false
+
   
   
   @State var currentView = 1
@@ -79,8 +81,18 @@ struct HostController: View {
     }.navigationTitle("Lobby")
     .navigationBarHidden(true).onAppear(perform: {
       notExited = false
+      if (!isTiming) {
+        let _ = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+          if (!(sharedSpotify.isPaused ?? false)) {
+            sharedSpotify.currentlyPlayingPos = (sharedSpotify.currentlyPlayingPos ?? 0) + 1000
+            sharedSpotify.updateCurrentlyPlayingPosition()
+          }
+        }
+        isTiming = true
+      }
     }).navigate(to: LandingPageView(), when: $notExited).navigationViewStyle(StackNavigationViewStyle())
   }
+  
 }
 
 /*struct HostController_PreviewContainer: View {

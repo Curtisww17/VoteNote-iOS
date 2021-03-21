@@ -99,14 +99,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate,
   func playerStateDidChange(_ playerState: SPTAppRemotePlayerState) {
     //debugPrint("Track name: %@", playerState.track.name)
     sharedSpotify.isPaused = playerState.isPaused
-    
+    sharedSpotify.currentlyPlayingPos = playerState.playbackPosition
+    sharedSpotify.currentlyPlayingPercent = (Float)(playerState.playbackPosition) / (Float)(playerState.track.duration)
     sharedSpotify.getTrackInfo(track_uri: playerState.track.uri, completion: {(currPlaying) in
       if (currPlaying != nil) {
         OperationQueue.main.addOperation {
           sharedSpotify.currentlyPlaying = currPlaying
+          
         }
       }
-                               })
+    })
+    
   }
   
   
@@ -154,6 +157,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate,
   
   func appRemoteDidEstablishConnection(_ appRemote: SPTAppRemote) {
     print("connected!")
+    appRemote.playerAPI?.pause(nil)
     
     OperationQueue.main.addOperation {
       sharedSpotify.loggedIn = true
@@ -191,7 +195,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate,
     self.appRemote.connectionParameters.accessToken = session.accessToken
     //self.appRemote.authorizeAndPlayURI("")
     self.appRemote.connect()
-    print("connected session")
+    
   }
   
   func sessionManager(manager: SPTSessionManager, didFailWith error: Error) {

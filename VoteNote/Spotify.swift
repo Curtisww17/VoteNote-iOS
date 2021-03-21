@@ -42,7 +42,8 @@ class Spotify: ObservableObject {
   @Published var anon_name: String
   @Published var isPaused: Bool?
   @Published var currentlyPlaying: SpotifyTrack?
-  
+  @Published var currentlyPlayingPos: Int?
+  @Published var currentlyPlayingPercent: Float?
   
   init() {
     self.loggedIn = false
@@ -90,6 +91,20 @@ class Spotify: ObservableObject {
     }
   }
   
+  func updateCurrentlyPlayingPosition() {
+//    self.appRemote?.playerAPI?.getPlayerState( { (playStateMaybe, err) in
+//      if err != nil {
+//        if let playState = playStateMaybe as? SPTAppRemotePlayerState {
+//          self.currentlyPlayingPos = playState.playbackPosition
+//          self.currentlyPlayingPercent = (Float)(self.currentlyPlayingPos!) / (Float)(self.currentlyPlaying!.duration_ms ?? 100000)
+//        }
+//
+//
+//      }
+//    })
+    self.currentlyPlayingPercent = (Float)(self.currentlyPlayingPos!) / (Float)(self.currentlyPlaying!.duration_ms ?? 100000)
+  }
+  
   //pauses spotify player
   func pause() {
     self.appRemote?.playerAPI?.pause({ (_, error) in
@@ -99,6 +114,7 @@ class Spotify: ObservableObject {
   
   //resumes spotify player
   func resume(){
+    print("playing song")
     self.appRemote?.playerAPI?.resume({ (_, error) in
       print(error as Any)
     })
@@ -245,7 +261,7 @@ class Spotify: ObservableObject {
     if (track_uri.contains("spotify")) {
       track_id = String(track_uri.split(separator: ":").last!)
     }
-    
+    print(track_id)
     self.httpRequester.headerGet(url: "https://api.spotify.com/v1/tracks/\(track_id)", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? "")" ]).onFinish = { (response) in
       do {
         let decoder = JSONDecoder()

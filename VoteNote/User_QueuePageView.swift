@@ -23,8 +23,9 @@ struct User_QueuePageView: View {
     @ObservedObject var votingEnabled: ObservableBoolean
     @ObservedObject var selectedUser: user = user(name: "", profilePic: "")
     @ObservedObject var isHost: ObservableBoolean = ObservableBoolean(boolValue: false)
+  @State var isTiming = false
     
-    let refreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+//    let refreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
   
     /**
         Updates the music queue after a specified time interval
@@ -81,18 +82,18 @@ struct User_QueuePageView: View {
                 }
             }
             
-            Text("\(voteUpdateSeconds)").font(.largeTitle).multilineTextAlignment(.trailing).onReceive(refreshTimer) {
-                _ in
-                if self.voteUpdateSeconds > 0 {
-                    self.voteUpdateSeconds -= 1
-                } else {
-                    self.voteUpdateSeconds = 10
-                    print("Updating Queue")
-                        
-                    updateQueue()
-                    updateHistory()
-                }
-            }.hidden().frame(width: 0, height: 0)
+//            Text("\(voteUpdateSeconds)").font(.largeTitle).multilineTextAlignment(.trailing).onReceive(refreshTimer) {
+//                _ in
+//                if self.voteUpdateSeconds > 0 {
+//                    self.voteUpdateSeconds -= 1
+//                } else {
+//                    self.voteUpdateSeconds = 10
+//                    print("Updating Queue")
+//
+//                    updateQueue()
+//                    updateHistory()
+//                }
+//            }.hidden().frame(width: 0, height: 0)
             
             NowPlayingViewHost(isPlaying: isPlaying, songQueue: songQueue, isHost: isHost)
                 .padding(.bottom)
@@ -101,12 +102,14 @@ struct User_QueuePageView: View {
           .navigationBarHidden(true)
         }.onAppear(perform: {
 
-                //makes the first song in the queue the first to play
-//          if sharedSpotify.currentlyPlaying == nil && songQueue.musicList.count > 0 /*&& (songsList ?? []).count > 0*/ {
-//                    nowPlaying = songQueue.musicList[0]
-//                    sharedSpotify.enqueue(songID: songQueue.musicList[0].id)
-//                    vetoSong(id: songQueue.musicList[0].id)
-//                }
+          if (!isTiming) {
+            let _ = Timer.scheduledTimer(withTimeInterval: 10.0, repeats: true) { timer in
+              songQueue.updateQueue()
+              updateHistory()
+              print("Queue Updated!")
+            }
+            isTiming = true
+          }
                 print("Updating Queue...")
                 updateQueue()
                 print("Queue Updated!")
