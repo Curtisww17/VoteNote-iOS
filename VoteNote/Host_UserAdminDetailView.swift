@@ -19,6 +19,7 @@ struct HostUserDetailView: View {
   @ObservedObject var votingEnabled: ObservableBoolean
   @ObservedObject var songHistory: MusicQueue
   @State var voteUpdateSeconds = 10
+  @State var showingBanUserAlert: Bool = false
 
     func updateHistory() {
         getHistory(){(songs, err) in
@@ -71,7 +72,7 @@ struct HostUserDetailView: View {
                         List {
                             ForEach(songQueue.musicList) { song in
                                 if song.addedBy == getUID() {
-                                    QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: hostControllerHidden, isDetailView: true, isUserQueue: false, isHistoryView: false, votingEnabled: votingEnabled, selectedUser: user)
+                                    QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: hostControllerHidden, isDetailView: true, isUserQueue: false, isHistoryView: false, votingEnabled: votingEnabled, selectedUser: user, localVotes: ObservableInteger(intValue: song.numVotes!))
                                 }
                             }
                         }
@@ -81,13 +82,13 @@ struct HostUserDetailView: View {
                         List {
                             ForEach(songHistory.musicList) { song in
                                 if song.addedBy == getUID() {
-                                    QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songHistory, isViewingUser: hostControllerHidden, isDetailView: true, isUserQueue: false, isHistoryView: true, votingEnabled: ObservableBoolean(boolValue: false), selectedUser: user)
+                                    QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songHistory, isViewingUser: hostControllerHidden, isDetailView: true, isUserQueue: false, isHistoryView: true, votingEnabled: ObservableBoolean(boolValue: false), selectedUser: user, localVotes: ObservableInteger(intValue: song.numVotes!))
                                 }
                             }
                         }
                     }
                     
-                    Button(action: {banSelectedUser()}) {
+                    Button(action: {showingBanUserAlert = true}) {
                         Text("Ban User")
                             .foregroundColor(Color.red)
                     }
@@ -98,7 +99,13 @@ struct HostUserDetailView: View {
             updateHistory()
         }).navigate(to: Host_QueuePageView(songHistory: songHistory, votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue)), when: $shouldReturn).onAppear(perform: {
         shouldReturn = false
-    }).navigationBarHidden(true).navigationViewStyle(StackNavigationViewStyle())
+    }).navigationBarHidden(true).navigationViewStyle(StackNavigationViewStyle()).alert(isPresented:$showingBanUserAlert) {
+        Alert(title: Text("Are you sure you want to ban this user from the room? This action cannot be undone."), primaryButton: .destructive(Text("Ban")) {
+                banSelectedUser()
+        }, secondaryButton: .cancel() {
+            showingBanUserAlert = false
+        })
+    }
   }
 }
 
