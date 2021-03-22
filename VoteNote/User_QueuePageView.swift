@@ -77,7 +77,7 @@ struct User_QueuePageView: View {
                 
                 List {
                     ForEach(songQueue.musicList) { song in
-                        QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: isViewingUser, isDetailView: false, isUserQueue: true, isHistoryView: false, votingEnabled: votingEnabled, selectedUser: selectedUser)
+                        QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: isViewingUser, isDetailView: false, isUserQueue: true, isHistoryView: false, votingEnabled: votingEnabled, selectedUser: selectedUser, localVotes: ObservableInteger(intValue: song.numVotes!))
                                 }
                 }
             }

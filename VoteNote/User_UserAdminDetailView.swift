@@ -68,7 +68,7 @@ struct UserUserDetailView: View {
                         List {
                             ForEach(songQueue.musicList) { song in
                                 if song.addedBy == getUID() {
-                                    QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: hostControllerHidden, isDetailView: true, isUserQueue: true, isHistoryView: false, votingEnabled: votingEnabled, selectedUser: user)
+                                    QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: hostControllerHidden, isDetailView: true, isUserQueue: true, isHistoryView: false, votingEnabled: votingEnabled, selectedUser: user, localVotes: ObservableInteger(intValue: song.numVotes!))
                                 }
                             }
                         }
@@ -78,7 +78,7 @@ struct UserUserDetailView: View {
                         List {
                             ForEach(songHistory.musicList) { song in
                                 if song.addedBy == getUID() {
-                                    QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songHistory, isViewingUser: hostControllerHidden, isDetailView: true, isUserQueue: true, isHistoryView: true, votingEnabled: ObservableBoolean(boolValue: false), selectedUser: user)
+                                    QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songHistory, isViewingUser: hostControllerHidden, isDetailView: true, isUserQueue: true, isHistoryView: true, votingEnabled: ObservableBoolean(boolValue: false), selectedUser: user, localVotes: ObservableInteger(intValue: song.numVotes!))
                                 }
                             }
                         }

@@ -44,3 +44,15 @@ class ObservableBoolean: ObservableObject {
         self.boolValue = boolValue
     }
 }
+
+class ObservableInteger: ObservableObject {
+    var intValue: Int
+    
+    init(intValue: Int) {
+        if intValue != nil {
+            self.intValue = intValue
+        } else {
+            self.intValue = 0
+        }
+    }
+}

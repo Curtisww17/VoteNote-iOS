@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 
+//var nowPlayingIsMinimized: Bool = true
 var isPlaying: Bool = false //should be false by default
 //TO-DO: enqueue next song when only so much time is left
 var songQueue: MusicQueue = MusicQueue()
@@ -58,8 +59,8 @@ struct Host_QueuePageView: View {
             Form {
                 List {
                     ForEach(songQueue.musicList) { song in
-                        QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: isViewingUser, isDetailView: false, isUserQueue: false, isHistoryView: false, votingEnabled: votingEnabled, selectedUser: selectedUser)
-                                }
+                        QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: isViewingUser, isDetailView: false, isUserQueue: false, isHistoryView: false, votingEnabled: votingEnabled, selectedUser: selectedUser, localVotes: ObservableInteger(intValue: song.numVotes!))
+                    }
                 }
             }
             
@@ -236,14 +237,17 @@ struct QueueEntry: View {
     
     @State var selectedUser: user
     
+    @ObservedObject var localVotes: ObservableInteger
+    
     /**
         Calls the DB to upvote the current song
      */
     //TO-DO: limit number of upvotes
     func upVoteSong(){
         print("Upvote Song")
+        localVotes.intValue = localVotes.intValue + 1
         voteSong(vote: 1, id: curSong.id)
-        print("Number of Votes for selected song: \(curSong.numVotes)")
+        songQueue.updateQueue()
     }
     
     /**
@@ -252,7 +256,9 @@ struct QueueEntry: View {
     //TO-DO: limit number of downvotes
     func downVoteSong(){
         print("Downvote Song")
+        localVotes.intValue = localVotes.intValue - 1
         voteSong(vote: -1, id: curSong.id)
+        songQueue.updateQueue()
     }
     
     /**
@@ -283,6 +289,7 @@ struct QueueEntry: View {
     }
     
     var body: some View {
+    
         
         ZStack {
             VStack {
@@ -306,19 +313,20 @@ struct QueueEntry: View {
                     Spacer()
                     
                     if votingEnabled.boolValue {
-                        if curSong.numVotes == nil || curSong.numVotes == 0 {
+                        Text("\(localVotes.intValue)")
+                        /*if curSong.numVotes == nil || curSong.numVotes == 0 {
                             Text("\(0)")
                         } else {
                             Text("\(curSong.numVotes!)")
-                        }
-                        Button(action: {upVoteSong()}) {
-                            Image(systemName: "hand.thumbsup").resizable().frame(width: 30.0, height: 30.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
-                        }.onTapGesture {
+                        }*/
+                        /*Button(action: {upVoteSong()}) {
+                            */Image(systemName: "hand.thumbsup").resizable().frame(width: 30.0, height: 30.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)/*
+                        }*/.onTapGesture {
                             upVoteSong()
                         }
-                        Button(action: {downVoteSong()}) {
-                            Image(systemName: "hand.thumbsdown").resizable().frame(width: 30.0, height: 30.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
-                        }.onTapGesture {
+                        /*Button(action: {downVoteSong()}) {
+                            */Image(systemName: "hand.thumbsdown").resizable().frame(width: 30.0, height: 30.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)/*
+                        }*/.onTapGesture {
                             downVoteSong()
                         }
                     }
@@ -342,15 +350,15 @@ struct QueueEntry: View {
                             }
                             
                             if !isDetailView {
-                                Button(action: {viewUser()}) {
+                                /*Button(action: {viewUser()}) {
                                     Text("User").foregroundColor(Color.black).scaleEffect(scale)
                                 }.padding(.all).border(/*@START_MENU_TOKEN@*/Color.black/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/).onTapGesture {
                                     viewUser()
-                                }.frame(width: 80, height: 80)
-                                
-                                /*NavigationLink(destination: HostUserDetailView(user: selectedUser, songQueue: songQueue, votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue), displayHostController: displayHostController)) {
-                                    Text("User").scaleEffect(scale)
                                 }.frame(width: 80, height: 80)*/
+                                
+                                NavigationLink(destination: HostUserDetailView(user: selectedUser, songQueue: songQueue, votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue), songHistory: songQueue)) {
+                                    Text("User").scaleEffect(scale)
+                                }.frame(width: 80, height: 80)
                             }
                         }
                         .padding(.leading)
