@@ -147,10 +147,20 @@ class MusicQueue: Identifiable, ObservableObject {
             }
           }
       }
-    if((sharedSpotify.currentlyPlayingPercent ?? 0) > 0.50 && currSongID != sharedSpotify.currentlyPlaying?.id ?? "notPlaying"){
-        currSongID = sharedSpotify.currentlyPlaying?.id ?? ""
-        sharedSpotify.enqueue(songID: self.musicList[0].id) {
-          dequeue(id: self.musicList[0].id)
+    if(self.musicList.count > 0){
+        if((sharedSpotify.currentlyPlayingPercent ?? 0) > 0.50 && currSongID != sharedSpotify.currentlyPlaying?.id ?? "notPlaying"){
+            currSongID = sharedSpotify.currentlyPlaying?.id ?? ""
+            sharedSpotify.enqueue(songID: self.musicList[0].id) {
+              dequeue(id: self.musicList[0].id)
+            }
+        }
+    } else {
+        if((sharedSpotify.currentlyPlayingPercent ?? 0) > 0.50 && currSongID != sharedSpotify.currentlyPlaying?.id ?? "notPlaying"){
+            var pos = Int.random(in: 0..<(sharedSpotify.PlaylistBase?.tracks?.items?.count ?? 1))
+            currSongID = sharedSpotify.PlaylistBase?.tracks?.items?[pos].track.id ?? ""
+            sharedSpotify.enqueue(songID: sharedSpotify.PlaylistBase?.tracks?.items?[pos].track.id ?? "") {
+              dequeue(id: sharedSpotify.PlaylistBase?.tracks?.items?[pos].track.id ?? "")
+            }
         }
     }
   }
