@@ -115,6 +115,12 @@ struct Host_RoomPageView: View {
             }
             
             HStack{
+              Text("Base Playlist")
+              Spacer()
+                Text("\(sharedSpotify.PlaylistBase?.name ?? "no base")")
+            }
+            
+            HStack{
                 if votingEnabled {
                     Text("Voting Enabled")
                 } else {
