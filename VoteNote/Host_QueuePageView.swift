@@ -11,6 +11,7 @@ import SwiftUI
 var isPlaying: Bool = false //should be false by default
 //TO-DO: enqueue next song when only so much time is left
 var songQueue: MusicQueue = MusicQueue()
+var timeTracker = true
 /**
     The UI for the host's version of the Queue View
  */
@@ -19,7 +20,6 @@ struct Host_QueuePageView: View {
     @ObservedObject var spotify = sharedSpotify
     //@State var historyRefreshSeconds = 30
     @State var queueRefreshSeconds = 10
-    @State var timeTracker = 0
     //@ObservedObject var songQueue: MusicQueue = MusicQueue()
     var songHistory: MusicQueue
     @ObservedObject var isViewingUser: ObservableBoolean = ObservableBoolean(boolValue: false)
@@ -57,12 +57,10 @@ struct Host_QueuePageView: View {
                 }
             }
         }
-        if(timeTracker == 2){
-            timeTracker == 0
-        }
-        if(songQueue.musicList.count > 0 && timeTracker == 0){
-            timeTracker = 1
-            print("timer stater for \((sharedSpotify.currentlyPlaying?.duration_ms ?? -1)/1000) seconds")
+        print(timeTracker)
+        if(songQueue.musicList.count > 0 && timeTracker == true){
+            timeTracker = false
+            print("timer stater for \((sharedSpotify.currentlyPlaying?.duration_ms ?? 0)/1000) seconds")
             DispatchQueue.main.asyncAfter(deadline: .now() + (Double((sharedSpotify.currentlyPlaying?.duration_ms ?? 0))/1000.0)) {
             print("song ended")
             songQueue.skipSong()
@@ -422,6 +420,8 @@ struct NowPlayingViewHost: View {
      */
     func skipSong(){
       songQueue.skipSong()
+        print("skiped")
+      timeTracker = true
       RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
     }
     
