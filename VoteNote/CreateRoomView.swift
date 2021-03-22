@@ -75,6 +75,17 @@ struct CreateRoomView: View {
                 .padding(.leading)
             }
             
+            HStack{
+                NavigationLink(
+                    destination: playListBaseView(songsPerUser: songsPerUser, myPlaylists: sharedSpotify.userPlaylists?.items ?? [Playlist(id: "")])
+                    .navigationBarBackButtonHidden(true).navigationBarHidden(true),
+                  label: {
+                    Text("Base Room Off Playlist")
+                  }).onAppear(perform: {
+                    sharedSpotify.userPlaylists(completion: {playlist in sharedSpotify.userPlaylists = playlist}, limit: "10")
+                  })
+            }
+            
             HStack {
               Text("Explicit Songs Allowed")
               
@@ -184,4 +195,26 @@ extension View {
       }
     }
   }
+}
+
+struct playListBaseView: View {
+    @State var songsPerUser: Int
+    @State var myPlaylists: [Playlist]
+    
+    @Environment(\.presentationMode) var presentationMode
+    
+    var body: some View {
+        ZStack{
+            VStack{
+                List{
+                    ForEach(((sharedSpotify.userPlaylists?.items ?? [Playlist(description: "", id: "", images: nil, name: "", type: "", uri: "")]))) { list in
+                        Button(list.name ?? "") {
+                            sharedSpotify.playlistSongs(completion: {playlistSongs in sharedSpotify.PlaylistBase = playlistSongs}, id: list.id)
+                            self.presentationMode.wrappedValue.dismiss()
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
