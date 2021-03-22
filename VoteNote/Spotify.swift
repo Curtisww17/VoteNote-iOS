@@ -182,7 +182,6 @@ class Spotify: ObservableObject {
         let decoder = JSONDecoder()
         try completion( decoder.decode(playlistTrackTime.self, from: response.data))
       } catch {
-        print("\(self.appRemote?.connectionParameters.accessToken ?? "")")
         fatalError("Couldn't parse \(response.description)")
       }
     }

@@ -102,7 +102,6 @@ struct Host_QueuePageView: View {
                     self.queueRefreshSeconds -= 1
                 } else {
                     self.queueRefreshSeconds = 10
-                    print("Updating Queue")
                         
                     updateQueue()
                     updateHistory()
@@ -121,9 +120,7 @@ struct Host_QueuePageView: View {
                     sharedSpotify.enqueue(songID: songQueue.musicList[0].id)
                     vetoSong(id: songQueue.musicList[0].id)
                 }*/
-                print("Updating Queue...")
                 updateQueue()
-                print("Queue Updated!")
                 
         }).navigate(to: HostUserDetailView(user: selectedUser, songQueue: songQueue, votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue), songHistory: songHistory), when: $isViewingUser.boolValue).navigationViewStyle(StackNavigationViewStyle())
     }
