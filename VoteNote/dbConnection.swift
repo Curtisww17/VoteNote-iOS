@@ -266,13 +266,19 @@ func storePrevRoom(code: String){
             print("err")
         } else {
             
-            let rm = query?.documents[0].documentID
+            let rm = query?.documents[0]
+            
+            
             
             //if we didn't find the document
-            if rm == nil{
+            if rm?.documentID == nil{
                 print("err")
             } else {
-                db.collection("users").document(uid!).collection("prevRooms").addDocument(data: ["code": upperCode , "time": FieldValue.serverTimestamp()])
+                let isHost: Bool;
+                if rm!.data()["host"] as? String ?? "" == uid! {
+                    isHost = true
+                } else {isHost = false}
+                db.collection("users").document(uid!).collection("prevRooms").addDocument(data: ["code": upperCode , "time": FieldValue.serverTimestamp(), "isHost": isHost])
             }
             
         }
@@ -297,7 +303,8 @@ func getPrevJoinedRooms(completion: @escaping ([String]?, Error?) -> Void){
             var rooms: [String] = []
             
             for doc in docs!.documents {
-                if doc.data()["host"] as? String ?? "" != uid! {
+                //if they did not host the room
+                if !(doc.data()["isHost"] as? Bool ?? true) {
                   let id = doc.data()["code"] as? String ?? ""
                     rooms.append(id)
                     
@@ -309,6 +316,9 @@ func getPrevJoinedRooms(completion: @escaping ([String]?, Error?) -> Void){
     }
 }
 
+/**
+ get the rooms the user has previously hosted
+ */
 func getPrevHostedRooms(completion: @escaping ([String]?, Error?) -> Void){
     let uid = FAuth.currentUser?.uid
     
@@ -321,7 +331,8 @@ func getPrevHostedRooms(completion: @escaping ([String]?, Error?) -> Void){
             var rooms: [String] = []
             
             for doc in docs!.documents {
-                if doc.data()["host"] as? String ?? "" != uid! {
+                //if they hosted this room
+                if (doc.data()["isHost"] as? Bool ?? false) {
                     let id = doc.data()["code"] as? String ?? ""
                     rooms.append(id)
                     
@@ -456,33 +467,36 @@ func getUsers(completion: @escaping ([user]?, Error?) -> Void){
     getCurrRoom { (code, err) in
         
         getRoom(code: code) { (currRoom, err) in
-            
-            //find all users that have their currentRoom set = to the current room
-            let usrQuery = db.collection("users").whereField("currentRoom", isEqualTo: code)
-            
-            usrQuery.getDocuments() { (query, err) in
+            if currRoom == nil {
+                print("no Room found for getUsers")
+            } else {
+                //find all users that have their currentRoom set = to the current room
+                let usrQuery = db.collection("users").whereField("currentRoom", isEqualTo: code)
                 
-                if let err = err{
-                    print("err gerring documents \(err)")
-                    completion(nil, err)
-                }
-                else{
-                    //iterate through user documents and get their data
-                    for usr in query!.documents{
-                        var usrdata = usr.data()
-                        usrdata["uid"] = usr.documentID
-                        let newusr = user(usr: usr.data())
-                        if (newusr.isAnon != nil) {
-                            if newusr.isAnon! {
+                usrQuery.getDocuments() { (query, err) in
+                    
+                    if let err = err{
+                        print("err gerring documents \(err)")
+                        completion(nil, err)
+                    }
+                    else{
+                        //iterate through user documents and get their data
+                        for usr in query!.documents{
+                            var usrdata = usr.data()
+                            usrdata["uid"] = usr.documentID
+                            let newusr = user(usr: usr.data())
+                            if (newusr.isAnon != nil) {
+                                if newusr.isAnon! {
+                                    newusr.name = newusr.anon_name
+                                }
+                            }
+                            if (currRoom!.anonUsr) {
                                 newusr.name = newusr.anon_name
                             }
+                            users.append(newusr)
                         }
-                        if (currRoom!.anonUsr) {
-                            newusr.name = newusr.anon_name
-                        }
-                        users.append(newusr)
+                        completion(users, nil)
                     }
-                    completion(users, nil)
                 }
                 
             }
@@ -762,16 +776,23 @@ func getQueue(completion: @escaping ([song]?, Error?) -> Void){
                 print("\n\n\n Error Getting Queue \(err)")
                 completion(nil, err)
             } else {
-                //grab the queue from the room
-                let queue = docs?.documents[0].data()["queue"] as? [String: Any]
-                var songs: [song] = []
-                if queue != nil {
-                    //iterate through the queue and convert it into an array of song
-                    for (id, s) in queue!{
-                        songs.append(song(sng: s as! [String: Any], id: id))
+                //if no documents were returned from the querey
+                if docs?.documents.isEmpty ?? true {
+                    print("No documents found for getQueue")
+                    completion(nil, nil)
+                }else{
+                
+                    //grab the queue from the room
+                    let queue = docs?.documents[0].data()["queue"] as? [String: Any]
+                    var songs: [song] = []
+                    if queue != nil {
+                        //iterate through the queue and convert it into an array of song
+                        for (id, s) in queue!{
+                            songs.append(song(sng: s as! [String: Any], id: id))
+                        }
                     }
+                    completion(songs, nil)
                 }
-                completion(songs, nil)
             }
             completion(nil, nil)
         }
@@ -795,22 +816,28 @@ func getHistory(completion: @escaping ([song]?, Error?) -> Void){
                 print("\n\n\n Error Getting History \(err)")
                 completion(nil, err)
             } else {
-                //grab the history from the room
-                let queue = docs?.documents[0].data()["history"] as? [String: Any]
-                var songs: [song] = []
-                if queue != nil {
-                    //iterate through the queue and convert it into an array of song
-                    for (id, s) in queue!{
-                        songs.append(song(sng: s as! [String: Any], id: id))
+                //if no documents were returned from the querey
+                if docs?.documents.isEmpty ?? true {
+                    print("No documents found for getHistory")
+                    completion(nil, nil)
+                }else{
+                    //grab the history from the room
+                    let queue = docs?.documents[0].data()["history"] as? [String: Any]
+                    var songs: [song] = []
+                    if queue != nil {
+                        //iterate through the queue and convert it into an array of song
+                        for (id, s) in queue!{
+                            songs.append(song(sng: s as! [String: Any], id: id))
+                        }
+                    } else {
+                        print("\n\n\n Error Getting History")
+                        enum newError: Error {
+                            case documentError(String)
+                        }
+                        completion(nil, newError.documentError("history does not exist"))
                     }
-                } else {
-                    print("\n\n\n Error Getting History")
-                    enum newError: Error {
-                        case documentError(String)
-                    }
-                    completion(nil, newError.documentError("history does not exist"))
+                    completion(songs, nil)
                 }
-                completion(songs, nil)
             }
             completion(nil, nil)
         }
