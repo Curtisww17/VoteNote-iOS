@@ -9,6 +9,15 @@
           "revision": "a2144ddaa7c43a6ee00873edd4cc7815ad97942f",
           "version": "1.0.7"
         }
+      },
+      {
+        "package": "PartialSheet",
+        "repositoryURL": "https://github.com/AndreaMiotto/PartialSheet.git",
+        "state": {
+          "branch": null,
+          "revision": "936465232b6399e402e79d5b031622af9a5e9960",
+          "version": "2.1.11"
+        }
       }
     ]
   },

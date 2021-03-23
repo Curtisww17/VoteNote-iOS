@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import PartialSheet
 
 /**
     The UI for the host's version of the Queue View
@@ -23,7 +24,8 @@ struct User_QueuePageView: View {
     @ObservedObject var votingEnabled: ObservableBoolean
     @ObservedObject var selectedUser: user = user(name: "", profilePic: "")
     @ObservedObject var isHost: ObservableBoolean = ObservableBoolean(boolValue: false)
-  @State var isTiming = false
+    @State var isTiming = false
+    @State var canMaximize: Bool = false
     
 //    let refreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
   
@@ -95,7 +97,7 @@ struct User_QueuePageView: View {
 //                }
 //            }.hidden().frame(width: 0, height: 0)
             
-            NowPlayingViewHost(isPlaying: isPlaying, songQueue: songQueue, isHost: isHost)
+            NowPlayingViewHostMinimized(isPlaying: isPlaying, songQueue: songQueue, isHost: isHost, isMaximized: $canMaximize, sheetManager: PartialSheetManager())
                 .padding(.bottom)
             
           }
