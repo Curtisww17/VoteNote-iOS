@@ -204,8 +204,10 @@ struct recomendedView: View{
                             }
                         }
                         else {
-                            if (!explicitSongsAllowed && !songs.explicit!) || explicitSongsAllowed {
-                                SearchEntry(songTitle: songs.name, songArtist: (songs.artists?[0].name)!, songID: songs.id, imageURL: nil, isExplicit: songs.explicit!, songsPerUser: songsPerUser)
+                            if (songs.explicit != nil) {
+                                if (!explicitSongsAllowed && !songs.explicit!) || explicitSongsAllowed {
+                                    SearchEntry(songTitle: songs.name, songArtist: (songs.artists?[0].name)!, songID: songs.id, imageURL: nil, isExplicit: songs.explicit!, songsPerUser: songsPerUser)
+                                }
                             }
                         }
                     }
@@ -264,8 +266,10 @@ struct likedSongsView: View{
                             }
                         }
                         else {
-                            if (!explicitSongsAllowed && !songs.track.explicit!) || explicitSongsAllowed {
-                                SearchEntry(songTitle: songs.track.name, songArtist: (songs.track.artists?[0].name)!, songID: songs.track.id, imageURL: nil, isExplicit: songs.track.explicit!, songsPerUser: songsPerUser)
+                            if (songs.track.explicit != nil) {
+                                if (!explicitSongsAllowed && !songs.track.explicit!) || explicitSongsAllowed {
+                                    SearchEntry(songTitle: songs.track.name, songArtist: (songs.track.artists?[0].name)!, songID: songs.track.id, imageURL: nil, isExplicit: songs.track.explicit!, songsPerUser: songsPerUser)
+                                }
                             }
                         }
                     }
@@ -326,8 +330,10 @@ struct uniquePlaylistView: View{
                             }
                         }
                         else {
-                            if (!explicitSongsAllowed && !songs.track.explicit!) || explicitSongsAllowed {
-                                SearchEntry(songTitle: songs.track.name, songArtist: (songs.track.artists?[0].name)!, songID: songs.track.id, imageURL: nil, isExplicit: songs.track.explicit!, songsPerUser: songsPerUser)
+                            if (songs.track.explicit != nil) {
+                                if (!explicitSongsAllowed && !songs.track.explicit!) || explicitSongsAllowed {
+                                    SearchEntry(songTitle: songs.track.name, songArtist: (songs.track.artists?[0].name)!, songID: songs.track.id, imageURL: nil, isExplicit: songs.track.explicit!, songsPerUser: songsPerUser)
+                                }
                             }
                         }
                 }
