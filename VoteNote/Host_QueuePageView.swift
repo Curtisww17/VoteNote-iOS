@@ -170,6 +170,9 @@ class MusicQueue: Identifiable, ObservableObject {
               dequeue(id: sharedSpotify.PlaylistBase?.tracks?.items?[pos].track.id ?? "")
             }
         }
+    } else if(sharedSpotify.currentlyPlayingPercent ?? 0 > 0.50 ){
+        print("no music to add")
+        //self.currentlyPlaying = nil
     }
   }
   
