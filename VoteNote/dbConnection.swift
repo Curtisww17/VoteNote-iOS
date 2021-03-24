@@ -214,9 +214,7 @@ func joinRoom(code: String, completion:@escaping (room?, String?) -> Void){
     let usr = FAuth.currentUser
     
     
-    let joiningQuery = db.collection("room").whereField("code", isEqualTo: upperCode)
-    
-    joiningQuery.getDocuments() { (query, err) in
+    db.collection("room").document(upperCode).getDocument(completion: { (doc, err) in
         if let err = err{
             print("err gerring documents \(err)")
             completion(nil, err.localizedDescription)
@@ -228,7 +226,7 @@ func joinRoom(code: String, completion:@escaping (room?, String?) -> Void){
             
             //if joining a nonexistent room this will crash rn
             //TODO: fix this crash
-            let rm = query?.documents[0].data()
+            let rm = doc?.data()
             
             //check if banned
             for u in (rm?["bannedUsers"] as? [String] ?? []){
@@ -241,7 +239,7 @@ func joinRoom(code: String, completion:@escaping (room?, String?) -> Void){
             completion(room(rm: rm!), nil)
         }
         
-    }
+    })
     
 }
 
@@ -354,33 +352,31 @@ func getPrevHostedRooms(completion: @escaping ([String]?, Error?) -> Void){
  */
 func getRoom(code: String, completion: @escaping (room?, Error?) -> Void){
     
+    if code == "" {
+        print("getRoom was called with no code given")
+        completion(nil, nil)
+    } else {
     
-    let joiningQuery = db.collection("room").whereField("code", isEqualTo: code)
-    
-    joiningQuery.getDocuments() { (query, err) in
+    db.collection("room").document(code).getDocument { (doc, err) in
         if let err = err{
             print("err gerring documents \(err)")
             completion(nil, err)
         }
-        else if query!.isEmpty { //make sure the querey returns a room
-            completion(nil, nil)
+        else if !(doc?.exists ?? false) { //make sure the querey returns a room
+            enum newError: Error {
+                case documentError(String)
+            }
+            completion(nil, newError.documentError("no room with that code could be found"))
         } else {
             
-            let rm = query?.documents[0].data()
+            let rm = doc?.data()
             
-            //if we didn't find the document
-            if rm == nil{
-                enum newError: Error {
-                    case documentError(String)
-                }
-                completion(nil, newError.documentError("no room with that code could be found"))
-            }
             
             //return the room
             completion(room(rm: rm!), nil)
         }
-        
-    }//end joiningquerey
+    }
+    }
     
     
     
@@ -414,7 +410,7 @@ func makeRoom(newRoom: room) -> String{
     }
     
     //make the room in the db
-    db.collection("room").addDocument(data: [
+    db.collection("room").document(code).setData([
                                         "name": newRoom.name,
                                         "desc": newRoom.desc ?? "",
                                         "anonUsr": newRoom.anonUsr,
@@ -637,6 +633,7 @@ func getSong(id: String, completion: @escaping (song?, Error?) -> Void){
         var songout: song? = nil
         
         //grab our room
+        //TODO: this wont work
         db.collection("room").document(currRoom).getDocument { (doc, err) in
             if let err = err {
                 print("Error getting song \(err)")
