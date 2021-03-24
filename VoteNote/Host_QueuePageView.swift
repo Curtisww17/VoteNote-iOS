@@ -154,7 +154,7 @@ class MusicQueue: Identifiable, ObservableObject {
               dequeue(id: self.musicList[0].id)
             }
         }
-    } else {
+    } else if(sharedSpotify.PlaylistBase != nil) {
         if((sharedSpotify.currentlyPlayingPercent ?? 0) > 0.50 && currSongID != sharedSpotify.currentlyPlaying?.id ?? "notPlaying"){
             var pos = Int.random(in: 0..<(sharedSpotify.PlaylistBase?.tracks?.items?.count ?? 1))
             currSongID = sharedSpotify.PlaylistBase?.tracks?.items?[pos].track.id ?? ""
