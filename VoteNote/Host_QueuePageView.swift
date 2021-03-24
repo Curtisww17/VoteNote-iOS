@@ -28,7 +28,7 @@ struct Host_QueuePageView: View {
     @ObservedObject var selectedUser: user = user(name: "", profilePic: "")
     @ObservedObject var votingEnabled: ObservableBoolean
     @ObservedObject var isHost: ObservableBoolean = ObservableBoolean(boolValue: true)
-    @State var isTiming = false
+    @Binding var isTiming: Bool
     @State var showMaxNowPlaying: Bool = false
     @EnvironmentObject var sheetManager : PartialSheetManager
 

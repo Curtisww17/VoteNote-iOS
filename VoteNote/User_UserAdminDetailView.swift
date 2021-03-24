@@ -20,6 +20,7 @@ struct UserUserDetailView: View {
   @ObservedObject var votingEnabled: ObservableBoolean
   @ObservedObject var songHistory: MusicQueue
   @State var voteUpdateSeconds = 10
+  @State var isTiming: Bool = true
       
     /**
         Updates the music queue after a specified time interval
@@ -88,7 +89,7 @@ struct UserUserDetailView: View {
         //}
     }.onAppear(perform: {
         updateHistory()
-    }).navigate(to: User_QueuePageView(songHistory: songHistory, votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue)), when: $shouldReturn).onAppear(perform: {
+    }).navigate(to: User_QueuePageView(songHistory: songHistory, votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue), isTiming: $isTiming), when: $shouldReturn).onAppear(perform: {
         shouldReturn = false
     }).navigationBarHidden(true).navigationViewStyle(StackNavigationViewStyle())
   }

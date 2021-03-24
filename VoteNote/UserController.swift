@@ -20,7 +20,8 @@ struct UserController: View {
   @State var anonUsr: Bool
   @State var explicitSongsAllowed: Bool
   @State var notExited: Bool = false
-    @ObservedObject var songHistory: MusicQueue = MusicQueue()
+  @ObservedObject var songHistory: MusicQueue = MusicQueue()
+  @State var isTimingQueue: Bool = false
     
   @State var currentView = 0
     
@@ -62,11 +63,11 @@ struct UserController: View {
       .frame(width: UIScreen.main.bounds.size.width, alignment: .top)
       
       if (currentView == 0) {
-        User_QueuePageView(songHistory: songHistory, votingEnabled: ObservableBoolean(boolValue: votingEnabled))
+        User_QueuePageView(songHistory: songHistory, votingEnabled: ObservableBoolean(boolValue: votingEnabled), isTiming: $isTimingQueue)
           .animation(.default)
           .transition(.move(edge: .leading))
       } else {
-        User_RoomPageView(roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser, votingEnabled: votingEnabled, anonUsr: $anonUsr, notExited: $notExited, showNav: $showNav, songHistory: songHistory)
+        User_RoomPageView(roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser, votingEnabled: votingEnabled, anonUsr: $anonUsr, notExited: $notExited, showNav: $showNav, songHistory: songHistory, isTiming: $isTimingQueue)
           .animation(.default)
           .transition(.move(edge: .trailing))
         

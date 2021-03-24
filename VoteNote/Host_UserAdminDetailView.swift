@@ -20,6 +20,7 @@ struct HostUserDetailView: View {
   @ObservedObject var songHistory: MusicQueue
   @State var voteUpdateSeconds = 10
   @State var showingBanUserAlert: Bool = false
+  @State var isTiming: Bool = true
 
     func updateHistory() {
         getHistory(){(songs, err) in
@@ -97,7 +98,7 @@ struct HostUserDetailView: View {
         //}
         }.onAppear(perform: {
             updateHistory()
-        }).navigate(to: Host_QueuePageView(songHistory: songHistory, votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue)), when: $shouldReturn).onAppear(perform: {
+        }).navigate(to: Host_QueuePageView(songHistory: songHistory, votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue), isTiming: $isTiming), when: $shouldReturn).onAppear(perform: {
         shouldReturn = false
     }).navigationBarHidden(true).navigationViewStyle(StackNavigationViewStyle()).alert(isPresented:$showingBanUserAlert) {
         Alert(title: Text("Are you sure you want to ban this user from the room? This action cannot be undone."), primaryButton: .destructive(Text("Ban")) {
