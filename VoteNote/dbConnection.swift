@@ -665,7 +665,7 @@ func dequeue(id: String){
     //first we get the song in doc form
     getCurrRoom { (currRoom, err) in
         
-        
+        /*
         //grab our room
         db.collection("room").whereField("code", isEqualTo: currRoom).getDocuments { (docs, err) in
             if let err = err {
@@ -696,7 +696,29 @@ func dequeue(id: String){
                 }
                 //completion(nil, nil)
             }
-        }
+        }*/
+        
+        
+        //grab the room
+        let rm = db.collection("room").document(currRoom)
+        
+        //grab the song from the queue
+        rm.collection("queue").document(id).getDocument { (doc, err) in
+            //confirm we got a document
+            if let err = err, !(doc?.exists ?? false){
+                print("error finding queue in dequeue \(err)")
+            } else {
+                //store the song
+                var sng = doc!.data()!
+                sng["time"] = FieldValue.serverTimestamp()
+                
+                //delete the song from the queue
+                rm.collection("queue").document(id).delete()
+                
+                //put the song into history
+                rm.collection("history").document(id).setData(sng)
+            }
+        }//end queue
     }//end getCurrRoom
 }
 
