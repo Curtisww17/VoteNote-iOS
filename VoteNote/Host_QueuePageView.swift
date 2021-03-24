@@ -80,7 +80,7 @@ struct Host_QueuePageView: View {
 //            }.hidden().frame(width: 0, height: 0)
             
             
-            NowPlayingViewHostMinimized(isPlaying: isPlaying, songQueue: songQueue, isHost: isHost, isMaximized: $showMaxNowPlaying, sheetManager: sheetManager)
+            NowPlayingViewHostMinimized(isPlaying: isPlaying, songQueue: songQueue, historyQueue: songHistory, isHost: isHost, isMaximized: $showMaxNowPlaying, sheetManager: sheetManager)
             
             
                // .padding()
@@ -109,7 +109,7 @@ struct Host_QueuePageView: View {
                   
           }).partialSheet(isPresented: $showMaxNowPlaying, content: {
             ZStack {
-                NowPlayingViewHostMaximized(isPlaying: isPlaying, songQueue: songQueue, isHost: isHost, isMaximized: $showMaxNowPlaying)
+                NowPlayingViewHostMaximized(isPlaying: isPlaying, songQueue: songQueue, historyQueue: songHistory, isHost: isHost, isMaximized: $showMaxNowPlaying)
             }
           }).addPartialSheet()
           .navigate(to: HostUserDetailView(user: selectedUser, songQueue: songQueue, votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue), songHistory: songHistory), when: $isViewingUser.boolValue).navigationViewStyle(StackNavigationViewStyle())
@@ -406,6 +406,7 @@ struct QueueEntry: View {
 struct NowPlayingViewHostMaximized: View {
     @State var isPlaying: Bool
     @ObservedObject var songQueue: MusicQueue
+    @ObservedObject var historyQueue: MusicQueue
     @ObservedObject var isHost: ObservableBoolean
     @State var saved: Bool = false
     @Binding var isMaximized: Bool //should start as true
@@ -439,8 +440,24 @@ struct NowPlayingViewHostMaximized: View {
     /**
         Goes back to the previous song in the Spotify Queue
      */
+    //TO-DO: method to delete from history
+    //TO-DO: update history
     func previousSong(){
-        //TODO- implement going to previous song
+        if historyQueue.musicList.count > 0 {
+            
+            //print("Current Number of Songs in Queue \(songQueue.musicList.count)")
+            
+            sharedSpotify.enqueue(songID: self.historyQueue.musicList[historyQueue.musicList.count - 1].id) {
+            sharedSpotify.skip()
+            
+            //dequeue(id: self.historyQueue.musicList[0].id)
+          }
+            //updateQueue()
+            isPlaying = false
+        }
+        else {
+          sharedSpotify.skip()
+        }
     }
     
     /**
@@ -550,6 +567,7 @@ struct NowPlayingViewHostMaximized: View {
 struct NowPlayingViewHostMinimized: View {
     @State var isPlaying: Bool
     @ObservedObject var songQueue: MusicQueue
+    @ObservedObject var historyQueue: MusicQueue
     @ObservedObject var isHost: ObservableBoolean
     @State var saved: Bool = false
     @Binding var isMaximized: Bool //should start as true
@@ -614,7 +632,7 @@ struct NowPlayingViewHostMinimized: View {
                     self.sheetManager.showPartialSheet({
                          print("normal sheet dismissed")
                     }) {
-                        NowPlayingViewHostMaximized(isPlaying: isPlaying, songQueue: songQueue, isHost: isHost, isMaximized: $isMaximized)
+                        NowPlayingViewHostMaximized(isPlaying: isPlaying, songQueue: songQueue, historyQueue: historyQueue, isHost: isHost, isMaximized: $isMaximized)
                     }
                 }
                 

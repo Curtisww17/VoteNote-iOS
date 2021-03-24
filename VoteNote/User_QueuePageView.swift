@@ -97,7 +97,7 @@ struct User_QueuePageView: View {
 //                }
 //            }.hidden().frame(width: 0, height: 0)
             
-            NowPlayingViewHostMinimized(isPlaying: isPlaying, songQueue: songQueue, isHost: isHost, isMaximized: $canMaximize, sheetManager: PartialSheetManager())
+            NowPlayingViewHostMinimized(isPlaying: isPlaying, songQueue: songQueue, historyQueue: songHistory, isHost: isHost, isMaximized: $canMaximize, sheetManager: PartialSheetManager())
                 .padding(.bottom)
             
           }
