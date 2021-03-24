@@ -101,13 +101,13 @@ struct AddMusicView: View {
               List {
                 //if you havent searched anything display options to see songs
                 if( currentSearch == ""){
-                    NavigationLink(destination: playListView(songsPerUser: songsPerUser, myPlaylists: sharedSpotify.userPlaylists?.items ?? [Playlist(id: "")])) {
+                    NavigationLink(destination: playListView(songsPerUser: songsPerUser, myPlaylists: sharedSpotify.userPlaylists?.items ?? [Playlist(id: "")], explicitSongsAllowed: $explicitSongsAllowed)) {
                            Text("View My Playlists")
                        }
-                    NavigationLink(destination: likedSongsView(songsPerUser: songsPerUser)){
+                    NavigationLink(destination: likedSongsView(songsPerUser: songsPerUser, explicitSongsAllowed: $explicitSongsAllowed)){
                      Text("Liked Songs")
                      }
-                    NavigationLink(destination: recomendedView(songsPerUser: songsPerUser)){
+                    NavigationLink(destination: recomendedView(songsPerUser: songsPerUser, explicitSongsAllowed: $explicitSongsAllowed)){
                         Text("Reccomended")
                     }
                 }
@@ -141,13 +141,14 @@ struct AddMusicView: View {
 struct playListView: View {
     @State var songsPerUser: Int
     @State var myPlaylists: [Playlist]
+    @Binding var explicitSongsAllowed: Bool
     
     var body: some View {
         ZStack{
             VStack{
                 List{
                     ForEach(((sharedSpotify.userPlaylists?.items ?? [Playlist(description: "", id: "", images: nil, name: "", type: "", uri: "")]))) { list in
-                        NavigationLink(destination: uniquePlaylistView( playlistInfo: list, songsPerUser: songsPerUser)) {
+                        NavigationLink(destination: uniquePlaylistView( playlistInfo: list, explicitSongsAllowed: $explicitSongsAllowed, songsPerUser: songsPerUser)) {
                             Text(playlistEntry(playlistName: list.name!, playlistID: list.id, playlistDesc: list.description!).playlistName)
                         }
                         //myPlaylist: sharedSpotify.currentPlaylist ?? uniquePlaylist(id: "" ),
@@ -163,6 +164,7 @@ struct playListView: View {
 struct recomendedView: View{
     @State var songsPerUser: Int
     @State private var isEditing = false
+    @Binding var explicitSongsAllowed: Bool
     @Environment(\.presentationMode) var presentationMode
     
     
@@ -196,7 +198,18 @@ struct recomendedView: View{
                 
                 List{
                     ForEach((sharedSpotify.recommendedSongs?.tracks ?? [SpotifyTrack(album: nil, id: "", name: "")]), id: \.id){ songs in
-                        SearchEntry(songTitle: songs.name, songArtist: (songs.artists?[0].name) ?? "", songID: songs.id, imageURL: songs.album?.images?[0].url, isExplicit: false, songsPerUser: songsPerUser)
+                        if (songs.album?.images?.count ?? 0 > 0) {
+                            if (!explicitSongsAllowed && !songs.explicit!) || explicitSongsAllowed {
+                                SearchEntry(songTitle: songs.name, songArtist: (songs.artists?[0].name)!, songID: songs.id, imageURL: (songs.album?.images?[0].url) ?? nil, isExplicit: songs.explicit!, songsPerUser: songsPerUser)
+                            }
+                        }
+                        else {
+                            if (songs.explicit != nil) {
+                                if (!explicitSongsAllowed && !songs.explicit!) || explicitSongsAllowed {
+                                    SearchEntry(songTitle: songs.name, songArtist: (songs.artists?[0].name)!, songID: songs.id, imageURL: nil, isExplicit: songs.explicit!, songsPerUser: songsPerUser)
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -213,6 +226,7 @@ struct likedSongsView: View{
     
     @State var songsPerUser: Int
     @State private var isEditing = false
+    @Binding var explicitSongsAllowed: Bool
     @Environment(\.presentationMode) var presentationMode
     
     
@@ -246,7 +260,18 @@ struct likedSongsView: View{
                 
                 List{
                     ForEach((sharedSpotify.usersSavedSongs?.items ?? [songTimeAdded(track: SpotifyTrack(album: nil, id: "", name: ""))]), id: \.track.id){ songs in
-                        SearchEntry(songTitle: songs.track.name, songArtist: (songs.track.artists?[0].name) ?? "", songID: songs.track.id, imageURL: songs.track.album?.images?[0].url, isExplicit: false, songsPerUser: songsPerUser)
+                        if (songs.track.album?.images?.count ?? 0 > 0) {
+                            if (!explicitSongsAllowed && !songs.track.explicit!) || explicitSongsAllowed {
+                                SearchEntry(songTitle: songs.track.name, songArtist: (songs.track.artists?[0].name)!, songID: songs.track.id, imageURL: (songs.track.album?.images?[0].url) ?? nil, isExplicit: songs.track.explicit!, songsPerUser: songsPerUser)
+                            }
+                        }
+                        else {
+                            if (songs.track.explicit != nil) {
+                                if (!explicitSongsAllowed && !songs.track.explicit!) || explicitSongsAllowed {
+                                    SearchEntry(songTitle: songs.track.name, songArtist: (songs.track.artists?[0].name)!, songID: songs.track.id, imageURL: nil, isExplicit: songs.track.explicit!, songsPerUser: songsPerUser)
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -263,6 +288,7 @@ struct uniquePlaylistView: View{
     //@State var myPlaylist: uniquePlaylist
     @State var playlistInfo: Playlist
     @State private var isEditing = false
+    @Binding var explicitSongsAllowed: Bool
     @Environment(\.presentationMode) var presentationMode
     @State var songsPerUser: Int
     
@@ -298,7 +324,18 @@ struct uniquePlaylistView: View{
                 
                 List{
                     ForEach((sharedSpotify.currentPlaylist?.tracks?.items ?? [songTimeAdded(track: SpotifyTrack(album: nil, id: "", name: ""))]), id: \.track.id){ songs in
-                        SearchEntry(songTitle: songs.track.name, songArtist: (songs.track.artists?[0].name) ?? "", songID: songs.track.id, imageURL: songs.track.album?.images?[0].url, isExplicit: false, songsPerUser: songsPerUser)
+                        if (songs.track.album?.images?.count ?? 0 > 0) {
+                            if (!explicitSongsAllowed && !songs.track.explicit!) || explicitSongsAllowed {
+                                SearchEntry(songTitle: songs.track.name, songArtist: (songs.track.artists?[0].name)!, songID: songs.track.id, imageURL: (songs.track.album?.images?[0].url) ?? nil, isExplicit: songs.track.explicit!, songsPerUser: songsPerUser)
+                            }
+                        }
+                        else {
+                            if (songs.track.explicit != nil) {
+                                if (!explicitSongsAllowed && !songs.track.explicit!) || explicitSongsAllowed {
+                                    SearchEntry(songTitle: songs.track.name, songArtist: (songs.track.artists?[0].name)!, songID: songs.track.id, imageURL: nil, isExplicit: songs.track.explicit!, songsPerUser: songsPerUser)
+                                }
+                            }
+                        }
                 }
             }
         }.onAppear(perform: {

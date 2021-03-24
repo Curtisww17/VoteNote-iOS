@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import PartialSheet
 
 //var nowPlayingIsMinimized: Bool = true
 var isPlaying: Bool = false //should be false by default
@@ -27,8 +28,9 @@ struct Host_QueuePageView: View {
     @ObservedObject var selectedUser: user = user(name: "", profilePic: "")
     @ObservedObject var votingEnabled: ObservableBoolean
     @ObservedObject var isHost: ObservableBoolean = ObservableBoolean(boolValue: true)
-  @State var isTiming = false
-    
+    @Binding var isTiming: Bool
+    @State var showMaxNowPlaying: Bool = false
+    @EnvironmentObject var sheetManager : PartialSheetManager
 
     
     let refreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
@@ -77,7 +79,10 @@ struct Host_QueuePageView: View {
 //                }
 //            }.hidden().frame(width: 0, height: 0)
             
-            NowPlayingViewHost(isPlaying: isPlaying, songQueue: songQueue, isHost: isHost)
+            
+            NowPlayingViewHostMinimized(isPlaying: isPlaying, songQueue: songQueue, historyQueue: songHistory, isHost: isHost, isMaximized: $showMaxNowPlaying, sheetManager: sheetManager)
+            
+            
                // .padding()
           }
           .frame(width: geo.size.width, height: geo.size.height)
@@ -102,7 +107,11 @@ struct Host_QueuePageView: View {
               isTiming = true
             }
                   
-          })
+          }).partialSheet(isPresented: $showMaxNowPlaying, content: {
+            ZStack {
+                NowPlayingViewHostMaximized(isPlaying: isPlaying, songQueue: songQueue, historyQueue: songHistory, isHost: isHost, isMaximized: $showMaxNowPlaying)
+            }
+          }).addPartialSheet()
           .navigate(to: HostUserDetailView(user: selectedUser, songQueue: songQueue, votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue), songHistory: songHistory), when: $isViewingUser.boolValue).navigationViewStyle(StackNavigationViewStyle())
     }
   }
@@ -394,12 +403,175 @@ struct QueueEntry: View {
 /**
     The UI for the now playing bar on the Queue page
  */
-struct NowPlayingViewHost: View {
-    @State var isMinimized: Bool = true //should start as true
+struct NowPlayingViewHostMaximized: View {
     @State var isPlaying: Bool
     @ObservedObject var songQueue: MusicQueue
+    @ObservedObject var historyQueue: MusicQueue
     @ObservedObject var isHost: ObservableBoolean
     @State var saved: Bool = false
+    @Binding var isMaximized: Bool //should start as true
+    
+    /**
+        Resumes the current song in the Spotify Queue
+     */
+    func playSong(){
+        print("Play Song")
+        sharedSpotify.resume()
+        isPlaying = true
+    }
+    
+    /**
+        Pauses the current song in the Spotify Queue
+     */
+    func pauseSong(){
+        //if nowPlaying != nil {
+        sharedSpotify.pause()
+        print("Pause")
+        isPlaying = false
+    }
+    
+    /**
+        Skips the current song in the Spotify Queue
+     */
+    func skipSong(){
+      songQueue.skipSong()
+    }
+    
+    /**
+        Goes back to the previous song in the Spotify Queue
+     */
+    //TO-DO: method to delete from history
+    //TO-DO: update history
+    func previousSong(){
+        if historyQueue.musicList.count > 0 {
+            
+            //print("Current Number of Songs in Queue \(songQueue.musicList.count)")
+            
+            sharedSpotify.enqueue(songID: self.historyQueue.musicList[historyQueue.musicList.count - 1].id) {
+            sharedSpotify.skip()
+            
+            //dequeue(id: self.historyQueue.musicList[0].id)
+          }
+            //updateQueue()
+            isPlaying = false
+        }
+        else {
+          sharedSpotify.skip()
+        }
+    }
+    
+    /**
+        Favorites the current song in the Spotify Queue
+     */
+    func favoriteSong(){
+      if(sharedSpotify.currentlyPlaying != nil){
+        sharedSpotify.likeSong(id: sharedSpotify.currentlyPlaying!.id)
+            saved = !saved
+        }
+    }
+
+    var body: some View {
+      VStack {
+        if (isHost.boolValue) {
+          HStack {
+            Color.green
+              .frame(width: UIScreen.main.bounds.width * CGFloat(sharedSpotify.currentlyPlayingPercent ?? 0), alignment: .leading)
+          }
+          .frame(width: UIScreen.main.bounds.width, height: 4, alignment: .leading)
+        }
+        ZStack {
+            Button(action: {
+                if isHost.boolValue {
+                    isMaximized = !isMaximized
+                }
+                
+            }, label: {
+                VStack {
+                  if (sharedSpotify.currentlyPlaying != nil) {
+                    RemoteImage(url: sharedSpotify.currentlyPlaying!.album!.images![0].url)
+                      .frame(width: 160, height: 160)
+                  } else {
+                    Image(systemName: "person.crop.square.fill").resizable().frame(width: 160.0, height: 160.0)
+                  }
+                    HStack {
+                        Spacer()
+                      if sharedSpotify.currentlyPlaying == nil {
+                            Text("None Selected")
+                                .padding(.leading)
+                        } else {
+                          Text(sharedSpotify.currentlyPlaying!.name)
+                                .padding(.leading)
+                        }
+                        Spacer()
+                    }
+                    
+                  if sharedSpotify.currentlyPlaying != nil {
+                    Text(sharedSpotify.currentlyPlaying!.artists!.first!.name)
+                            .font(.caption)
+                    }
+                    
+                    HStack {
+                      //Text("\(.numVotes ?? 0)")
+                        
+                        Spacer()
+                        Button(action: {previousSong()}) {
+                            Image(systemName: "backward").resizable().frame(width: 25.0, height: 20.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
+                        }
+                        Spacer()
+                      Button(action: {if !(sharedSpotify.isPaused ?? true) {
+                            pauseSong()
+                        } else {
+                            playSong()
+                        }}) {
+                            if !(sharedSpotify.isPaused ?? true) {
+                                Image(systemName: "pause").resizable().frame(width: 20.0, height: 25.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
+                            } else {
+                                Image(systemName: "play")
+                                    .resizable().frame(width: 20.0, height: 25.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
+                            }
+                        }
+                        Spacer()
+                        Button(action: {skipSong()}) {
+                            Image(systemName: "forward").resizable().frame(width: 25.0, height: 20.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
+                            
+                        }
+                        Spacer()
+                        Button(action: {favoriteSong()}) {
+                            if(!saved){
+                            Image(systemName: "heart")
+                                .foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
+                            } else {
+                                Image(systemName: "heart.fill")
+                                    .foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
+                            }
+                            
+                        }
+                    }
+                    .padding(.all)
+                }
+                .padding(.top)
+            })
+            
+        }
+      }.onAppear(perform: {
+        sharedSpotify.updateCurrentlyPlayingPosition()
+      })
+      
+      
+    }
+}
+
+/**
+    The UI for the now playing bar on the Queue page
+ */
+struct NowPlayingViewHostMinimized: View {
+    @State var isPlaying: Bool
+    @ObservedObject var songQueue: MusicQueue
+    @ObservedObject var historyQueue: MusicQueue
+    @ObservedObject var isHost: ObservableBoolean
+    @State var saved: Bool = false
+    @Binding var isMaximized: Bool //should start as true
+    let sheetManager: PartialSheetManager
     
     /**
         Resumes the current song in the Spotify Queue
@@ -456,111 +628,49 @@ struct NowPlayingViewHost: View {
         ZStack {
             Button(action: {
                 if isHost.boolValue {
-                    isMinimized = !isMinimized
+                    //isMaximized = !isMaximized
+                    self.sheetManager.showPartialSheet({
+                         print("normal sheet dismissed")
+                    }) {
+                        NowPlayingViewHostMaximized(isPlaying: isPlaying, songQueue: songQueue, historyQueue: historyQueue, isHost: isHost, isMaximized: $isMaximized)
+                    }
                 }
                 
             }, label: {
-                if isMinimized {
-                    HStack {
-                        Spacer()
-                        Spacer()
-                        Spacer()
-                        Spacer()
-                        Spacer()
-                        Spacer()
-                      if (sharedSpotify.currentlyPlaying != nil) {
-                        RemoteImage(url: (sharedSpotify.currentlyPlaying!.album?.images![0].url)!)
-                          .frame(width: 40, height: 40)
-                      } else {
-                        Image(systemName: "person.crop.square.fill").resizable().frame(width: 40.0, height: 40.0)
-                      }
-                        VStack {
-                            HStack {
-                              if sharedSpotify.currentlyPlaying == nil {
-                                    Text("None Selected").padding(.leading)
-                                } else {
-                                  Text(sharedSpotify.currentlyPlaying!.name).padding(.leading)
-                                }
-                                Spacer()
-                            }
-                            HStack {
-                              if sharedSpotify.currentlyPlaying != nil {
-                                Text(sharedSpotify.currentlyPlaying!.artists!.first!.name).font(.caption)
-                                        .foregroundColor(Color.gray).padding(.leading)
-                                }
-                                Spacer()
-                            }
-                        }
-                        Spacer()
-                        Spacer()
-                    }
-                    .padding(.vertical)
-                } else {
+                HStack {
+                    Spacer()
+                    Spacer()
+                    Spacer()
+                    Spacer()
+                    Spacer()
+                    Spacer()
+                  if (sharedSpotify.currentlyPlaying != nil) {
+                    RemoteImage(url: (sharedSpotify.currentlyPlaying!.album?.images![0].url)!)
+                      .frame(width: 40, height: 40)
+                  } else {
+                    Image(systemName: "person.crop.square.fill").resizable().frame(width: 40.0, height: 40.0)
+                  }
                     VStack {
-                      if (sharedSpotify.currentlyPlaying != nil) {
-                        RemoteImage(url: sharedSpotify.currentlyPlaying!.album!.images![0].url)
-                          .frame(width: 160, height: 160)
-                      } else {
-                        Image(systemName: "person.crop.square.fill").resizable().frame(width: 160.0, height: 160.0)
-                      }
                         HStack {
-                            Spacer()
                           if sharedSpotify.currentlyPlaying == nil {
-                                Text("None Selected")
-                                    .padding(.leading)
+                                Text("None Selected").padding(.leading)
                             } else {
-                              Text(sharedSpotify.currentlyPlaying!.name)
-                                    .padding(.leading)
+                              Text(sharedSpotify.currentlyPlaying!.name).padding(.leading)
                             }
                             Spacer()
                         }
-                        
-                      if sharedSpotify.currentlyPlaying != nil {
-                        Text(sharedSpotify.currentlyPlaying!.artists!.first!.name)
-                                .font(.caption)
-                        }
-                        
                         HStack {
-                          //Text("\(.numVotes ?? 0)")
-                            
-                            Spacer()
-                            Button(action: {previousSong()}) {
-                                Image(systemName: "backward").resizable().frame(width: 25.0, height: 20.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
+                          if sharedSpotify.currentlyPlaying != nil {
+                            Text(sharedSpotify.currentlyPlaying!.artists!.first!.name).font(.caption)
+                                    .foregroundColor(Color.gray).padding(.leading)
                             }
                             Spacer()
-                          Button(action: {if !(sharedSpotify.isPaused ?? true) {
-                                pauseSong()
-                            } else {
-                                playSong()
-                            }}) {
-                                if !(sharedSpotify.isPaused ?? true) {
-                                    Image(systemName: "pause").resizable().frame(width: 20.0, height: 25.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
-                                } else {
-                                    Image(systemName: "play")
-                                        .resizable().frame(width: 20.0, height: 25.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
-                                }
-                            }
-                            Spacer()
-                            Button(action: {skipSong()}) {
-                                Image(systemName: "forward").resizable().frame(width: 25.0, height: 20.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
-                                
-                            }
-                            Spacer()
-                            Button(action: {favoriteSong()}) {
-                                if(!saved){
-                                Image(systemName: "heart")
-                                    .foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
-                                } else {
-                                    Image(systemName: "heart.fill")
-                                        .foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
-                                }
-                                
-                            }
                         }
-                        .padding(.all)
                     }
-                    .padding(.top)
+                    Spacer()
+                    Spacer()
                 }
+                .padding(.vertical)
             })
             
         }

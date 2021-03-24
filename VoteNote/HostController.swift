@@ -23,6 +23,7 @@ struct HostController: View {
   @State var notExited: Bool = false
   @ObservedObject var songHistory: MusicQueue = MusicQueue()
   @State var isTiming = false
+  @State var isTimingQueue: Bool = false
 
   
   
@@ -68,11 +69,11 @@ struct HostController: View {
       .frame(width: UIScreen.main.bounds.size.width, alignment: .top)
       
       if (currentView == 0) {
-        Host_QueuePageView(songHistory: songHistory, votingEnabled: ObservableBoolean(boolValue: votingEnabled))
+        Host_QueuePageView(songHistory: songHistory, votingEnabled: ObservableBoolean(boolValue: votingEnabled), isTiming: $isTiming)
           .animation(.default)
           .transition(.move(edge: .leading))
       } else {
-        Host_RoomPageView(roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser, votingEnabled: votingEnabled, anonUsr: $anonUsr, showNav: $showNav, notExited: $notExited, songHistory: songHistory)
+        Host_RoomPageView(roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser, votingEnabled: votingEnabled, anonUsr: $anonUsr, showNav: $showNav, notExited: $notExited, songHistory: songHistory, isTiming: $isTiming)
           .animation(.default)
           .transition(.move(edge: .trailing))
         

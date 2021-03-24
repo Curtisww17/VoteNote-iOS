@@ -41,6 +41,7 @@
 		671BABC925D895B500964AAF /* httpRequester.swift in Sources */ = {isa = PBXBuildFile; fileRef = 671BABC825D895B500964AAF /* httpRequester.swift */; };
 		67222A2A25FEE5CE0021D963 /* QueueHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67222A2925FEE5CE0021D963 /* QueueHistoryView.swift */; };
 		674280A625FD6AB200B06405 /* User_UserAdminDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674280A525FD6AB200B06405 /* User_UserAdminDetailView.swift */; };
+		675671B5260941AA004E46C3 /* PartialSheet in Frameworks */ = {isa = PBXBuildFile; productRef = 675671B4260941AA004E46C3 /* PartialSheet */; };
 		67C1C10825F6F67D006A878B /* Host_UserAdminDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67C1C10725F6F67D006A878B /* Host_UserAdminDetailView.swift */; };
 		67DC8DA625DB3F63008C07F8 /* AddMusicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67DC8DA525DB3F63008C07F8 /* AddMusicView.swift */; };
 		88FB562525C73562007114C7 /* (null) in Resources */ = {isa = PBXBuildFile; };
@@ -133,6 +134,7 @@
 			files = (
 				4485733425C22F0E006C5C07 /* SpotifyiOS.framework in Frameworks */,
 				D738F43F41913F7DF0F59E32 /* Pods_VoteNote.framework in Frameworks */,
+				675671B5260941AA004E46C3 /* PartialSheet in Frameworks */,
 				44C07DC425E5813C00D3667A /* CodeScanner in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -290,6 +292,7 @@
 			name = VoteNote;
 			packageProductDependencies = (
 				44C07DC325E5813C00D3667A /* CodeScanner */,
+				675671B4260941AA004E46C3 /* PartialSheet */,
 			);
 			productName = VoteNote;
 			productReference = 448572AA25BF421E006C5C07 /* VoteNote.app */;
@@ -367,6 +370,7 @@
 			mainGroup = 448572A125BF421E006C5C07;
 			packageReferences = (
 				44C07DC225E5813C00D3667A /* XCRemoteSwiftPackageReference "CodeScanner" */,
+				675671B3260941AA004E46C3 /* XCRemoteSwiftPackageReference "PartialSheet" */,
 			);
 			productRefGroup = 448572AB25BF421E006C5C07 /* Products */;
 			projectDirPath = "";
@@ -900,6 +904,14 @@
 				minimumVersion = 1.0.7;
 			};
 		};
+		675671B3260941AA004E46C3 /* XCRemoteSwiftPackageReference "PartialSheet" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AndreaMiotto/PartialSheet.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.1.11;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -907,6 +919,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 44C07DC225E5813C00D3667A /* XCRemoteSwiftPackageReference "CodeScanner" */;
 			productName = CodeScanner;
+		};
+		675671B4260941AA004E46C3 /* PartialSheet */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 675671B3260941AA004E46C3 /* XCRemoteSwiftPackageReference "PartialSheet" */;
+			productName = PartialSheet;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

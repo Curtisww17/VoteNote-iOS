@@ -17,19 +17,21 @@ struct User_RoomPageView: View {
   @State var roomDescription: String
   @State var roomCapacity: Int
   @State var songsPerUser: Int
-    @State var votingEnabled: Bool
+  @State var votingEnabled: Bool
   @Binding var anonUsr: Bool
   @ObservedObject var currentRoom: CurrentRoom = CurrentRoom()
   @Binding var notExited: Bool
   
   @Binding var showNav: Bool
-    @ObservedObject var songHistory: MusicQueue
+  @ObservedObject var songHistory: MusicQueue
+  @Binding var isTiming: Bool
   
     /**
         Causes the current user to leave the room
      */
   func exitRoom() {
       leaveRoom()
+      isTiming = false
       notExited = true
   }
   
