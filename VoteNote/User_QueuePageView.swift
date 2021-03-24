@@ -73,7 +73,7 @@ struct User_QueuePageView: View {
     
   var body: some View {
     GeometryReader { geo in
-        ZStack {
+        return ZStack {
           VStack {
             Form {
                 
