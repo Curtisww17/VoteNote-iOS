@@ -591,23 +591,21 @@ func addsong(id: String, completion: @escaping () -> () ){
             
             
             //add the song to the queue
-            db.collection("room").whereField("code", isEqualTo: currRoom).getDocuments { (query, err) in
-                if let err = err {
+            db.collection("room").document(currRoom).getDocument { (doc, err) in
+                if let err = err, !(doc?.exists ?? false) {
                     print("Error getting room \(err)")
                 }else {
-                    let docid = query?.documents[0].documentID
                     //make a map to put into the db
                     let sng = ["title": title,
                                "artist": artist,
                                "length": length,
                                "addedBy": addedBy,
                                "imageurl": imageUrl,
-                               "numvotes": 0] as [String : Any]
+                               "numvotes": 0,
+                               "time": FieldValue.serverTimestamp()] as [String : Any]
                     
                     //put the map into the queue
-                    db.collection("room").document(docid!).updateData([
-                        "queue.\(id)": sng
-                    ])
+                    db.collection("room").document(currRoom).collection("queue").document(id).setData(sng)
                 }
               completion()
             }
@@ -617,7 +615,7 @@ func addsong(id: String, completion: @escaping () -> () ){
     
 }
 
-//used to get details like who posted the song
+
 /**
  gets a songs details by it's id
  
@@ -743,16 +741,9 @@ func vetoSong(id: String){
 func voteSong(vote: Int, id: String){
     getCurrRoom { (currRoom, err) in
         
-        let _ = db.collection("room").whereField("code", isEqualTo: currRoom).getDocuments { (doc, Err) in
-            if let err = err {
-                print("/n/nerror getting doc \(err.localizedDescription)")
-            }else if !doc!.isEmpty{
-                
-                let docid = doc?.documents[0].documentID
-                
-                db.collection("room").document(docid!).updateData(["queue.\(id).numvotes": FieldValue.increment(Int64(vote))])
-            }
-        }
+        let queue = db.collection("room").document(currRoom).collection("queue")
+        
+        queue.document(id).updateData(["numvotes": FieldValue.increment(Int64(vote))])
         
         
     }//end getCurrRoom
@@ -765,33 +756,18 @@ func getQueue(completion: @escaping ([song]?, Error?) -> Void){
     
     getCurrRoom { (currRoom, err) in
         
-        //find the current room doc
-        let joiningQuery = db.collection("room").whereField("code", isEqualTo: currRoom)
-        
-        joiningQuery.getDocuments { (docs, err) in
-            if let err = err {
-                print("\n\n\n Error Getting Queue \(err)")
+        db.collection("room").document(currRoom).collection("queue").order(by: "time").getDocuments { (queue, err) in
+            if let err = err, queue?.isEmpty ?? true{
+                print("error getting queue \(err)")
                 completion(nil, err)
             } else {
-                //if no documents were returned from the querey
-                if docs?.documents.isEmpty ?? true {
-                    print("No documents found for getQueue")
-                    completion(nil, nil)
-                }else{
+                var songs: [song] = []
                 
-                    //grab the queue from the room
-                    let queue = docs?.documents[0].data()["queue"] as? [String: Any]
-                    var songs: [song] = []
-                    if queue != nil {
-                        //iterate through the queue and convert it into an array of song
-                        for (id, s) in queue!{
-                            songs.append(song(sng: s as! [String: Any], id: id))
-                        }
-                    }
-                    completion(songs, nil)
+                for doc in queue!.documents {
+                    songs.append(song(sng: doc.data() , id: doc.documentID))
                 }
+                completion(songs, nil)
             }
-            completion(nil, nil)
         }
     }//end getCurrRoom
     
