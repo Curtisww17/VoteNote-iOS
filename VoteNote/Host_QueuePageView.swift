@@ -106,8 +106,16 @@ class MusicQueue: Identifiable, ObservableObject {
         updateQueue()
         isPlaying = false
       }
-      else {
-        sharedSpotify.skip()
+      else if(sharedSpotify.PlaylistBase != nil){
+        var pos = Int.random(in: 0..<(sharedSpotify.PlaylistBase?.tracks?.items?.count ?? 0))
+        currSongID = sharedSpotify.PlaylistBase?.tracks?.items?[pos].track.id ?? ""
+        sharedSpotify.enqueue(songID: currSongID) {
+          sharedSpotify.skip()
+          dequeue(id: currSongID)
+        }
+      } else {
+        //sharedSpotify.skip()
+        print("no Song to play :(")
       }
   }
   
