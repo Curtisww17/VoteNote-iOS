@@ -23,6 +23,8 @@ struct Host_RoomPageView: View {
   @ObservedObject var currentRoom: CurrentRoom = CurrentRoom()
   @Binding var notExited: Bool
   @ObservedObject var songHistory: MusicQueue
+  @Binding var isTiming: Bool
+  @State var inRoom: Bool = true
   
     /**
         Causes the current user to leave the room
@@ -30,6 +32,7 @@ struct Host_RoomPageView: View {
   func exitRoom() {
     print("Left Room")
     leaveRoom()
+    isTiming = false
     notExited = true
   }
     //@State var notExited: Bool = true
@@ -51,7 +54,9 @@ struct Host_RoomPageView: View {
             
           }
           
-          Section() {
+            Section(header: Text("Room Settings"), footer: NavigationLink(destination: EditRoomView(isInRoom: $inRoom, currentRoom: currentRoom)) {
+                Text("Edit").foregroundColor(Color.blue)
+            }) {
             NavigationLink(destination: QueueHistoryView( songHistory: songHistory)
                             .onAppear(perform: {
                               showNav = false

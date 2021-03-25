@@ -20,6 +20,7 @@ struct HostUserDetailView: View {
   @ObservedObject var songHistory: MusicQueue
   @State var voteUpdateSeconds = 10
   @State var showingBanUserAlert: Bool = false
+  @State var isTiming: Bool = true
 
     func updateHistory() {
         getHistory(){(songs, err) in

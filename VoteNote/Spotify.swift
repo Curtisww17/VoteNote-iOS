@@ -13,10 +13,6 @@ let sharedSpotify = Spotify()
 
 class Spotify: ObservableObject {
   
-  let SpotifyClientID = "badf7b737e204baf818600b2c352a985"
-  let SpotifyRedirectURL = URL(string: "VoteNote://SpotifyAuthentication")!
-  let SpotifyRedirectURLString = "VoteNote://SpotifyAuthentication"
-  
   private var httpRequester: HttpRequester
   
   //is empty if the user is not joining through link, otherwise its the room code
@@ -104,7 +100,7 @@ class Spotify: ObservableObject {
 //
 //      }
 //    })
-    self.currentlyPlayingPercent = (Float)(self.currentlyPlayingPos!) / (Float)(self.currentlyPlaying!.duration_ms ?? 100000)
+    self.currentlyPlayingPercent = (Float)(self.currentlyPlayingPos ?? 0) / (Float)(self.currentlyPlaying?.duration_ms ?? 100000)
   }
   
   //pauses spotify player
@@ -259,9 +255,8 @@ class Spotify: ObservableObject {
   //gets information on a song based of off a song uri
   func getTrackInfo(track_uri: String, completion: @escaping (SpotifyTrack?) -> ()) {
     var track_id = track_uri
-    if (track_uri.contains("spotify")) {
       track_id = String(track_uri.split(separator: ":").last!)
-    }
+    
     
     self.httpRequester.headerGet(url: "https://api.spotify.com/v1/tracks/\(track_id)", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? "")" ]).onFinish = { (response) in
       do {

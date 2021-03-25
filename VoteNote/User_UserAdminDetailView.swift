@@ -20,6 +20,7 @@ struct UserUserDetailView: View {
   @ObservedObject var votingEnabled: ObservableBoolean
   @ObservedObject var songHistory: MusicQueue
   @State var voteUpdateSeconds = 10
+  @State var isTiming: Bool = true
       
     /**
         Updates the music queue after a specified time interval

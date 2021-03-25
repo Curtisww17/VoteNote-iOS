@@ -20,7 +20,8 @@ struct UserController: View {
   @State var anonUsr: Bool
   @State var explicitSongsAllowed: Bool
   @State var notExited: Bool = false
-    @ObservedObject var songHistory: MusicQueue = MusicQueue()
+  @ObservedObject var songHistory: MusicQueue = MusicQueue()
+  @State var isTiming: Bool = false
     
   @State var currentView = 0
     
