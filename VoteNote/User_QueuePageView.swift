@@ -24,7 +24,7 @@ struct User_QueuePageView: View {
     @ObservedObject var votingEnabled: ObservableBoolean
     @ObservedObject var selectedUser: user = user(name: "", profilePic: "")
     @ObservedObject var isHost: ObservableBoolean = ObservableBoolean(boolValue: false)
-    @Binding var isTiming: Bool
+    @State var isTiming: Bool = false
     @State var canMaximize: Bool = false
     
 //    let refreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
