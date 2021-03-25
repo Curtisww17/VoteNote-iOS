@@ -24,14 +24,11 @@ struct User_RoomPageView: View {
   
   @Binding var showNav: Bool
   @ObservedObject var songHistory: MusicQueue
-  @Binding var isTiming: Bool
-  
     /**
         Causes the current user to leave the room
      */
   func exitRoom() {
       leaveRoom()
-      isTiming = false
       notExited = true
   }
   

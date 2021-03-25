@@ -89,7 +89,7 @@ struct UserUserDetailView: View {
         //}
     }.onAppear(perform: {
         updateHistory()
-    }).navigate(to: User_QueuePageView(songHistory: songHistory, votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue), isTiming: $isTiming), when: $shouldReturn).onAppear(perform: {
+    }).navigate(to: User_QueuePageView(songHistory: songHistory, votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue)), when: $shouldReturn).onAppear(perform: {
         shouldReturn = false
     }).navigationBarHidden(true).navigationViewStyle(StackNavigationViewStyle())
   }

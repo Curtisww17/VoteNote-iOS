@@ -272,13 +272,13 @@ func storePrevRoom(code: String){
             
             //if we didn't find the document
             if rm?.documentID == nil{
-                print("err")
+                print("error storing previous room")
             } else {
                 let isHost: Bool;
                 if rm!.data()["host"] as? String ?? "" == uid! {
                     isHost = true
                 } else {isHost = false}
-                db.collection("users").document(uid!).collection("prevRooms").addDocument(data: ["code": upperCode , "time": FieldValue.serverTimestamp(), "isHost": isHost])
+                db.collection("users").document(uid!).collection("prevRooms").document(upperCode).setData(["code": upperCode , "time": FieldValue.serverTimestamp(), "isHost": isHost])
             }
             
         }
