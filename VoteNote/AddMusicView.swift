@@ -213,7 +213,7 @@ struct recomendedView: View{
             VStack{
                 HStack {
                     
-                    TextField("Search Playlists", text: $searchStr).onChange(of: self.searchStr, perform: { value in
+                    TextField("Search Songs", text: $searchStr).onChange(of: self.searchStr, perform: { value in
                         currentSearch.stringValue = searchStr
                     })
                     .padding(7)
@@ -312,7 +312,7 @@ struct likedSongsView: View{
             VStack{
                 HStack {
                     
-                    TextField("Search Playlists", text: $searchStr).onChange(of: self.searchStr, perform: { value in
+                    TextField("Search Songs", text: $searchStr).onChange(of: self.searchStr, perform: { value in
                         currentSearch.stringValue = searchStr
                     })
                     .padding(7)
@@ -413,7 +413,7 @@ struct uniquePlaylistView: View{
             VStack{
                 HStack {
                     
-                    TextField("Search Playlists", text: $searchStr).onChange(of: self.searchStr, perform: { value in
+                    TextField("Search Songs", text: $searchStr).onChange(of: self.searchStr, perform: { value in
                         currentSearch.stringValue = searchStr
                     })
                     .padding(7)
