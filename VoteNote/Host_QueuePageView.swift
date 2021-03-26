@@ -13,6 +13,8 @@ import PartialSheet
 var isPlaying: Bool = false //should be false by default
 //TO-DO: enqueue next song when only so much time is left
 var songQueue: MusicQueue = MusicQueue()
+var timeTracker = true
+var currSongID = ""
 /**
     The UI for the host's version of the Queue View
  */
@@ -88,21 +90,11 @@ struct Host_QueuePageView: View {
           .frame(width: geo.size.width, height: geo.size.height)
           .navigationBarHidden(true)
           .onAppear(perform: {
-
-                  //makes the first song in the queue the first to play
-            /*if sharedSpotify.currentlyPlaying == nil && songQueue.musicList.count > 0 /*&& (songsList ?? []).count > 0*/ {
-                      nowPlaying = songQueue.musicList[0]
-                      sharedSpotify.enqueue(songID: songQueue.musicList[0].id)
-                      vetoSong(id: songQueue.musicList[0].id)
-                  }*/
-                  print("Updating Queue...")
             songQueue.updateQueue()
-                  print("Queue Updated!")
             if (!isTiming) {
               let _ = Timer.scheduledTimer(withTimeInterval: 10.0, repeats: true) { timer in
                 songQueue.updateQueue()
                 updateHistory()
-                print("Queue Updated!")
               }
               isTiming = true
             }
@@ -126,25 +118,24 @@ class MusicQueue: Identifiable, ObservableObject {
   public func skipSong() {
     print(musicList.count)
       if musicList.count > 0 {
-          
-          //print("Current Number of Songs in Queue \(songQueue.musicList.count)")
-          
         sharedSpotify.enqueue(songID: self.musicList[0].id) {
           sharedSpotify.skip()
           
           dequeue(id: self.musicList[0].id)
         }
-        //borked
-          //OperationQueue.main.waitUntilAllOperationsAreFinished()
-          //RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
-          //nowPlaying = songQueue.musicList[0]
-          //songQueue.musicList.remove(at: 0)
         updateQueue()
-          //sharedSpotify.pause()
-          isPlaying = false
+        isPlaying = false
       }
-      else {
-        sharedSpotify.skip()
+      else if(sharedSpotify.PlaylistBase != nil){
+        var pos = Int.random(in: 0..<(sharedSpotify.PlaylistBase?.tracks?.items?.count ?? 0))
+        currSongID = sharedSpotify.PlaylistBase?.tracks?.items?[pos].track.id ?? ""
+        sharedSpotify.enqueue(songID: currSongID) {
+          sharedSpotify.skip()
+          dequeue(id: currSongID)
+        }
+      } else {
+        //sharedSpotify.skip()
+        print("no Song to play :(")
       }
   }
   
@@ -179,25 +170,41 @@ class MusicQueue: Identifiable, ObservableObject {
               for i in Range(0...self.musicList.count-1) {
                 if self.musicList[i].numVotes ?? 0 < -(numUsersInRoom / 2) {
                   vetoSong(id: self.musicList[i].id)
-                  //self.musicList.remove(at: i)
                 }
               }
             }
           }
       }
+    if(self.musicList.count > 0){
+        if((sharedSpotify.currentlyPlayingPercent ?? 0) > 0.50 && currSongID != sharedSpotify.currentlyPlaying?.id ?? "notPlaying"){
+            currSongID = sharedSpotify.currentlyPlaying?.id ?? ""
+            sharedSpotify.enqueue(songID: self.musicList[0].id) {
+              dequeue(id: self.musicList[0].id)
+            }
+        }
+    } else if(sharedSpotify.PlaylistBase != nil) {
+        if((sharedSpotify.currentlyPlayingPercent ?? 0) > 0.50 && currSongID != sharedSpotify.currentlyPlaying?.id ?? "notPlaying"){
+            var pos = Int.random(in: 0..<(sharedSpotify.PlaylistBase?.tracks?.items?.count ?? 1))
+            currSongID = sharedSpotify.PlaylistBase?.tracks?.items?[pos].track.id ?? ""
+            sharedSpotify.enqueue(songID: sharedSpotify.PlaylistBase?.tracks?.items?[pos].track.id ?? "") {
+              dequeue(id: sharedSpotify.PlaylistBase?.tracks?.items?[pos].track.id ?? "")
+            }
+        }
+    } else if(sharedSpotify.currentlyPlayingPercent ?? 0 > 0.50 ){
+        print("no music to add")
+        //self.currentlyPlaying = nil
+    }
   }
   
   public func addMusic(songs: [song]){
     
     //set the first song if nothing is playing
   if self.currentlyPlaying == nil && songs.count > 0 {
-      //print("Song Added")
     self.currentlyPlaying = selectedSongs[0]
     sharedSpotify.enqueue(songID: selectedSongs[0].id) {
       sharedSpotify.skip()
     }
     addsong(id: songs[0].id) {
-      //RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
       dequeue(id: songs[0].id)
     }
       //sharedSpotify.skip() //need to clear out queue still before playing, clears out one song for now
@@ -217,8 +224,6 @@ class MusicQueue: Identifiable, ObservableObject {
         print("Done")
     }
   }
-    
-    
   }
 }
 
@@ -597,6 +602,9 @@ struct NowPlayingViewHostMinimized: View {
      */
     func skipSong(){
       songQueue.skipSong()
+        print("skiped")
+      timeTracker = true
+      RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
     }
     
     /**

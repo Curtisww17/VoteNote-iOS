@@ -25,6 +25,8 @@ class Spotify: ObservableObject {
   var currentPlaylist: uniquePlaylist?
   var usersSavedSongs: playlistTrackTime?
   var recommendedSongs: reccomndations?
+  var PlaylistBase: uniquePlaylist?
+  var songTimer: Int = 0
   
   var sessionManager: SPTSessionManager?
   var appRemote: SPTAppRemote?
@@ -168,7 +170,7 @@ class Spotify: ObservableObject {
             fatalError("Couldn't parse \(response.description)")
           }
       }
-      RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+      //RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
     
     }
   
@@ -193,7 +195,6 @@ class Spotify: ObservableObject {
         let decoder = JSONDecoder()
         try completion( decoder.decode(playlistTrackTime.self, from: response.data))
       } catch {
-        print("\(self.appRemote?.connectionParameters.accessToken ?? "")")
         fatalError("Couldn't parse \(response.description)")
       }
     }
@@ -262,6 +263,7 @@ class Spotify: ObservableObject {
         let decoder = JSONDecoder()
         try completion( decoder.decode(SpotifyTrack.self, from: response.data))
       } catch {
+        print(track_id)
         fatalError("Couldn't parse \(response.description)")
       }
     }
