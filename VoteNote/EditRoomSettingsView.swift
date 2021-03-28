@@ -13,6 +13,8 @@ struct EditRoomView: View {
   @Binding var isInRoom: Bool
   @State var showAlert: Bool = false
   @ObservedObject var currentRoom: CurrentRoom
+    
+  @Environment(\.presentationMode) var presentationMode
   
   @State var userCapacity: Int = 20 {
     didSet {
@@ -36,22 +38,20 @@ struct EditRoomView: View {
   @State var anonUsr: Bool = false
   @State var explicitSongsAllowed: Bool = false
   
-  @Environment(\.presentationMode) var presentationMode
-  
   func editRoom(){
     //TO-DO- send info to room, songs per user
     print("Room")
     /*let newRoom: room = room(name: roomName, desc: roomDescription, anonUsr: anonUsr, capacity: userCapacity, explicit: explicitSongsAllowed, voting: votingEnabled, spu: songsPerUser)
     let newcode = makeRoom(newRoom: newRoom)
     storePrevRoom(code: newcode)
-    madeRoom = true
-    self.presentationMode.wrappedValue.dismiss()*/
+    madeRoom = true*/
+    presentationMode.wrappedValue.dismiss()
   }
   
   var body: some View {
     //return NavigationView {
     ZStack {
-      Color.white
+      //Color.white
       VStack {
         
         Form {

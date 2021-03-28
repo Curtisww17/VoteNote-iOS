@@ -290,7 +290,8 @@ struct recomendedView: View{
                 }
             }
         }.onAppear(perform: {
-            
+            selectedSongs.removeAll()
+
             sharedSpotify.recomendations(artistSeed: "4NHQUGzhtTLFvgF5SZesLK", genre: "classical", trackSeed: "0c6xIDDpzE81m2q797ordA",completion: {playlistSongs in sharedSpotify.recommendedSongs = playlistSongs})
         })
     }
@@ -389,6 +390,7 @@ struct likedSongsView: View{
                 }
             }
         }.onAppear(perform: {
+            selectedSongs.removeAll()
             
             sharedSpotify.savedSongs(completion: {playlistSongs in sharedSpotify.usersSavedSongs = playlistSongs})
         })
@@ -489,6 +491,8 @@ struct uniquePlaylistView: View{
                     }
                 }
             }.onAppear(perform: {
+                selectedSongs.removeAll()
+                
             sharedSpotify.playlistSongs(completion: {playlistSongs in sharedSpotify.currentPlaylist = playlistSongs}, id: playlistInfo.id)
             })
         }

@@ -11,7 +11,7 @@ import SwiftUI
 struct QueueHistoryView: View {
     @ObservedObject var hostControllerHidden: ObservableBoolean = ObservableBoolean(boolValue: false)
     @ObservedObject var songHistory: MusicQueue
-    @ObservedObject var selectedSong: song = song(addedBy: "Nil User", artist: "", genres: [""], id: "", length: 0, numVotes: 0, title: "None Selected", imageUrl: "")
+
     var body: some View{
         ZStack{
             VStack{
@@ -33,7 +33,7 @@ struct QueueHistoryView: View {
                 Section(header: Text("History")) {
                     List {
                         ForEach(songHistory.musicList) { song in
-                            QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songHistory, isViewingUser: hostControllerHidden, isDetailView: true, isUserQueue: false, isHistoryView: true, votingEnabled: ObservableBoolean(boolValue: false), selectedUser: user(name: song.addedBy, profilePic: ""), localVotes: ObservableInteger(intValue: song.numVotes!))
+                            QueueEntry(curSong: song, isDetailView: true, isUserQueue: false, isHistoryView: true, votingEnabled: ObservableBoolean(boolValue: false), localVotes: ObservableInteger(intValue: song.numVotes!))
                         }
                     }
                 }

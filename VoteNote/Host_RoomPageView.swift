@@ -13,16 +13,15 @@ import SwiftUI
  */
 struct Host_RoomPageView: View {
   @State var currentView = 1
-  var roomName: String
-  var roomDescription: String
-  var roomCapacity: Int
-  var songsPerUser: Int
-  var votingEnabled: Bool
+  @State var roomName: String
+  @State var roomDescription: String
+  @State var roomCapacity: Int
+  @State var songsPerUser: Int
+  @State var votingEnabled: Bool
   @Binding var anonUsr: Bool
   @Binding var showNav: Bool
   @ObservedObject var currentRoom: CurrentRoom = CurrentRoom()
   @Binding var notExited: Bool
-  @ObservedObject var songHistory: MusicQueue
   @Binding var isTiming: Bool
   @State var inRoom: Bool = true
   
@@ -54,7 +53,7 @@ struct Host_RoomPageView: View {
             
           }
           
-            Section(header: Text("Room Settings"), footer: NavigationLink(destination: EditRoomView(isInRoom: $inRoom, currentRoom: currentRoom)) {
+            Section(footer: NavigationLink(destination: EditRoomView(isInRoom: $inRoom, currentRoom: currentRoom)) {
                 Text("Edit").foregroundColor(Color.blue)
             }) {
             NavigationLink(destination: QueueHistoryView( songHistory: songHistory)
