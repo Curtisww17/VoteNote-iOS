@@ -252,6 +252,18 @@ class Spotify: ObservableObject {
     }
   }
   
+  func isSongFavorited(songID: String) -> Bool{
+    if(self.usersSavedSongs == nil){
+      self.savedSongs(completion: {playlistSongs in self.usersSavedSongs = playlistSongs})
+    }
+    for song in self.usersSavedSongs?.items ?? [songTimeAdded(track: SpotifyTrack(album: nil, id: "", name: ""))] {
+      if(song.track.id == songID){
+        return true
+      }
+    }
+    return false
+  }
+  
   //gets information on a song based of off a song uri
   func getTrackInfo(track_uri: String, completion: @escaping (SpotifyTrack?) -> ()) {
     var track_id = track_uri
