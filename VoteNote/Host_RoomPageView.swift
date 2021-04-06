@@ -20,7 +20,6 @@ struct Host_RoomPageView: View {
   @State var votingEnabled: Bool
   @Binding var anonUsr: Bool
   @Binding var showNav: Bool
-  @ObservedObject var currentRoom: CurrentRoom = CurrentRoom()
   @Binding var notExited: Bool
   @Binding var isTiming: Bool
   @State var inRoom: Bool = true
@@ -53,7 +52,7 @@ struct Host_RoomPageView: View {
             
           }
           
-            Section(footer: NavigationLink(destination: EditRoomView(isInRoom: $inRoom, currentRoom: currentRoom)) {
+            Section(footer: NavigationLink(destination: EditRoomView(isInRoom: $inRoom)) {
                 Text("Edit").foregroundColor(Color.blue)
             }) {
             NavigationLink(destination: QueueHistoryView( songHistory: songHistory)
@@ -84,7 +83,7 @@ struct Host_RoomPageView: View {
                                 Text("Users")
                               }
                             })
-            NavigationLink(destination: RoomCodeView(currentRoom: currentRoom)
+            NavigationLink(destination: RoomCodeView()
                             .onAppear(perform: {
                               showNav = false
                             })

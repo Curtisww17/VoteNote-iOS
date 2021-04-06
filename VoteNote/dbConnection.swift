@@ -119,13 +119,13 @@ class user: Identifiable, ObservableObject {
 }
 
 class song: Identifiable, ObservableObject{
-    let addedBy: String //UID of who added it
-    let artist: String  //String of all credited artsts, sperated by spaces
+    let addedBy: String? //UID of who added it
+    let artist: String?  //String of all credited artsts, sperated by spaces
     let genres: [String]
     let id: String  //spotify id of the song
-    let length: Int //length in ms
+    let length: Int? //length in ms
     let numVotes: Int?  //nuber of votes recived by the song
-    let title: String   //name of the song
+    let title: String?   //name of the song
     let imageUrl: String
     //let timeStarted: Int
     init(addedBy: String, artist: String, genres: [String], id: String, length: Int, numVotes: Int?, title: String, imageUrl: String) {
@@ -141,13 +141,13 @@ class song: Identifiable, ObservableObject{
     
     //firestore
     init(sng: [String: Any], id: String){
-        addedBy = sng["addedBy"] as! String
-        artist = sng["artist"] as! String
+        addedBy = sng["addedBy"] as? String
+        artist = sng["artist"] as? String
         genres = []
         self.id = id
-        length = sng["length"] as! Int
+        length = sng["length"] as? Int
         numVotes = sng["numvotes"] as? Int
-        title = sng["title"] as! String
+        title = sng["title"] as? String
         imageUrl = sng["imageurl"] as? String ?? ""
     }
     
@@ -209,6 +209,7 @@ func joinRoom(code: String, completion:@escaping (room?, String?) -> Void){
     //TODO: add checking for banned user and capacity
     
     let upperCode = code.uppercased()
+    currentQR.update(roomCode: upperCode)
     
     //get UID from firebase auth
     let usr = FAuth.currentUser
@@ -412,6 +413,9 @@ func makeRoom(newRoom: room) -> String{
     } else{
         code = newRoom.code
     }
+  
+  
+  currentQR.update(roomCode: code.uppercased())
     
     //make the room in the db
     db.collection("room").addDocument(data: [

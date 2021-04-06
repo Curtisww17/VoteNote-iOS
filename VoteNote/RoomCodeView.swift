@@ -9,14 +9,13 @@ import Foundation
 import SwiftUI
 
 struct RoomCodeView: View {
-  @ObservedObject var currentRoom: CurrentRoom
   
   var body: some View {
     return VStack {
-      if currentRoom.roomQR != nil {
-        Image(uiImage: currentRoom.roomQR!)
+      if currentQR.roomQR != nil {
+        Image(uiImage: currentQR.roomQR!)
       }
-      Text(currentRoom.roomCode)
+      Text(currentQR.roomCode)
         .font(.title)
       
       Spacer()
@@ -32,18 +31,19 @@ struct RoomCodeView: View {
           }
         })
       }
-    }.onAppear(perform: {
-      getCurrRoom(completion: {code, err in
-        if err == nil {
-          self.currentRoom.update(roomCode: code)
-        }
-      })
-    })
+    }
+//    }.onAppear(perform: {
+//      getCurrRoom(completion: {code, err in
+//        if err == nil {
+//          self.currentRoom.update(roomCode: code)
+//        }
+//      })
+//    })
   }
   
   func actionSheet() {
-    let link = "VoteNote://SpotifyAuthentication/?room_code=" + currentRoom.roomCode
-    let data = [currentRoom.roomCode, currentRoom.roomQR!, link] as [Any]
+    let link = "VoteNote://SpotifyAuthentication/?room_code=" + currentQR.roomCode
+    let data = [currentQR.roomQR!, link] as [Any]
     let av = UIActivityViewController(activityItems: data, applicationActivities: nil)
     UIApplication.shared.windows.first?.rootViewController?.present(av, animated: true, completion: nil)
     

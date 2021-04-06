@@ -79,7 +79,7 @@ struct User_RoomPageView: View {
                                     Text("Users")
                                   }
                                 })
-                NavigationLink(destination: RoomCodeView(currentRoom: currentRoom)
+                NavigationLink(destination: RoomCodeView()
                                 .onAppear(perform: {
                                   showNav = false
                                 })

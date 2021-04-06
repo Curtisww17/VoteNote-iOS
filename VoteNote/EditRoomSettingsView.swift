@@ -12,7 +12,6 @@ struct EditRoomView: View {
   //TODO: Create second version of this view to take in info from an existing room
   @Binding var isInRoom: Bool
   @State var showAlert: Bool = false
-  @ObservedObject var currentRoom: CurrentRoom
     
   @Environment(\.presentationMode) var presentationMode
   
@@ -116,16 +115,16 @@ struct EditRoomView: View {
     .navigationBarHidden(true)
     .navigate(to: HostController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription, votingEnabled: votingEnabled, anonUsr: anonUsr, roomCapacity: userCapacity, songsPerUser: songsPerUser, explicitSongsAllowed: explicitSongsAllowed), when: $madeRoom)
     .onAppear(perform: {
-        getCurrRoom(completion: {code, err in
-          if err == nil {
-            self.currentRoom.update(roomCode: code)
-          }
-        })
+//        getCurrRoom(completion: {code, err in
+//          if err == nil {
+//            self.currentRoom.update(roomCode: code)
+//          }
+//        })
         
         RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
         
         var curRoom: room = room(name: "", anonUsr: false, capacity: 0, explicit: false, voting: true)
-        getRoom(code: currentRoom.roomCode, completion: {room, err in
+        getRoom(code: currentQR.roomCode, completion: {room, err in
             if (room != nil) {
                 curRoom = room!
             }
