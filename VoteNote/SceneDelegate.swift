@@ -202,6 +202,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate,
   
   func appRemote(_ appRemote: SPTAppRemote, didDisconnectWithError error: Error?) {
     print("didDisconnectWithError")
+    appRemote.connect()
   }
   
   func sessionManager(manager: SPTSessionManager, didInitiate session: SPTSession) {

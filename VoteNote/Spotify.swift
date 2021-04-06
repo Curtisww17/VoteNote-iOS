@@ -106,7 +106,9 @@ class Spotify: ObservableObject {
   //pauses spotify player
   func pause() {
     self.appRemote?.playerAPI?.pause({ (_, error) in
-      print(error as Any)
+      if error != nil {
+        print(error as Any)
+      }
     })
   }
   
@@ -114,7 +116,9 @@ class Spotify: ObservableObject {
   func resume(){
     print("playing song")
     self.appRemote?.playerAPI?.resume({ (_, error) in
-      print(error as Any)
+      if (error != nil) {
+        print(error as Any)
+      }
     })
   }
   
@@ -123,7 +127,7 @@ class Spotify: ObservableObject {
   func enqueue(songID: String, completion: @escaping () -> () ){
     self.appRemote?.playerAPI?.enqueueTrackUri("spotify:track:"+songID, callback: { (_, error) in
       if (error != nil) {
-      print(error as Any)
+        print(error as Any)
       }
       completion()
     }
