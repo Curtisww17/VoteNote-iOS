@@ -13,17 +13,16 @@ import SwiftUI
  */
 struct Host_RoomPageView: View {
   @State var currentView = 1
-  var roomName: String
-  var roomDescription: String
-  var roomCapacity: Int
-  var songsPerUser: Int
-  var votingEnabled: Bool
+  @State var roomName: String
+  @State var roomDescription: String
+  @State var roomCapacity: Int
+  @State var songsPerUser: Int
+  @State var votingEnabled: Bool
   @Binding var anonUsr: Bool
   @Binding var showNav: Bool
-  @ObservedObject var currentRoom: CurrentRoom = CurrentRoom()
   @Binding var notExited: Bool
-  @ObservedObject var songHistory: MusicQueue
   @Binding var isTiming: Bool
+  @State var inRoom: Bool = true
   
     /**
         Causes the current user to leave the room
@@ -53,7 +52,9 @@ struct Host_RoomPageView: View {
             
           }
           
-          Section() {
+            Section(footer: NavigationLink(destination: EditRoomView(isInRoom: $inRoom)) {
+                Text("Edit").foregroundColor(Color.blue)
+            }) {
             NavigationLink(destination: QueueHistoryView( songHistory: songHistory)
                             .onAppear(perform: {
                               showNav = false
@@ -82,7 +83,7 @@ struct Host_RoomPageView: View {
                                 Text("Users")
                               }
                             })
-            NavigationLink(destination: RoomCodeView(currentRoom: currentRoom)
+            NavigationLink(destination: RoomCodeView()
                             .onAppear(perform: {
                               showNav = false
                             })
@@ -114,6 +115,12 @@ struct Host_RoomPageView: View {
               Text("Songs Per User")
               Spacer()
               Text("\(songsPerUser)")
+            }
+            
+            HStack{
+              Text("Base Playlist")
+              Spacer()
+                Text("\(sharedSpotify.PlaylistBase?.name ?? "no base")")
             }
             
             HStack{

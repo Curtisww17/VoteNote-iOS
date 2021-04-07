@@ -4,7 +4,6 @@
 //
 //  Created by COMP401 on 3/13/21.
 //
-
 import Foundation
 import SwiftUI
 
@@ -12,46 +11,19 @@ import SwiftUI
     The UI for viewing the details of a user as a user
  */
 struct UserUserDetailView: View {
-  @ObservedObject var user: user
-  @ObservedObject var songQueue: MusicQueue
-  @ObservedObject var selectedSong: song = song(addedBy: "Nil User", artist: "", genres: [""], id: "", length: 0, numVotes: 0, title: "None Selected", imageUrl: "")
-  @ObservedObject var hostControllerHidden: ObservableBoolean = ObservableBoolean(boolValue: false)
-  @State var shouldReturn: Bool = false
+  @ObservedObject var selectedUserUID: ObservableString
+  @ObservedObject var isViewingUser: ObservableBoolean = ObservableBoolean(boolValue: true)
   @ObservedObject var votingEnabled: ObservableBoolean
-  @ObservedObject var songHistory: MusicQueue
   @State var voteUpdateSeconds = 10
   @State var isTiming: Bool = true
+  @State var userName: String = ""
       
-    /**
-        Updates the music queue after a specified time interval
-     */
-      func updateHistory() {
-          getHistory(){(songs, err) in
-              if songs != nil {
-                  if songs!.count > 0 {
-                      songHistory.musicList.removeAll()
-                      var count: Int = 0
-                      while count < songs!.count {
-                          songHistory.musicList.append(songs![count])
-                          count = count + 1
-                      }
-                  }
-              }
-          }
-      }
-    
-    /**
-        Causes the user to return to the Host Queue page
-     */
-  func returnToQueue(){
-    shouldReturn = true
-  }
     
   var body: some View {
     return //NavigationView {
         ZStack {
             VStack {
-                HStack {
+                /*HStack {
                     Button(action: {returnToQueue()}) {
                         Image(systemName: "chevron.left")
                             .foregroundColor(/*@START_MENU_TOKEN@*/.blue/*@END_MENU_TOKEN@*/).padding(.leading)
@@ -59,17 +31,22 @@ struct UserUserDetailView: View {
                             .foregroundColor(Color.blue)
                     }
                     Spacer()
+                }*/
+                
+                HStack {
+                    Text(userName)
+                        .font(.title)
+                    Spacer()
                 }
+                .padding(.leading)
                 
                 Form {
-                    Text(user.name)
-                        .font(.title)
                     
                     Section(header: Text("In Queue")) {
                         List {
                             ForEach(songQueue.musicList) { song in
                                 if song.addedBy == getUID() {
-                                    QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: hostControllerHidden, isDetailView: true, isUserQueue: true, isHistoryView: false, votingEnabled: votingEnabled, selectedUser: user, localVotes: ObservableInteger(intValue: song.numVotes!))
+                                    QueueEntry(curSong: song, isDetailView: true, isUserQueue: true, isHistoryView: false, votingEnabled: votingEnabled, localVotes: ObservableInteger(intValue: song.numVotes!))
                                 }
                             }
                         }
@@ -79,7 +56,7 @@ struct UserUserDetailView: View {
                         List {
                             ForEach(songHistory.musicList) { song in
                                 if song.addedBy == getUID() {
-                                    QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songHistory, isViewingUser: hostControllerHidden, isDetailView: true, isUserQueue: true, isHistoryView: true, votingEnabled: ObservableBoolean(boolValue: false), selectedUser: user, localVotes: ObservableInteger(intValue: song.numVotes!))
+                                    QueueEntry(curSong: song, isDetailView: true, isUserQueue: true, isHistoryView: true, votingEnabled: ObservableBoolean(boolValue: false), localVotes: ObservableInteger(intValue: song.numVotes!))
                                 }
                             }
                         }
@@ -88,10 +65,19 @@ struct UserUserDetailView: View {
             }
         //}
     }.onAppear(perform: {
-        updateHistory()
-    }).navigate(to: User_QueuePageView(songHistory: songHistory, votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue), isTiming: $isTiming), when: $shouldReturn).onAppear(perform: {
+        songHistory.updateHistory()
+        RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+        
+        getUser(uid: selectedUserUID.stringValue, completion: {use, err in
+            if (use != nil) {
+                userName = use!.name
+            }
+        })
+        
+        RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+    })/*.navigate(to: User_QueuePageView(songHistory: songHistory, votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue)), when: $shouldReturn).onAppear(perform: {
         shouldReturn = false
-    }).navigationBarHidden(true).navigationViewStyle(StackNavigationViewStyle())
+    }).navigationBarHidden(true)*/.navigationViewStyle(StackNavigationViewStyle())
   }
 }
 

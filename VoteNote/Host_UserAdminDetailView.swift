@@ -11,51 +11,26 @@ import SwiftUI
     The UI for viewing the details of a user as a host
  */
 struct HostUserDetailView: View {
-  @ObservedObject var user: user
-  @ObservedObject var songQueue: MusicQueue
-  @ObservedObject var selectedSong: song = song(addedBy: "Nil User", artist: "", genres: [""], id: "", length: 0, numVotes: 0, title: "None Selected", imageUrl: "")
-  @ObservedObject var hostControllerHidden: ObservableBoolean = ObservableBoolean(boolValue: false)
-  @State var shouldReturn: Bool = false
+  @ObservedObject var selectedUserUID: ObservableString
+  @ObservedObject var isViewingUser: ObservableBoolean = ObservableBoolean(boolValue: false)
   @ObservedObject var votingEnabled: ObservableBoolean
-  @ObservedObject var songHistory: MusicQueue
   @State var voteUpdateSeconds = 10
   @State var showingBanUserAlert: Bool = false
   @State var isTiming: Bool = true
-
-    func updateHistory() {
-        getHistory(){(songs, err) in
-            if songs != nil {
-                if songs!.count > 0 {
-                    songHistory.musicList.removeAll()
-                    var count: Int = 0
-                    while count < songs!.count {
-                        songHistory.musicList.append(songs![count])
-                        count = count + 1
-                    }
-                }
-            }
-        }
-    }
-    
-    /**
-        Causes the user to return to the Hoest Queue page
-     */
-  func returnToQueue(){
-    shouldReturn = true
-  }
+  @State var userName: String = ""
     
     /**
         Bans the selected user
      */
   func banSelectedUser(){
-    banUser(uid: user.uid!)
+    banUser(uid: selectedUserUID.stringValue)
   }
     
   var body: some View {
     return //NavigationView {
         ZStack {
             VStack {
-                HStack {
+                /*HStack {
                     Button(action: {returnToQueue()}) {
                         Image(systemName: "chevron.left")
                             .foregroundColor(/*@START_MENU_TOKEN@*/.blue/*@END_MENU_TOKEN@*/).padding(.leading)
@@ -63,17 +38,22 @@ struct HostUserDetailView: View {
                             .foregroundColor(Color.blue)
                     }
                     Spacer()
+                }*/
+                
+                HStack {
+                    Text(userName)
+                        .font(.title)
+                    Spacer()
                 }
+                .padding(.leading)
                 
                 Form {
-                    Text(user.name)
-                        .font(.title)
                     
                     Section(header: Text("In Queue")) {
                         List {
                             ForEach(songQueue.musicList) { song in
-                                if song.addedBy == getUID() {
-                                    QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: hostControllerHidden, isDetailView: true, isUserQueue: false, isHistoryView: false, votingEnabled: votingEnabled, selectedUser: user, localVotes: ObservableInteger(intValue: song.numVotes!))
+                                if song.addedBy == selectedUserUID.stringValue {
+                                    QueueEntry(curSong: song, isDetailView: true, isUserQueue: false, isHistoryView: false, votingEnabled: votingEnabled, localVotes: ObservableInteger(intValue: song.numVotes!))
                                 }
                             }
                         }
@@ -82,25 +62,36 @@ struct HostUserDetailView: View {
                     Section(header: Text("History")) {
                         List {
                             ForEach(songHistory.musicList) { song in
-                                if song.addedBy == getUID() {
-                                    QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songHistory, isViewingUser: hostControllerHidden, isDetailView: true, isUserQueue: false, isHistoryView: true, votingEnabled: ObservableBoolean(boolValue: false), selectedUser: user, localVotes: ObservableInteger(intValue: song.numVotes!))
+                                if song.addedBy == selectedUserUID.stringValue {
+                                    QueueEntry(curSong: song, isDetailView: true, isUserQueue: false, isHistoryView: true, votingEnabled: ObservableBoolean(boolValue: false), localVotes: ObservableInteger(intValue: song.numVotes!))
                                 }
                             }
                         }
                     }
-                    
-                    Button(action: {showingBanUserAlert = true}) {
-                        Text("Ban User")
-                            .foregroundColor(Color.red)
-                    }
                 }
+                
+                Button(action: {showingBanUserAlert = true}) {
+                    Text("Ban User")
+                        .foregroundColor(Color.red)
+                }
+                .padding(.vertical)
+                
             }
         //}
         }.onAppear(perform: {
-            updateHistory()
-        }).navigate(to: Host_QueuePageView(songHistory: songHistory, votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue), isTiming: $isTiming), when: $shouldReturn).onAppear(perform: {
+            songHistory.updateHistory()
+            RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+            
+            getUser(uid: selectedUserUID.stringValue, completion: {use, err in
+                if (use != nil) {
+                    userName = use!.name
+                }
+            })
+            
+            RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+        })/*.navigate(to: Host_QueuePageView(songHistory: songHistory, votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue)), when: $shouldReturn).onAppear(perform: {
         shouldReturn = false
-    }).navigationBarHidden(true).navigationViewStyle(StackNavigationViewStyle()).alert(isPresented:$showingBanUserAlert) {
+    })*//*.navigationBarHidden(true)*/.navigationViewStyle(StackNavigationViewStyle()).alert(isPresented:$showingBanUserAlert) {
         Alert(title: Text("Are you sure you want to ban this user from the room? This action cannot be undone."), primaryButton: .destructive(Text("Ban")) {
                 banSelectedUser()
         }, secondaryButton: .cancel() {

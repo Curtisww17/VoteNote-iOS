@@ -13,10 +13,6 @@ let sharedSpotify = Spotify()
 
 class Spotify: ObservableObject {
   
-  let SpotifyClientID = "badf7b737e204baf818600b2c352a985"
-  let SpotifyRedirectURL = URL(string: "VoteNote://SpotifyAuthentication")!
-  let SpotifyRedirectURLString = "VoteNote://SpotifyAuthentication"
-  
   private var httpRequester: HttpRequester
   
   //is empty if the user is not joining through link, otherwise its the room code
@@ -29,6 +25,8 @@ class Spotify: ObservableObject {
   var currentPlaylist: uniquePlaylist?
   var usersSavedSongs: playlistTrackTime?
   var recommendedSongs: reccomndations?
+  var PlaylistBase: uniquePlaylist?
+  var songTimer: Int = 0
   
   var sessionManager: SPTSessionManager?
   var appRemote: SPTAppRemote?
@@ -102,13 +100,15 @@ class Spotify: ObservableObject {
 //
 //      }
 //    })
-    self.currentlyPlayingPercent = (Float)(self.currentlyPlayingPos!) / (Float)(self.currentlyPlaying!.duration_ms ?? 100000)
+    self.currentlyPlayingPercent = (Float)(self.currentlyPlayingPos ?? 0) / (Float)(self.currentlyPlaying?.duration_ms ?? 100000)
   }
   
   //pauses spotify player
   func pause() {
     self.appRemote?.playerAPI?.pause({ (_, error) in
-      print(error as Any)
+      if error != nil {
+        print(error as Any)
+      }
     })
   }
   
@@ -116,7 +116,9 @@ class Spotify: ObservableObject {
   func resume(){
     print("playing song")
     self.appRemote?.playerAPI?.resume({ (_, error) in
-      print(error as Any)
+      if (error != nil) {
+        print(error as Any)
+      }
     })
   }
   
@@ -125,7 +127,7 @@ class Spotify: ObservableObject {
   func enqueue(songID: String, completion: @escaping () -> () ){
     self.appRemote?.playerAPI?.enqueueTrackUri("spotify:track:"+songID, callback: { (_, error) in
       if (error != nil) {
-      print(error as Any)
+        print(error as Any)
       }
       completion()
     }
@@ -172,7 +174,7 @@ class Spotify: ObservableObject {
             fatalError("Couldn't parse \(response.description)")
           }
       }
-      RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+      //RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
     
     }
   
@@ -197,7 +199,6 @@ class Spotify: ObservableObject {
         let decoder = JSONDecoder()
         try completion( decoder.decode(playlistTrackTime.self, from: response.data))
       } catch {
-        print("\(self.appRemote?.connectionParameters.accessToken ?? "")")
         fatalError("Couldn't parse \(response.description)")
       }
     }
@@ -258,15 +259,15 @@ class Spotify: ObservableObject {
   //gets information on a song based of off a song uri
   func getTrackInfo(track_uri: String, completion: @escaping (SpotifyTrack?) -> ()) {
     var track_id = track_uri
-    if (track_uri.contains("spotify")) {
       track_id = String(track_uri.split(separator: ":").last!)
-    }
+    
     
     self.httpRequester.headerGet(url: "https://api.spotify.com/v1/tracks/\(track_id)", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? "")" ]).onFinish = { (response) in
       do {
         let decoder = JSONDecoder()
         try completion( decoder.decode(SpotifyTrack.self, from: response.data))
       } catch {
+        print(track_id)
         fatalError("Couldn't parse \(response.description)")
       }
     }

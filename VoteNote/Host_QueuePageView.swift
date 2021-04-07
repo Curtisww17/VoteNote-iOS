@@ -13,47 +13,22 @@ import PartialSheet
 var isPlaying: Bool = false //should be false by default
 //TO-DO: enqueue next song when only so much time is left
 var songQueue: MusicQueue = MusicQueue()
+var songHistory: MusicQueue = MusicQueue()
+var timeTracker = true
+var currSongID = ""
 /**
     The UI for the host's version of the Queue View
  */
 struct Host_QueuePageView: View {
     @State var currentView = 0
     @ObservedObject var spotify = sharedSpotify
-    //@State var historyRefreshSeconds = 30
     @State var queueRefreshSeconds = 10
-    //@ObservedObject var songQueue: MusicQueue = MusicQueue()
-    var songHistory: MusicQueue
     @ObservedObject var isViewingUser: ObservableBoolean = ObservableBoolean(boolValue: false)
-    @ObservedObject var selectedSong: song = song(addedBy: "Nil User", artist: "", genres: [""], id: "", length: 0, numVotes: 0, title: "None Selected", imageUrl: "")
-    @ObservedObject var selectedUser: user = user(name: "", profilePic: "")
     @ObservedObject var votingEnabled: ObservableBoolean
     @ObservedObject var isHost: ObservableBoolean = ObservableBoolean(boolValue: true)
-    @Binding var isTiming: Bool
+    @State var isTiming: Bool = false
     @State var showMaxNowPlaying: Bool = false
     @EnvironmentObject var sheetManager : PartialSheetManager
-
-    
-    let refreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-  
-    /**
-        Updates the music queue after a specified time interval
-     */
-    
-    
-    func updateHistory() {
-        getHistory(){(songs, err) in
-            if songs != nil {
-                if songs!.count > 0 {
-                    songHistory.musicList.removeAll()
-                    var count: Int = 0
-                    while count < songs!.count {
-                        songHistory.musicList.append(songs![count])
-                        count = count + 1
-                    }
-                }
-            }
-        }
-    }
     
   var body: some View {
     GeometryReader { geo in
@@ -61,58 +36,31 @@ struct Host_QueuePageView: View {
             Form {
                 List {
                     ForEach(songQueue.musicList) { song in
-                        QueueEntry(curSong: song, selectedSong: selectedSong, songQueue: songQueue, isViewingUser: isViewingUser, isDetailView: false, isUserQueue: false, isHistoryView: false, votingEnabled: votingEnabled, selectedUser: selectedUser, localVotes: ObservableInteger(intValue: song.numVotes!))
+                        QueueEntry(curSong: song, isDetailView: false, isUserQueue: false, isHistoryView: false, votingEnabled: votingEnabled, localVotes: ObservableInteger(intValue: song.numVotes!))
                     }
                 }
             }
             
-//            Text("\(queueRefreshSeconds)").font(.largeTitle).multilineTextAlignment(.trailing).onReceive(refreshTimer) {
-//                _ in
-//                if self.queueRefreshSeconds > 0 {
-//                    self.queueRefreshSeconds -= 1
-//                } else {
-//                    self.queueRefreshSeconds = 10
-//                    print("Updating Queue")
-//                        
-//                  songQueue.updateQueue()
-//                    updateHistory()
-//                }
-//            }.hidden().frame(width: 0, height: 0)
-            
-            
             NowPlayingViewHostMinimized(isPlaying: isPlaying, songQueue: songQueue, historyQueue: songHistory, isHost: isHost, isMaximized: $showMaxNowPlaying, sheetManager: sheetManager)
-            
-            
-               // .padding()
+
           }
           .frame(width: geo.size.width, height: geo.size.height)
           .navigationBarHidden(true)
           .onAppear(perform: {
-
-                  //makes the first song in the queue the first to play
-            /*if sharedSpotify.currentlyPlaying == nil && songQueue.musicList.count > 0 /*&& (songsList ?? []).count > 0*/ {
-                      nowPlaying = songQueue.musicList[0]
-                      sharedSpotify.enqueue(songID: songQueue.musicList[0].id)
-                      vetoSong(id: songQueue.musicList[0].id)
-                  }*/
-                  print("Updating Queue...")
             songQueue.updateQueue()
-                  print("Queue Updated!")
             if (!isTiming) {
               let _ = Timer.scheduledTimer(withTimeInterval: 10.0, repeats: true) { timer in
                 songQueue.updateQueue()
-                updateHistory()
-                print("Queue Updated!")
+                songHistory.updateHistory()
               }
               isTiming = true
             }
                   
           }).partialSheet(isPresented: $showMaxNowPlaying, content: {
             ZStack {
-                NowPlayingViewHostMaximized(isPlaying: isPlaying, songQueue: songQueue, historyQueue: songHistory, isHost: isHost, isMaximized: $showMaxNowPlaying)
+                NowPlayingViewHostMaximized(isPlaying: isPlaying, isHost: isHost, isMaximized: $showMaxNowPlaying)
             }
           }).addPartialSheet()
-          .navigate(to: HostUserDetailView(user: selectedUser, songQueue: songQueue, votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue), songHistory: songHistory), when: $isViewingUser.boolValue).navigationViewStyle(StackNavigationViewStyle())
     }
   }
 }
@@ -126,25 +74,24 @@ class MusicQueue: Identifiable, ObservableObject {
   public func skipSong() {
     print(musicList.count)
       if musicList.count > 0 {
-          
-          //print("Current Number of Songs in Queue \(songQueue.musicList.count)")
-          
         sharedSpotify.enqueue(songID: self.musicList[0].id) {
           sharedSpotify.skip()
           
           dequeue(id: self.musicList[0].id)
         }
-        //borked
-          //OperationQueue.main.waitUntilAllOperationsAreFinished()
-          //RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
-          //nowPlaying = songQueue.musicList[0]
-          //songQueue.musicList.remove(at: 0)
         updateQueue()
-          //sharedSpotify.pause()
-          isPlaying = false
+        isPlaying = false
       }
-      else {
-        sharedSpotify.skip()
+      else if(sharedSpotify.PlaylistBase != nil){
+        var pos = Int.random(in: 0..<(sharedSpotify.PlaylistBase?.tracks?.items?.count ?? 0))
+        currSongID = sharedSpotify.PlaylistBase?.tracks?.items?[pos].track.id ?? ""
+        sharedSpotify.enqueue(songID: currSongID) {
+          sharedSpotify.skip()
+          dequeue(id: currSongID)
+        }
+      } else {
+        //sharedSpotify.skip()
+        print("no Song to play :(")
       }
   }
   
@@ -179,25 +126,41 @@ class MusicQueue: Identifiable, ObservableObject {
               for i in Range(0...self.musicList.count-1) {
                 if self.musicList[i].numVotes ?? 0 < -(numUsersInRoom / 2) {
                   vetoSong(id: self.musicList[i].id)
-                  //self.musicList.remove(at: i)
                 }
               }
             }
           }
       }
+    if(self.musicList.count > 0){
+        if((sharedSpotify.currentlyPlayingPercent ?? 0) > 0.50 && currSongID != sharedSpotify.currentlyPlaying?.id ?? "notPlaying"){
+            currSongID = sharedSpotify.currentlyPlaying?.id ?? ""
+            sharedSpotify.enqueue(songID: self.musicList[0].id) {
+              dequeue(id: self.musicList[0].id)
+            }
+        }
+    } else if(sharedSpotify.PlaylistBase != nil) {
+        if((sharedSpotify.currentlyPlayingPercent ?? 0) > 0.50 && currSongID != sharedSpotify.currentlyPlaying?.id ?? "notPlaying"){
+            var pos = Int.random(in: 0..<(sharedSpotify.PlaylistBase?.tracks?.items?.count ?? 1))
+            currSongID = sharedSpotify.PlaylistBase?.tracks?.items?[pos].track.id ?? ""
+            sharedSpotify.enqueue(songID: sharedSpotify.PlaylistBase?.tracks?.items?[pos].track.id ?? "") {
+              dequeue(id: sharedSpotify.PlaylistBase?.tracks?.items?[pos].track.id ?? "")
+            }
+        }
+    } else if(sharedSpotify.currentlyPlayingPercent ?? 0 > 0.50 ){
+        print("no music to add")
+        //self.currentlyPlaying = nil
+    }
   }
   
   public func addMusic(songs: [song]){
     
     //set the first song if nothing is playing
   if self.currentlyPlaying == nil && songs.count > 0 {
-      //print("Song Added")
     self.currentlyPlaying = selectedSongs[0]
     sharedSpotify.enqueue(songID: selectedSongs[0].id) {
       sharedSpotify.skip()
     }
     addsong(id: songs[0].id) {
-      //RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
       dequeue(id: songs[0].id)
     }
       //sharedSpotify.skip() //need to clear out queue still before playing, clears out one song for now
@@ -217,9 +180,23 @@ class MusicQueue: Identifiable, ObservableObject {
         print("Done")
     }
   }
-    
-    
   }
+    
+
+    func updateHistory() {
+        getHistory(){(songs, err) in
+            if songs != nil {
+                if songs!.count > 0 {
+                    self.musicList.removeAll()
+                    var count: Int = 0
+                    while count < songs!.count {
+                        self.musicList.append(songs![count])
+                        count = count + 1
+                    }
+                }
+            }
+        }
+    }
 }
 
 /**
@@ -227,24 +204,19 @@ class MusicQueue: Identifiable, ObservableObject {
  */
 struct QueueEntry: View {
     @State var curSong: song
-    @State var selectedSong: song
     @State var showingExtras: Bool = false
-    @ObservedObject var songQueue: MusicQueue
     
     let width : CGFloat = 60
     @State var offset = CGSize.zero
     @State var scale : CGFloat = 0.5
     @State var opened = false
     
-    @ObservedObject var isViewingUser: ObservableBoolean
     @State var isDetailView: Bool
     @State var isUserQueue: Bool
     @State var isHistoryView: Bool
     
     @State var showNav: Bool = false
     @ObservedObject var votingEnabled: ObservableBoolean
-    
-    @State var selectedUser: user
     
     @ObservedObject var localVotes: ObservableInteger
     
@@ -256,7 +228,7 @@ struct QueueEntry: View {
         print("Upvote Song")
         localVotes.intValue = localVotes.intValue + 1
         voteSong(vote: 1, id: curSong.id)
-        RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+        RunLoop.main.run(until: Date(timeIntervalSinceNow: 1))
         songQueue.updateQueue()
     }
     
@@ -268,7 +240,7 @@ struct QueueEntry: View {
         print("Downvote Song")
         localVotes.intValue = localVotes.intValue - 1
         voteSong(vote: -1, id: curSong.id)
-        RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+        RunLoop.main.run(until: Date(timeIntervalSinceNow: 1))
         songQueue.updateQueue()
     }
     
@@ -276,6 +248,7 @@ struct QueueEntry: View {
         Calls the DB to veto the current song
      */
     func vetoMusic(){
+        print("Vetoing Song")
         vetoSong(id: curSong.id)
         
         var count: Int = 0
@@ -286,17 +259,6 @@ struct QueueEntry: View {
             }
             count = count + 1
         }
-    }
-    
-    /**
-        Allows the user to view who posted the selected song
-     */
-    func viewUser(){
-        getUser(uid: curSong.addedBy){(user, err) in
-            selectedUser = user!
-        }
-        selectedSong = self.curSong
-        isViewingUser.boolValue = true
     }
     
     var body: some View {
@@ -310,11 +272,11 @@ struct QueueEntry: View {
                     if !opened {
                         VStack {
                             HStack {
-                                Text(curSong.title)
+                              Text(curSong.title!)
                                 Spacer()
                             }
                             HStack {
-                                Text(curSong.artist).font(.caption)
+                              Text(curSong.artist!).font(.caption)
                                     .foregroundColor(Color.gray)
                                 Spacer()
                             }
@@ -353,7 +315,7 @@ struct QueueEntry: View {
                     if opened && !isHistoryView {
                         HStack {
                             if !isUserQueue {
-                                Button(action: {vetoMusic()}) {
+                                Button(action: {/*vetoMusic()*/}) {
                                     Text("Veto").foregroundColor(Color.black).scaleEffect(scale)
                                 }.padding(.all).background(Color.red).border(/*@START_MENU_TOKEN@*/Color.red/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/2/*@END_MENU_TOKEN@*/).onTapGesture {
                                     vetoMusic()
@@ -361,15 +323,21 @@ struct QueueEntry: View {
                             }
                             
                             if !isDetailView {
-                                /*Button(action: {viewUser()}) {
-                                    Text("User").foregroundColor(Color.black).scaleEffect(scale)
-                                }.padding(.all).border(/*@START_MENU_TOKEN@*/Color.black/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/).onTapGesture {
-                                    viewUser()
-                                }.frame(width: 80, height: 80)*/
-                                
-                                NavigationLink(destination: HostUserDetailView(user: selectedUser, songQueue: songQueue, votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue), songHistory: songQueue)) {
-                                    Text("User").scaleEffect(scale)
-                                }.frame(width: 80, height: 80)
+                                if isUserQueue {
+                                    ZStack {
+                                        Text("User").scaleEffect(scale)
+                                      NavigationLink(destination: UserUserDetailView(selectedUserUID: ObservableString(stringValue: curSong.addedBy!), votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue))) {
+                                            EmptyView()
+                                        }.hidden()
+                                    }.padding(.all).border(Color.black, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/).frame(width: 80, height: 80)
+                                } else {
+                                    ZStack {
+                                        Text("User").scaleEffect(scale)
+                                      NavigationLink(destination: HostUserDetailView(selectedUserUID: ObservableString(stringValue: curSong.addedBy!), votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue))) {
+                                            EmptyView()
+                                        }.hidden()
+                                    }.padding(.all).border(Color.black, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/).frame(width: 80, height: 80)
+                                }
                             }
                         }
                         .padding(.leading)
@@ -386,14 +354,16 @@ struct QueueEntry: View {
                     }
                   }
                     .onEnded { _ in
-                      if self.offset.width < 50 {
-                        self.scale = 1
-                        self.offset.width = -60
-                        opened = true
-                      } else {
-                        self.scale = 0.5
-                        self.offset = .zero
-                        opened = false
+                      if !isHistoryView {
+                        if self.offset.width < 50 {
+                          self.scale = 1
+                          self.offset.width = -60
+                          opened = true
+                        } else {
+                          self.scale = 0.5
+                          self.offset = .zero
+                          opened = false
+                        }
                       }
                     }
         )
@@ -405,8 +375,6 @@ struct QueueEntry: View {
  */
 struct NowPlayingViewHostMaximized: View {
     @State var isPlaying: Bool
-    @ObservedObject var songQueue: MusicQueue
-    @ObservedObject var historyQueue: MusicQueue
     @ObservedObject var isHost: ObservableBoolean
     @State var saved: Bool = false
     @Binding var isMaximized: Bool //should start as true
@@ -417,7 +385,14 @@ struct NowPlayingViewHostMaximized: View {
     func playSong(){
         print("Play Song")
         sharedSpotify.resume()
-        isPlaying = true
+        
+        RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+        
+        if !(sharedSpotify.isPaused ?? true) {
+            isPlaying = false
+        } else {
+            isPlaying = true
+        }
     }
     
     /**
@@ -427,7 +402,14 @@ struct NowPlayingViewHostMaximized: View {
         //if nowPlaying != nil {
         sharedSpotify.pause()
         print("Pause")
-        isPlaying = false
+        
+        RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+        
+        if !(sharedSpotify.isPaused ?? true) {
+            isPlaying = false
+        } else {
+            isPlaying = true
+        }
     }
     
     /**
@@ -443,11 +425,11 @@ struct NowPlayingViewHostMaximized: View {
     //TO-DO: method to delete from history
     //TO-DO: update history
     func previousSong(){
-        if historyQueue.musicList.count > 0 {
+        if songHistory.musicList.count > 0 {
             
             //print("Current Number of Songs in Queue \(songQueue.musicList.count)")
             
-            sharedSpotify.enqueue(songID: self.historyQueue.musicList[historyQueue.musicList.count - 1].id) {
+            sharedSpotify.enqueue(songID: songHistory.musicList[songHistory.musicList.count - 1].id) {
             sharedSpotify.skip()
             
             //dequeue(id: self.historyQueue.musicList[0].id)
@@ -523,7 +505,7 @@ struct NowPlayingViewHostMaximized: View {
                         } else {
                             playSong()
                         }}) {
-                            if !(sharedSpotify.isPaused ?? true) {
+                            if !(isPlaying) {
                                 Image(systemName: "pause").resizable().frame(width: 20.0, height: 25.0).foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
                             } else {
                                 Image(systemName: "play")
@@ -555,6 +537,12 @@ struct NowPlayingViewHostMaximized: View {
         }
       }.onAppear(perform: {
         sharedSpotify.updateCurrentlyPlayingPosition()
+        
+        if !(sharedSpotify.isPaused ?? true) {
+            isPlaying = false
+        } else {
+            isPlaying = true
+        }
       })
       
       
@@ -597,6 +585,9 @@ struct NowPlayingViewHostMinimized: View {
      */
     func skipSong(){
       songQueue.skipSong()
+        print("skiped")
+      timeTracker = true
+      RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
     }
     
     /**
@@ -632,7 +623,7 @@ struct NowPlayingViewHostMinimized: View {
                     self.sheetManager.showPartialSheet({
                          print("normal sheet dismissed")
                     }) {
-                        NowPlayingViewHostMaximized(isPlaying: isPlaying, songQueue: songQueue, historyQueue: historyQueue, isHost: isHost, isMaximized: $isMaximized)
+                        NowPlayingViewHostMaximized(isPlaying: isPlaying, isHost: isHost, isMaximized: $isMaximized)
                     }
                 }
                 

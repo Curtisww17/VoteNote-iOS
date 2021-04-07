@@ -52,3 +52,11 @@ class ObservableInteger: ObservableObject {
         self.intValue = intValue
     }
 }
+
+class ObservableString: ObservableObject {
+    var stringValue: String
+    
+    init(stringValue: String) {
+        self.stringValue = stringValue
+    }
+}

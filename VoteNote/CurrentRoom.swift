@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 
 
+var currentQR = CurrentRoom()
 /**
  This class is for keeping track of the current room's qr code. Swift is weird so I had to
  make this in a separate class
