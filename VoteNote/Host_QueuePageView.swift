@@ -227,9 +227,9 @@ struct QueueEntry: View {
     func upVoteSong(){
         print("Upvote Song")
         localVotes.intValue = localVotes.intValue + 1
-        voteSong(vote: 1, id: curSong.id)
-        RunLoop.main.run(until: Date(timeIntervalSinceNow: 1))
+      voteSong(vote: 1, id: curSong.id){
         songQueue.updateQueue()
+      }
     }
     
     /**
@@ -239,9 +239,9 @@ struct QueueEntry: View {
     func downVoteSong(){
         print("Downvote Song")
         localVotes.intValue = localVotes.intValue - 1
-        voteSong(vote: -1, id: curSong.id)
-        RunLoop.main.run(until: Date(timeIntervalSinceNow: 1))
+      voteSong(vote: -1, id: curSong.id) {
         songQueue.updateQueue()
+      }
     }
     
     /**
