@@ -228,7 +228,7 @@ struct QueueEntry: View {
         print("Upvote Song")
         localVotes.intValue = localVotes.intValue + 1
         voteSong(vote: 1, id: curSong.id)
-        RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+        RunLoop.main.run(until: Date(timeIntervalSinceNow: 1))
         songQueue.updateQueue()
     }
     
@@ -240,7 +240,7 @@ struct QueueEntry: View {
         print("Downvote Song")
         localVotes.intValue = localVotes.intValue - 1
         voteSong(vote: -1, id: curSong.id)
-        RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+        RunLoop.main.run(until: Date(timeIntervalSinceNow: 1))
         songQueue.updateQueue()
     }
     
