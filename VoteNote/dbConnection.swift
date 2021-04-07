@@ -216,11 +216,13 @@ func joinRoom(code: String, completion:@escaping (room?, String?) -> Void){
     
     
     let joiningQuery = db.collection("room").whereField("code", isEqualTo: upperCode)
-    
     joiningQuery.getDocuments() { (query, err) in
-        if let err = err{
+        if err != nil {
             print("err gerring documents \(err)")
-            completion(nil, err.localizedDescription)
+          completion(nil, err?.localizedDescription)
+        }
+        else if query!.isEmpty {
+          completion(nil, "There is no room with that code")
         }
         else{
             //put the user in the room
@@ -241,7 +243,6 @@ func joinRoom(code: String, completion:@escaping (room?, String?) -> Void){
             
             completion(room(rm: rm!), nil)
         }
-        
     }
     
 }

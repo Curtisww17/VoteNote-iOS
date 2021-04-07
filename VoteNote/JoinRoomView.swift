@@ -27,11 +27,14 @@ struct JoinRoomView: View {
   @State var explicitSongsAllowed: Bool = false
   @State var anonUsr: Bool = false
   @State var prevJoinedRooms: [String] = []
+  @State var showingAlert = false
+  @State var alertMsg = ""
   
   func join(c: String) {
     joinRoom(code: c){ (ret, message) in
       if message != nil {
-        //TODO: popup that they cannot join the room
+        alertMsg = message!
+        showingAlert = true
       }else{
         storePrevRoom(code: c)
         self.joined = true
@@ -98,6 +101,9 @@ struct JoinRoomView: View {
        })
        }
        }
+    }
+    .alert(isPresented: $showingAlert) {
+      Alert(title: Text("Cannot Join Room"), message: Text(alertMsg), dismissButton: .default(Text("Got it!")))
     }
     .onAppear(perform: {
       getPrevJoinedRooms(completion: {(codes, err) in
