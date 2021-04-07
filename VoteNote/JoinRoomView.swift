@@ -14,7 +14,7 @@ struct JoinRoomView: View {
   @Binding var isInRoom: Bool
   //@ObservedObject var spotify: Spotify = sharedSpotify
   
-  @State var code = ""
+  @ObservedObject var code = TextBindingManager(limit: 5)
   @State var joined = false
   @State private var isShowingScanner = false
   
@@ -78,14 +78,16 @@ struct JoinRoomView: View {
           isShowingJoinAlert.toggle()
         })
         if (isShowingJoinAlert) {
-          TextField("Room Code", text: $code)
+          TextField("Room Code", text: $code.text)
             .textFieldStyle(RoundedBorderTextFieldStyle())
-          Button(action: {
-            join(c: code)
-          }, label: {
-            Text("Join")
-          })
-          .frame(width: UIScreen.main.bounds.width * 0.8, height: 60, alignment: .center)
+          if code.text.count == 5 {
+            Button(action: {
+              join(c: code.text)
+            }, label: {
+              Text("Join")
+            })
+            .frame(width: UIScreen.main.bounds.width * 0.8, height: 60, alignment: .center)
+          }
         }
       }
       // Not implemented yet

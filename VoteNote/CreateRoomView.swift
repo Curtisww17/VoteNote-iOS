@@ -19,6 +19,8 @@ struct CreateRoomView: View {
     didSet {
       if userCapacity < 1 {
         userCapacity = 1
+      } else if userCapacity > 50 {
+        userCapacity = 50
       }
     }
   }
@@ -30,8 +32,8 @@ struct CreateRoomView: View {
     }
   }
   
-  @State var roomName: String = ""
-  @State var roomDescription: String = ""
+  @ObservedObject var roomName = TextBindingManager(limit: 20)
+  @ObservedObject var roomDescription = TextBindingManager(limit: 20)
   @State var votingEnabled: Bool = true
   @State var madeRoom: Bool = false
   @State var anonUsr: Bool = false
@@ -42,7 +44,7 @@ struct CreateRoomView: View {
   
   func createRoom(){
     //TO-DO- send info to room, songs per user
-    let newRoom: room = room(name: roomName, desc: roomDescription, anonUsr: anonUsr, capacity: userCapacity, explicit: explicitSongsAllowed, voting: votingEnabled, spu: songsPerUser)
+    let newRoom: room = room(name: roomName.text, desc: roomDescription.text, anonUsr: anonUsr, capacity: userCapacity, explicit: explicitSongsAllowed, voting: votingEnabled, spu: songsPerUser)
     let newcode = makeRoom(newRoom: newRoom)
     storePrevRoom(code: newcode)
     madeRoom = true
@@ -57,8 +59,8 @@ struct CreateRoomView: View {
         
         Form {
           Section(header: Text("General Room Information")) {
-            TextField("Room Name", text: $roomName)
-            TextField("Room Description", text: $roomDescription)
+            TextField("Room Name", text: $roomName.text)
+            TextField("Room Description", text: $roomDescription.text)
           }
           
           Section(header: Text("Settings")) {
@@ -124,7 +126,7 @@ struct CreateRoomView: View {
           }
         }
         
-        if self.roomName != "" {
+        if self.roomName.text != "" {
           Button(action: {createRoom()}) {
             Text("Create Room")
             
@@ -136,7 +138,7 @@ struct CreateRoomView: View {
       //}
     }
     .navigationBarHidden(true)
-    .navigate(to: HostController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription, votingEnabled: votingEnabled, anonUsr: anonUsr, roomCapacity: userCapacity, songsPerUser: songsPerUser, explicitSongsAllowed: explicitSongsAllowed), when: $madeRoom)
+    .navigate(to: HostController(isInRoom: $isInRoom, roomName: roomName.text, roomDescription: roomDescription.text, votingEnabled: votingEnabled, anonUsr: anonUsr, roomCapacity: userCapacity, songsPerUser: songsPerUser, explicitSongsAllowed: explicitSongsAllowed), when: $madeRoom)
     .onAppear(perform: {
       getPrevHostedRooms(completion: {(codes, err) in
         if err != nil {
@@ -167,6 +169,21 @@ struct CreateRoomView_Previews: PreviewProvider {
     
     CreateRoomView_PreviewContainer()
   }
+}
+
+class TextBindingManager: ObservableObject {
+    @Published var text = "" {
+        didSet {
+            if text.count > characterLimit && oldValue.count <= characterLimit {
+                text = oldValue
+            }
+        }
+    }
+    let characterLimit: Int
+    
+    init(limit: Int = 20) {
+        characterLimit = limit
+    }
 }
 
 //Derived from George_E on Stack Overflow
