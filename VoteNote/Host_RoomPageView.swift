@@ -23,6 +23,7 @@ struct Host_RoomPageView: View {
   @Binding var notExited: Bool
   @Binding var isTiming: Bool
   @State var inRoom: Bool = true
+  let isHost = true
   
     /**
         Causes the current user to leave the room
@@ -69,7 +70,7 @@ struct Host_RoomPageView: View {
                                 Text("History")
                               }
                             })
-            NavigationLink(destination: UsersListView()
+              NavigationLink(destination: UsersListView(isHost: isHost, votingEnabled: votingEnabled)
                             .onAppear(perform: {
                               showNav = false
                             })

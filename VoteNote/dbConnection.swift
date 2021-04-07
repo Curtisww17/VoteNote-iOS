@@ -88,7 +88,7 @@ class user: Identifiable, ObservableObject {
     var profilePic: String //link to pfp
     var isAnon: Bool?       //is the user anonymized
     var anon_name: String  //the user's anonymous name
-    let uid: String?
+    var uid: String?
     
     //TODO: refactor this out
     init(name: String, profilePic: String){
@@ -497,6 +497,7 @@ func getUsers(completion: @escaping ([user]?, Error?) -> Void){
                             if (currRoom!.anonUsr) {
                                 newusr.name = newusr.anon_name
                             }
+                          newusr.uid = usr.documentID
                             users.append(newusr)
                         }
                         completion(users, nil)
