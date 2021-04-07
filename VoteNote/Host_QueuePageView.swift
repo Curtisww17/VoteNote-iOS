@@ -248,6 +248,7 @@ struct QueueEntry: View {
         Calls the DB to veto the current song
      */
     func vetoMusic(){
+        print("Vetoing Song")
         vetoSong(id: curSong.id)
         
         var count: Int = 0
@@ -314,7 +315,7 @@ struct QueueEntry: View {
                     if opened && !isHistoryView {
                         HStack {
                             if !isUserQueue {
-                                Button(action: {vetoMusic()}) {
+                                Button(action: {/*vetoMusic()*/}) {
                                     Text("Veto").foregroundColor(Color.black).scaleEffect(scale)
                                 }.padding(.all).background(Color.red).border(/*@START_MENU_TOKEN@*/Color.red/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/2/*@END_MENU_TOKEN@*/).onTapGesture {
                                     vetoMusic()
