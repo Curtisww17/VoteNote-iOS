@@ -732,17 +732,12 @@ func vetoSong(id: String){
     
     getCurrRoom { (currRoom, err) in
         
-        let _ = db.collection("room").whereField("code", isEqualTo: currRoom).getDocuments { (doc, Err) in
-            if let err = err {
-                print("/n/nerror getting doc \(err.localizedDescription)")
-            }else if !doc!.isEmpty{
-                
-                let docid = doc?.documents[0].documentID
-                
-                //remove the song from the queue
-                db.collection("room").document(docid!).updateData(["queue.\(id)" : FieldValue.delete()])
-            }
-        }
+            
+        let rm = db.collection("room").document(currRoom)
+            
+        rm.collection("queue").document(id).delete()
+        
+        
         
         
     }//end getCurrRoom
@@ -803,39 +798,25 @@ func getHistory(completion: @escaping ([song]?, Error?) -> Void){
     
     getCurrRoom { (currRoom, err) in
         
-        //find the current room doc
-        let joiningQuery = db.collection("room").whereField("code", isEqualTo: currRoom)
+        //--------------------------------------------
         
-        joiningQuery.getDocuments { (docs, err) in
-            if let err = err {
-                print("\n\n\n Error Getting History \(err)")
+        db.collection("room").document(currRoom).collection("history").order(by: "time").getDocuments { (hist, err) in
+            if let err = err{
+                print("error getting history \(err)")
                 completion(nil, err)
-            } else {
-                //if no documents were returned from the querey
-                if docs?.documents.isEmpty ?? true {
-                    print("No documents found for getHistory")
-                    completion(nil, nil)
-                }else{
-                    //grab the history from the room
-                    let queue = docs?.documents[0].data()["history"] as? [String: Any]
-                    var songs: [song] = []
-                    if queue != nil {
-                        //iterate through the queue and convert it into an array of song
-                        for (id, s) in queue!{
-                            songs.append(song(sng: s as! [String: Any], id: id))
-                        }
-                    } else {
-                        print("\n\n\n Error Getting History")
-                        enum newError: Error {
-                            case documentError(String)
-                        }
-                        completion(nil, newError.documentError("history does not exist"))
-                    }
-                    completion(songs, nil)
+            } else if hist?.isEmpty ?? true{
+                print("history is empty")
+                completion(nil, nil)
+            }else {
+                var songs: [song] = []
+                
+                for doc in hist!.documents {
+                    songs.append(song(sng: doc.data() , id: doc.documentID))
                 }
+                completion(songs, nil)
             }
-            completion(nil, nil)
         }
+        
     }//end getCurrRoom
     
     
