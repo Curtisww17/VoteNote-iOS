@@ -385,6 +385,7 @@ struct NowPlayingViewHostMaximized: View {
     @State var isPlaying: Bool
     @ObservedObject var isHost: ObservableBoolean
     @Binding var isMaximized: Bool //should start as true
+    @State var isLiked = false
     
     /**
         Resumes the current song in the Spotify Queue
@@ -457,9 +458,11 @@ struct NowPlayingViewHostMaximized: View {
         print(sharedSpotify.isSongFavorited(songID: sharedSpotify.currentlyPlaying?.id ?? ""))
         if(!sharedSpotify.isSongFavorited(songID: sharedSpotify.currentlyPlaying?.id ?? "")){
             sharedSpotify.likeSong(id: sharedSpotify.currentlyPlaying!.id)
+            isLiked = true
             }
         else{
             sharedSpotify.unLikeSong(id: sharedSpotify.currentlyPlaying!.id)
+            isLiked = false
         }
       }
     }
@@ -531,7 +534,7 @@ struct NowPlayingViewHostMaximized: View {
                         }
                         Spacer()
                         Button(action: {favoriteSong()}) {
-                            if(!sharedSpotify.isSongFavorited(songID: sharedSpotify.currentlyPlaying?.id ?? "")){
+                            if(!isLiked){
                             Image(systemName: "heart")
                                 .foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
                             } else {
@@ -554,6 +557,10 @@ struct NowPlayingViewHostMaximized: View {
             isPlaying = false
         } else {
             isPlaying = true
+        }
+        
+        if(sharedSpotify.isSongFavorited(songID: sharedSpotify.currentlyPlaying?.id ?? "")){
+            isLiked = true
         }
       })
       
