@@ -620,44 +620,6 @@ func addsong(id: String, completion: @escaping () -> () ){
 }
 
 
-/**
- gets a songs details by it's id
- 
- used to get details like who posted the song and how many votes it has
- 
- - Parameter id: the spotify id of the song
- */
-func getSong(id: String, completion: @escaping (song?, Error?) -> Void){
-    
-    getCurrRoom { (currRoom, err) in
-        
-        
-        var songout: song? = nil
-        
-        //grab our room
-        //TODO: this wont work
-        db.collection("room").document(currRoom).getDocument { (doc, err) in
-            if let err = err {
-                print("Error getting song \(err)")
-                completion(nil, err)
-            } else{
-                //grab the queue
-                let queue: Dictionary? = doc?.data()?["queue"] as? Dictionary<String, Any?>
-                if queue != nil {
-                    //grab the song from the queue
-                    let sng: Dictionary = queue![id] as! Dictionary<String, Any?>
-                    
-                    //convert from the db map of song to song obj
-                    songout = song(sng: sng, id: id)
-                    completion(songout, nil)
-                }
-                completion(nil, nil)
-            }
-        }
-    }//end getCurrRoom
-    
-    //return songout
-}
 
 /**
  removes a song from the queue and puts it into the history
@@ -802,7 +764,6 @@ func getHistory(completion: @escaping ([song]?, Error?) -> Void){
     
     getCurrRoom { (currRoom, err) in
         
-        //--------------------------------------------
         
         db.collection("room").document(currRoom).collection("history").order(by: "time").getDocuments { (hist, err) in
             if let err = err{
