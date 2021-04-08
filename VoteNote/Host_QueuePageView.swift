@@ -72,7 +72,6 @@ class MusicQueue: Identifiable, ObservableObject {
   @Published var currentlyPlaying: song?
   
   public func skipSong() {
-    print(musicList.count)
       if musicList.count > 0 {
         sharedSpotify.enqueue(songID: self.musicList[0].id) {
           sharedSpotify.skip()

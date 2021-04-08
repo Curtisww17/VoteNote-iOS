@@ -26,6 +26,7 @@ class Spotify: ObservableObject {
   var usersSavedSongs: playlistTrackTime?
   var recommendedSongs: reccomndations?
   var PlaylistBase: uniquePlaylist?
+  var genreList: genres?
   var songTimer: Int = 0
   
   var sessionManager: SPTSessionManager?
@@ -235,9 +236,22 @@ class Spotify: ObservableObject {
     self.httpRequester.headerPUT(url: "https://api.spotify.com/v1/me/tracks?ids=\(id)",header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ]).onFinish = {
       (response) in
       do{
-        print(response.description)
+        print("\(response.description)")
       } catch {
         fatalError("bad response \(response.description)")
+      }
+    }
+  }
+  
+  func getGenreList(completion: @escaping (genres?) -> ()) -> (){
+    self.httpRequester.headerGet(url: "https://api.spotify.com/v1/recommendations/available-genre-seeds", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ]).onFinish = {
+      (response) in
+      do {
+        print(" testingssdssds \(response.description)")
+        let decoder = JSONDecoder()
+        try completion( decoder.decode(genres.self, from: response.data))
+      } catch {
+        fatalError("Couldn't parse \(response.description)")
       }
     }
   }
@@ -377,4 +391,8 @@ struct songTimeAdded: Codable{
 
 struct reccomndations: Codable{
   var tracks: [SpotifyTrack]
+}
+
+struct genres: Codable{
+  var genres: [String]
 }
