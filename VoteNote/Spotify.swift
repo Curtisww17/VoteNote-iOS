@@ -218,6 +218,19 @@ class Spotify: ObservableObject {
     }
   }
   
+  func getGenreList(completion: @escaping (genres?) -> ()) -> (){
+    self.httpRequester.headerGet(url: "https://api.spotify.com/v1/recommendations/available-genre-seeds", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ]).onFinish = {
+      (response) in
+      do {
+        //print(" testingssdssds \(response.description)")
+        let decoder = JSONDecoder()
+        try completion( decoder.decode(genres.self, from: response.data))
+      } catch {
+        fatalError("Couldn't parse \(response.description)")
+      }
+    }
+  }
+  
   //creates a palylist on spotify for the user based on a json object
   //currently not working/implemented
   func createPlaylist(id: String, playlistData: String) {
@@ -239,19 +252,6 @@ class Spotify: ObservableObject {
         print("\(response.description)")
       } catch {
         fatalError("bad response \(response.description)")
-      }
-    }
-  }
-  
-  func getGenreList(completion: @escaping (genres?) -> ()) -> (){
-    self.httpRequester.headerGet(url: "https://api.spotify.com/v1/recommendations/available-genre-seeds", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ]).onFinish = {
-      (response) in
-      do {
-        print(" testingssdssds \(response.description)")
-        let decoder = JSONDecoder()
-        try completion( decoder.decode(genres.self, from: response.data))
-      } catch {
-        fatalError("Couldn't parse \(response.description)")
       }
     }
   }
