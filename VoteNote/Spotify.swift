@@ -183,6 +183,7 @@ class Spotify: ObservableObject {
     self.httpRequester.headerGet(url: "https://api.spotify.com/v1/playlists/\(id)", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ]).onFinish = {
       (response) in
       do {
+        print(response.description)
         let decoder = JSONDecoder()
         try completion( decoder.decode(uniquePlaylist.self, from: response.data))
       } catch {
@@ -228,6 +229,35 @@ class Spotify: ObservableObject {
         fatalError("bad response \(response.description)")
       }
     }
+  }
+  
+  func createPlaylist2(id: String, json: [String:Any]){
+    // prepare json data
+
+    let jsonData = try? JSONSerialization.data(withJSONObject: json)
+    let header = ["Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? "")" ]
+
+    // create post request
+    let url = "https://api.spotify.com/v1/users/\(id)/playlists"
+    //var request = URLRequest(url: url, headers: header)
+    var request = URLRequest(urlString: url, headers: header)
+    request?.httpMethod = "POST"
+
+    // insert json data to the request
+    request?.httpBody = jsonData
+
+    let task = URLSession.shared.dataTask(with: request ?? URLRequest(url: URL(string: url)!)) { data, response, error in
+        guard let data = data, error == nil else {
+            print(error?.localizedDescription ?? "No data")
+            return
+        }
+        let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
+        if let responseJSON = responseJSON as? [String: Any] {
+            print(responseJSON)
+        }
+    }
+
+    task.resume()
   }
   
   //adds specified to users liked/saved songs
