@@ -169,13 +169,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate,
   // MARK: AppRemoteDelegate
   
   func appRemoteDidEstablishConnection(_ appRemote: SPTAppRemote) {
-    print("connected!")
-    appRemote.playerAPI?.pause(nil)
-    
     OperationQueue.main.addOperation {
       sharedSpotify.loggedIn = true
       sharedSpotify.appRemote = self.appRemote
       sharedSpotify.getCurrentUser(completion: { user in
+        if sharedSpotify.currentUser == nil {
+          appRemote.playerAPI?.pause(nil)
+        }
         sharedSpotify.currentUser = user
         //login user to db
         firebaseLogin(name: (user?.display_name)!)
@@ -202,6 +202,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate,
   
   func appRemote(_ appRemote: SPTAppRemote, didDisconnectWithError error: Error?) {
     print("didDisconnectWithError")
+    appRemote.connect()
   }
   
   func sessionManager(manager: SPTSessionManager, didInitiate session: SPTSession) {

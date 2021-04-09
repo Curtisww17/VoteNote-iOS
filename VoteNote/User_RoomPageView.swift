@@ -24,6 +24,7 @@ struct User_RoomPageView: View {
   @Binding var notExited: Bool
   
   @Binding var showNav: Bool
+  let isHost = false
     
     /**
         Causes the current user to leave the room
@@ -65,7 +66,7 @@ struct User_RoomPageView: View {
                                     Text("History")
                                   }
                                 })
-                NavigationLink(destination: UsersListView()
+                NavigationLink(destination: UsersListView(isHost: isHost, votingEnabled: votingEnabled)
                                 .onAppear(perform: {
                                   showNav = false
                                 })
@@ -79,7 +80,7 @@ struct User_RoomPageView: View {
                                     Text("Users")
                                   }
                                 })
-                NavigationLink(destination: RoomCodeView(currentRoom: currentRoom)
+                NavigationLink(destination: RoomCodeView()
                                 .onAppear(perform: {
                                   showNav = false
                                 })
@@ -149,6 +150,7 @@ struct User_RoomPageView: View {
           }
           .navigationTitle("Room")
           .navigationBarHidden(true).navigationViewStyle(StackNavigationViewStyle())
+
         }.frame(height: geo.size.height)
     }
     //return NavigationView {

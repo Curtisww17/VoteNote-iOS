@@ -72,7 +72,6 @@ class MusicQueue: Identifiable, ObservableObject {
   @Published var currentlyPlaying: song?
   
   public func skipSong() {
-    print(musicList.count)
       if musicList.count > 0 {
         sharedSpotify.enqueue(songID: self.musicList[0].id) {
           sharedSpotify.skip()
@@ -236,9 +235,9 @@ struct QueueEntry: View {
     func upVoteSong(){
         print("Upvote Song")
         localVotes.intValue = localVotes.intValue + 1
-        voteSong(vote: 1, id: curSong.id)
-        RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+      voteSong(vote: 1, id: curSong.id){
         songQueue.updateQueue()
+      }
     }
     
     /**
@@ -248,15 +247,16 @@ struct QueueEntry: View {
     func downVoteSong(){
         print("Downvote Song")
         localVotes.intValue = localVotes.intValue - 1
-        voteSong(vote: -1, id: curSong.id)
-        RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+      voteSong(vote: -1, id: curSong.id) {
         songQueue.updateQueue()
+      }
     }
     
     /**
         Calls the DB to veto the current song
      */
     func vetoMusic(){
+        print("Vetoing Song")
         vetoSong(id: curSong.id)
         
         var count: Int = 0
@@ -280,11 +280,11 @@ struct QueueEntry: View {
                     if !opened {
                         VStack {
                             HStack {
-                                Text(curSong.title)
+                              Text(curSong.title!)
                                 Spacer()
                             }
                             HStack {
-                                Text(curSong.artist).font(.caption)
+                              Text(curSong.artist!).font(.caption)
                                     .foregroundColor(Color.gray)
                                 Spacer()
                             }
@@ -323,7 +323,7 @@ struct QueueEntry: View {
                     if opened && !isHistoryView {
                         HStack {
                             if !isUserQueue {
-                                Button(action: {vetoMusic()}) {
+                                Button(action: {/*vetoMusic()*/}) {
                                     Text("Veto").foregroundColor(Color.black).scaleEffect(scale)
                                 }.padding(.all).background(Color.red).border(/*@START_MENU_TOKEN@*/Color.red/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/2/*@END_MENU_TOKEN@*/).onTapGesture {
                                     vetoMusic()
@@ -334,14 +334,14 @@ struct QueueEntry: View {
                                 if isUserQueue {
                                     ZStack {
                                         Text("User").scaleEffect(scale)
-                                        NavigationLink(destination: UserUserDetailView(selectedUserUID: ObservableString(stringValue: curSong.addedBy), votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue))) {
+                                      NavigationLink(destination: UserUserDetailView(selectedUserUID: ObservableString(stringValue: curSong.addedBy!), votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue))) {
                                             EmptyView()
                                         }.hidden()
                                     }.padding(.all).border(Color.black, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/).frame(width: 80, height: 80)
                                 } else {
                                     ZStack {
                                         Text("User").scaleEffect(scale)
-                                        NavigationLink(destination: HostUserDetailView(selectedUserUID: ObservableString(stringValue: curSong.addedBy), votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue))) {
+                                      NavigationLink(destination: HostUserDetailView(selectedUserUID: ObservableString(stringValue: curSong.addedBy!), votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue))) {
                                             EmptyView()
                                         }.hidden()
                                     }.padding(.all).border(Color.black, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/).frame(width: 80, height: 80)

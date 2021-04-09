@@ -63,7 +63,6 @@ struct LandingPageView: View {
       spotify.initializeAnon()
     })
     .navigationViewStyle(StackNavigationViewStyle())
-    
   }
 }
 

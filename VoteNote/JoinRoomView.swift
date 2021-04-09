@@ -14,7 +14,7 @@ struct JoinRoomView: View {
   @Binding var isInRoom: Bool
   //@ObservedObject var spotify: Spotify = sharedSpotify
   
-  @State var code = ""
+  @ObservedObject var code = TextBindingManager(limit: 5)
   @State var joined = false
   @State private var isShowingScanner = false
   
@@ -27,11 +27,14 @@ struct JoinRoomView: View {
   @State var explicitSongsAllowed: Bool = false
   @State var anonUsr: Bool = false
   @State var prevJoinedRooms: [String] = []
+  @State var showingAlert = false
+  @State var alertMsg = ""
   
   func join(c: String) {
     joinRoom(code: c){ (ret, message) in
       if message != nil {
-        //TODO: popup that they cannot join the room
+        alertMsg = message!
+        showingAlert = true
       }else{
         storePrevRoom(code: c)
         self.joined = true
@@ -78,14 +81,16 @@ struct JoinRoomView: View {
           isShowingJoinAlert.toggle()
         })
         if (isShowingJoinAlert) {
-          TextField("Room Code", text: $code)
+          TextField("Room Code", text: $code.text)
             .textFieldStyle(RoundedBorderTextFieldStyle())
-          Button(action: {
-            join(c: code)
-          }, label: {
-            Text("Join")
-          })
-          .frame(width: UIScreen.main.bounds.width * 0.8, height: 60, alignment: .center)
+          if code.text.count == 5 {
+            Button(action: {
+              join(c: code.text)
+            }, label: {
+              Text("Join")
+            })
+            .frame(width: UIScreen.main.bounds.width * 0.8, height: 60, alignment: .center)
+          }
         }
       }
       // Not implemented yet
@@ -98,6 +103,9 @@ struct JoinRoomView: View {
        })
        }
        }
+    }
+    .alert(isPresented: $showingAlert) {
+      Alert(title: Text("Cannot Join Room"), message: Text(alertMsg), dismissButton: .default(Text("Got it!")))
     }
     .onAppear(perform: {
       getPrevJoinedRooms(completion: {(codes, err) in
