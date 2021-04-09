@@ -50,13 +50,13 @@ class room{
     let spu: Int    //songs per user
     let playlist: String //playlist id thing
     let host: String //uid of the host
-    let genres: [String]
-    let closed: Bool
-    let bannedUsers: [String]?
-    //need to add allowed genres
+    let genres: [String] //the allowwed genres
+    let closed: Bool //whether or not the room is open/active
+    let bannedUsers: [String]? //a list of all the users who are banned from the room
+    let currSong: String
     
     //normal constructor
-    init(name: String, desc: String? = "", anonUsr: Bool, capacity: Int, explicit: Bool, voting: Bool, spu: Int = -1, playlist: String? = nil, host: String = FAuth.currentUser!.uid, genres: [String]? = [], closed: Bool? = false, bannedUsers: [String]? = []) {
+    init(name: String, desc: String? = "", anonUsr: Bool, capacity: Int, explicit: Bool, voting: Bool, spu: Int = -1, playlist: String? = nil, host: String = FAuth.currentUser!.uid, genres: [String]? = [], closed: Bool? = false, bannedUsers: [String]? = [], currSong: String = "") {
         self.name = name
         self.desc = desc
         self.anonUsr = anonUsr
@@ -71,6 +71,7 @@ class room{
         self.genres = genres ?? []
         self.closed = closed ?? false
         self.bannedUsers = bannedUsers
+        self.currSong = currSong
     }
     
     //constructor for firestore
@@ -89,6 +90,7 @@ class room{
         genres = rm["genres"] as? [String] ?? []
         closed = rm["closed"] as? Bool ?? false
         bannedUsers = rm["bannedUsers"] as? [String]
+        currSong = rm["currSong"] as? String ?? ""
     }
 }
 
@@ -417,6 +419,16 @@ func openRoom(){
     }
 }
 
+/**
+ Set the currently playing song
+ 
+ - Parameter id: the spotify id of the song
+ */
+func setCurrSong(id: String){
+    getCurrRoom { (code, err) in
+        db.collection("room").document(code).updateData(["currSong": id])
+    }
+}
 
 /**
  makes a new room in the db from a room obj
