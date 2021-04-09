@@ -130,8 +130,6 @@ class MusicQueue: Identifiable, ObservableObject {
             }
           }
       }
-    
-    //add next song to queue
     if(self.musicList.count > 0){
         if((sharedSpotify.currentlyPlayingPercent ?? 0) > 0.50 && currSongID != sharedSpotify.currentlyPlaying?.id ?? "notPlaying"){
             currSongID = sharedSpotify.currentlyPlaying?.id ?? ""
@@ -150,13 +148,6 @@ class MusicQueue: Identifiable, ObservableObject {
     } else if(sharedSpotify.currentlyPlayingPercent ?? 0 > 0.50 ){
         print("no music to add")
         //self.currentlyPlaying = nil
-    }
-    
-    //automatically like songs
-    for song in self.musicList {
-        if(sharedSpotify.isSongFavorited(songID: song.id)){
-            voteSong(vote: 1, id: song.id)
-        }
     }
   }
   
@@ -384,8 +375,8 @@ struct QueueEntry: View {
 struct NowPlayingViewHostMaximized: View {
     @State var isPlaying: Bool
     @ObservedObject var isHost: ObservableBoolean
+    @State var saved: Bool = false
     @Binding var isMaximized: Bool //should start as true
-    @State var isLiked = false
     
     /**
         Resumes the current song in the Spotify Queue
@@ -425,13 +416,6 @@ struct NowPlayingViewHostMaximized: View {
      */
     func skipSong(){
       songQueue.skipSong()
-      RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
-      if(sharedSpotify.isSongFavorited(songID: sharedSpotify.currentlyPlaying?.id ?? "")){
-        isLiked = true
-      } else {
-        isLiked = false
-      }
-        
     }
     
     /**
@@ -462,16 +446,9 @@ struct NowPlayingViewHostMaximized: View {
      */
     func favoriteSong(){
       if(sharedSpotify.currentlyPlaying != nil){
-        print(sharedSpotify.isSongFavorited(songID: sharedSpotify.currentlyPlaying?.id ?? ""))
-        if(!sharedSpotify.isSongFavorited(songID: sharedSpotify.currentlyPlaying?.id ?? "")){
-            sharedSpotify.likeSong(id: sharedSpotify.currentlyPlaying!.id)
-            isLiked = true
-            }
-        else{
-            sharedSpotify.unLikeSong(id: sharedSpotify.currentlyPlaying!.id)
-            isLiked = false
+        sharedSpotify.likeSong(id: sharedSpotify.currentlyPlaying!.id)
+            saved = !saved
         }
-      }
     }
 
     var body: some View {
@@ -541,7 +518,7 @@ struct NowPlayingViewHostMaximized: View {
                         }
                         Spacer()
                         Button(action: {favoriteSong()}) {
-                            if(!isLiked){
+                            if(!saved){
                             Image(systemName: "heart")
                                 .foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
                             } else {
@@ -565,10 +542,6 @@ struct NowPlayingViewHostMaximized: View {
         } else {
             isPlaying = true
         }
-        
-        if(sharedSpotify.isSongFavorited(songID: sharedSpotify.currentlyPlaying?.id ?? "")){
-            isLiked = true
-        }
       })
       
       
@@ -583,6 +556,7 @@ struct NowPlayingViewHostMinimized: View {
     @ObservedObject var songQueue: MusicQueue
     @ObservedObject var historyQueue: MusicQueue
     @ObservedObject var isHost: ObservableBoolean
+    @State var saved: Bool = false
     @Binding var isMaximized: Bool //should start as true
     let sheetManager: PartialSheetManager
     
@@ -628,10 +602,8 @@ struct NowPlayingViewHostMinimized: View {
     func favoriteSong(){
       if(sharedSpotify.currentlyPlaying != nil){
         sharedSpotify.likeSong(id: sharedSpotify.currentlyPlaying!.id)
+            saved = !saved
         }
-      else{
-        //unfavorite song
-      }
     }
 
     var body: some View {
