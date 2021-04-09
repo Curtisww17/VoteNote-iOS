@@ -155,7 +155,7 @@ class MusicQueue: Identifiable, ObservableObject {
     //automatically like songs
     for song in self.musicList {
         if(sharedSpotify.isSongFavorited(songID: song.id)){
-            voteSong(vote: 1, id: song.id)
+            voteSong(vote: 1, id: song.id){}
         }
     }
   }
