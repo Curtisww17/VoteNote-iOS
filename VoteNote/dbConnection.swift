@@ -50,10 +50,12 @@ class room{
     let spu: Int    //songs per user
     let playlist: String //playlist id thing
     let host: String //uid of the host
+    let genres: [String]
+    let closed: Bool
     //need to add allowed genres
     
     //normal constructor
-    init(name: String, desc: String? = "", anonUsr: Bool, capacity: Int, explicit: Bool, voting: Bool, spu: Int = -1, playlist: String? = nil, host: String = FAuth.currentUser!.uid) {
+    init(name: String, desc: String? = "", anonUsr: Bool, capacity: Int, explicit: Bool, voting: Bool, spu: Int = -1, playlist: String? = nil, host: String = FAuth.currentUser!.uid, genres: [String]? = [], closed: Bool? = false) {
         self.name = name
         self.desc = desc
         self.anonUsr = anonUsr
@@ -65,6 +67,8 @@ class room{
         self.spu = spu
         self.playlist = playlist ?? ""
         self.host = host
+        self.genres = genres ?? []
+        self.closed = closed ?? false
     }
     
     //constructor for firestore
@@ -80,6 +84,8 @@ class room{
         spu = rm["spu"] as? Int ?? -1
         playlist = rm["playlist"] as? String ?? ""
         host = rm["host"] as? String ?? ""
+        genres = rm["genres"] as? [String] ?? []
+        closed = rm["closed"] as? Bool ?? false
     }
 }
 
@@ -119,7 +125,7 @@ class user: Identifiable, ObservableObject {
 }
 
 class song: Identifiable, ObservableObject{
-    let addedBy: String? //UID of who added it
+    let addedBy: String //UID of who added it
     let artist: String?  //String of all credited artsts, sperated by spaces
     let genres: [String]
     let id: String  //spotify id of the song
@@ -141,7 +147,7 @@ class song: Identifiable, ObservableObject{
     
     //firestore
     init(sng: [String: Any], id: String){
-        addedBy = sng["addedBy"] as? String
+        addedBy = sng["addedBy"] as? String ?? ""
         artist = sng["artist"] as? String
         genres = []
         self.id = id
@@ -206,7 +212,7 @@ func firebaseLogin(name: String){
  */
 func joinRoom(code: String, completion:@escaping (room?, String?) -> Void){
     //put the user in the correct room
-    //TODO: add checking for banned user and capacity
+    //TODO: add checking for capacity
     
     let upperCode = code.uppercased()
     currentQR.update(roomCode: upperCode)
@@ -236,7 +242,9 @@ func joinRoom(code: String, completion:@escaping (room?, String?) -> Void){
                     completion(nil, "You are banned from this room")
                 }
             }
-            
+            if (rm?["closed"] as? Bool ?? false){
+                completion(nil, "This room is closed")
+            }
             completion(room(rm: rm!), nil)
         }
         
@@ -392,6 +400,20 @@ func leaveRoom() -> Bool{
     return true
 }
 
+///set the current room to closed
+func closeRoom(){
+    getCurrRoom { (code, err) in
+        db.collection("room").document(code).updateData(["closed": true])
+    }
+}
+
+///set the current room to open
+func openRoom(){
+    getCurrRoom { (code, err) in
+        db.collection("room").document(code).updateData(["closed": false])
+    }
+}
+
 
 /**
  makes a new room in the db from a room obj
@@ -424,7 +446,9 @@ func makeRoom(newRoom: room) -> String{
                                         "code": code,
                                         "spu": newRoom.spu,
                                         "playlist": newRoom.playlist,
-                                        "host": newRoom.host])
+                                        "host": newRoom.host,
+                                        "genres": newRoom.genres,
+                                        "closed": newRoom.closed])
     
     //put the user who made the room into the room
     db.collection("users").document(usr!.uid).updateData(["currentRoom": code])
