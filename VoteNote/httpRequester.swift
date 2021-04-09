@@ -53,7 +53,6 @@ class HttpRequester: ObservableObject {
   
   //not done dont use
   func POST(url: String, params: [(name:String, value:String)]){
-    
     HTTP.POST(url, parameters: params) { response in
       //do things...
       
@@ -80,6 +79,15 @@ class HttpRequester: ObservableObject {
   //put with just header
   func headerPUT(url: String, header: [String: String]) -> HTTP{
     HTTP.PUT(url, headers: header) { response in
+      if let err = response.error {
+        print("error: \(err.localizedDescription)")
+        return //also notify app of failure as needed
+      }
+    }!
+  }
+  
+  func headerDELETE(url: String, header: [String: String]) -> HTTP{
+    HTTP.DELETE(url, headers: header) { response in
       if let err = response.error {
         print("error: \(err.localizedDescription)")
         return //also notify app of failure as needed
