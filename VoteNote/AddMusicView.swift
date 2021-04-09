@@ -556,7 +556,7 @@ struct SearchEntry: View {
   @State var songArtist: String
   @State var songID: String
   
-  @State var addedBy: String = ""
+  @State var addedBy: String = getUID()
   @State var genres: [String] = ["Placeholder"]
   @State var length: Int = 0
   @State var numVotes: Int? = 0
@@ -567,12 +567,19 @@ struct SearchEntry: View {
   @State var hasHitMaxSongs: Bool = false
   
   func selectSong() {
+    hasHitMaxSongs = false
+    
     if songTitle != "Searching..." {
         selectedSong = !selectedSong
         if selectedSong {
             
             var numAdded: Int = 0
-            getQueue(){(songs, err) in
+            for x in songQueue.musicList {
+                if x.addedBy == getUID() {
+                    numAdded = numAdded + 1
+                }
+            }
+            /*getQueue(){(songs, err) in
                 if songs != nil {
                     for x in songs! {
                         if x.addedBy == getUID() {
@@ -580,8 +587,11 @@ struct SearchEntry: View {
                         }
                     }
                 }
-            }
+            }*/
+            
             numAdded = numAdded + selectedSongs.count
+            print(numAdded)
+            print(selectedSongs.count)
             
             if numAdded >= songsPerUser {
                 hasHitMaxSongs = true

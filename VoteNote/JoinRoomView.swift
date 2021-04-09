@@ -127,7 +127,6 @@ struct JoinRoomView: View {
     .navigate(to: UserController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser, votingEnabled: votingEnabled, anonUsr: anonUsr, explicitSongsAllowed: explicitSongsAllowed), when: $joined)
     .onAppear(perform: {
       sharedSpotify.pause()
-      sharedSpotify.getGenreList(completion: {genres in sharedSpotify.genreList = genres})
       
     })
     .navigationViewStyle(StackNavigationViewStyle())

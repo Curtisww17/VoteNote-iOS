@@ -218,6 +218,19 @@ class Spotify: ObservableObject {
     }
   }
   
+  func getGenreList(completion: @escaping (genres?) -> ()) -> (){
+    self.httpRequester.headerGet(url: "https://api.spotify.com/v1/recommendations/available-genre-seeds", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ]).onFinish = {
+      (response) in
+      do {
+        //print(" testingssdssds \(response.description)")
+        let decoder = JSONDecoder()
+        try completion( decoder.decode(genres.self, from: response.data))
+      } catch {
+        fatalError("Couldn't parse \(response.description)")
+      }
+    }
+  }
+  
   //creates a palylist on spotify for the user based on a json object
   //currently not working/implemented
   func createPlaylist(id: String, playlistData: String) {
@@ -243,15 +256,13 @@ class Spotify: ObservableObject {
     }
   }
   
-  func getGenreList(completion: @escaping (genres?) -> ()) -> (){
-    self.httpRequester.headerGet(url: "https://api.spotify.com/v1/recommendations/available-genre-seeds", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ]).onFinish = {
+  func unLikeSong(id: String){
+    self.httpRequester.headerDELETE(url: "https://api.spotify.com/v1/me/tracks?ids=\(id)",header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ]).onFinish = {
       (response) in
-      do {
-        print(" testingssdssds \(response.description)")
-        let decoder = JSONDecoder()
-        try completion( decoder.decode(genres.self, from: response.data))
+      do{
+        print(response.description)
       } catch {
-        fatalError("Couldn't parse \(response.description)")
+        fatalError("bad response \(response.description)")
       }
     }
   }
@@ -270,8 +281,21 @@ class Spotify: ObservableObject {
     }
   }
   
+  func isSongFavorited(songID: String) -> Bool{
+    if(self.usersSavedSongs == nil){
+      self.savedSongs(completion: {playlistSongs in self.usersSavedSongs = playlistSongs})
+    }
+    for song in self.usersSavedSongs?.items ?? [songTimeAdded(track: SpotifyTrack(album: nil, id: "", name: ""))] {
+      if(song.track.id == songID){
+        return true
+      }
+    }
+    return false
+  }
+  
   //gets information on a song based of off a song uri
   func getTrackInfo(track_uri: String, completion: @escaping (SpotifyTrack?) -> ()) {
+    print(track_uri)
     var track_id = track_uri
     if (track_id.contains(":")) {
       track_id = String(track_uri.split(separator: ":").last!)
