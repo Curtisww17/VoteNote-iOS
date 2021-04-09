@@ -425,6 +425,13 @@ struct NowPlayingViewHostMaximized: View {
      */
     func skipSong(){
       songQueue.skipSong()
+      RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+      if(sharedSpotify.isSongFavorited(songID: sharedSpotify.currentlyPlaying?.id ?? "")){
+        isLiked = true
+      } else {
+        isLiked = false
+      }
+        
     }
     
     /**
