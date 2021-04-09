@@ -256,6 +256,17 @@ class Spotify: ObservableObject {
     }
   }
   
+  func unLikeSong(id: String){
+    self.httpRequester.headerDELETE(url: "https://api.spotify.com/v1/me/tracks?ids=\(id)",header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ]).onFinish = {
+      (response) in
+      do{
+        print(response.description)
+      } catch {
+        fatalError("bad response \(response.description)")
+      }
+    }
+  }
+  
   
   
   //reutnrs the current spotify user
@@ -270,8 +281,21 @@ class Spotify: ObservableObject {
     }
   }
   
+  func isSongFavorited(songID: String) -> Bool{
+    if(self.usersSavedSongs == nil){
+      self.savedSongs(completion: {playlistSongs in self.usersSavedSongs = playlistSongs})
+    }
+    for song in self.usersSavedSongs?.items ?? [songTimeAdded(track: SpotifyTrack(album: nil, id: "", name: ""))] {
+      if(song.track.id == songID){
+        return true
+      }
+    }
+    return false
+  }
+  
   //gets information on a song based of off a song uri
   func getTrackInfo(track_uri: String, completion: @escaping (SpotifyTrack?) -> ()) {
+    print(track_uri)
     var track_id = track_uri
     if (track_id.contains(":")) {
       track_id = String(track_uri.split(separator: ":").last!)
