@@ -52,10 +52,11 @@ class room{
     let host: String //uid of the host
     let genres: [String]
     let closed: Bool
+    let bannedUsers: [String]?
     //need to add allowed genres
     
     //normal constructor
-    init(name: String, desc: String? = "", anonUsr: Bool, capacity: Int, explicit: Bool, voting: Bool, spu: Int = -1, playlist: String? = nil, host: String = FAuth.currentUser!.uid, genres: [String]? = [], closed: Bool? = false) {
+    init(name: String, desc: String? = "", anonUsr: Bool, capacity: Int, explicit: Bool, voting: Bool, spu: Int = -1, playlist: String? = nil, host: String = FAuth.currentUser!.uid, genres: [String]? = [], closed: Bool? = false, bannedUsers: [String]? = []) {
         self.name = name
         self.desc = desc
         self.anonUsr = anonUsr
@@ -69,6 +70,7 @@ class room{
         self.host = host
         self.genres = genres ?? []
         self.closed = closed ?? false
+        self.bannedUsers = bannedUsers
     }
     
     //constructor for firestore
@@ -86,6 +88,7 @@ class room{
         host = rm["host"] as? String ?? ""
         genres = rm["genres"] as? [String] ?? []
         closed = rm["closed"] as? Bool ?? false
+        bannedUsers = rm["bannedUsers"] as? [String]
     }
 }
 
@@ -448,7 +451,8 @@ func makeRoom(newRoom: room) -> String{
                                         "playlist": newRoom.playlist,
                                         "host": newRoom.host,
                                         "genres": newRoom.genres,
-                                        "closed": newRoom.closed])
+                                        "closed": newRoom.closed,
+                                        "bannedUsers": newRoom.bannedUsers])
     
     //put the user who made the room into the room
     db.collection("users").document(usr!.uid).updateData(["currentRoom": code])
