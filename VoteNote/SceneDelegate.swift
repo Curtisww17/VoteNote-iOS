@@ -180,6 +180,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate,
         //login user to db
         firebaseLogin(name: (user?.display_name)!)
         
+        sharedSpotify.getGenreList(completion: {genres in sharedSpotify.genreList = genres})
         
         
       })

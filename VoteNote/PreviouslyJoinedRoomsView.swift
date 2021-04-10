@@ -77,7 +77,9 @@ struct PreviouslyJoinedRoomsView: View {
     .onAppear(perform: {
       for code in codes {
         getRoom(code: code, completion: { (prevRoom, err) in
+          if (!(prevRoom!.bannedUsers ?? []).contains(getUID())) {
           previousRooms.append(prevRoom!)
+          }
                 })
       }
     })

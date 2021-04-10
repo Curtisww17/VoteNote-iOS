@@ -126,8 +126,6 @@ struct JoinRoomView: View {
     }
     .navigate(to: UserController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser, votingEnabled: votingEnabled, anonUsr: anonUsr, explicitSongsAllowed: explicitSongsAllowed), when: $joined)
     .onAppear(perform: {
-      sharedSpotify.pause()
-      
     })
     .navigationViewStyle(StackNavigationViewStyle())
   }
@@ -145,20 +143,4 @@ struct JoinRoomView: View {
     
   }
 }
-
-struct JoinRoomView_PreviewsContainer: View {
-  //@State var spotify: Spotify = Spotify()
-  @State var isInRoom = false
-  var body: some View {
-    JoinRoomView(isInRoom: $isInRoom)
-  }
-}
-
-struct JoinRoomView_Previews: PreviewProvider {
-  static var previews: some View {
-    JoinRoomView_PreviewsContainer()
-  }
-}
-
-
 
