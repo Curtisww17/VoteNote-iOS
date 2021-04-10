@@ -94,3 +94,38 @@ struct GenreListItem: View {
     }
   }
 }
+
+
+struct GenreView: View {
+  @Binding var genres: [String]
+  
+  var body: some View {
+    return VStack {
+      HStack {
+      Form {
+        ForEach(genres, id: \.self) { genre in
+          GenreViewListItem(genreName: genre)
+        }
+      }
+    }
+  }
+  }
+  
+}
+
+struct GenreViewListItem: View {
+  let genreName: String
+  
+  var body: some View {
+    GeometryReader { geo in
+      HStack {
+        VStack {
+          Text(genreName)
+            .frame(alignment: .center)
+        }
+        .frame(width: geo.size.width, height: 50, alignment: .leading)
+      }
+      .frame(width: geo.size.width, height: 50, alignment: .leading)
+    }
+  }
+}

@@ -22,6 +22,7 @@ struct User_RoomPageView: View {
   @ObservedObject var currentRoom: CurrentRoom = CurrentRoom()
   @Binding var isTiming: Bool
   @Binding var notExited: Bool
+  @Binding var genres: [String]
   
   @Binding var showNav: Bool
   let isHost = false
@@ -113,6 +114,16 @@ struct User_RoomPageView: View {
                   Spacer()
                   Text("\(songsPerUser)")
                 }
+                
+                NavigationLink(
+                  destination: GenreView(genres: $genres),
+                  label: {
+                    HStack{
+                      Text("Genres Allowed")
+                      Spacer()
+                        //Text("\(sharedSpotify.PlaylistBase?.name ?? "no base")")
+                    }
+                  })
                 
                 HStack{
                     if votingEnabled {

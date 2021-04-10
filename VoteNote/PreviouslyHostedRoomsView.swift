@@ -22,6 +22,7 @@ struct PreviouslyHostedRoomsView: View {
   @State var votingEnabled: Bool = true
   @State var explicitSongsAllowed: Bool = false
   @State var anonUsr: Bool = false
+  @State var genres: [String] = sharedSpotify.genreList!.genres
   @Binding var isInRoom: Bool
   
   
@@ -39,6 +40,7 @@ struct PreviouslyHostedRoomsView: View {
           votingEnabled = ret!.voting
           explicitSongsAllowed = ret!.explicit
           anonUsr = ret!.anonUsr
+          genres = ret!.genres
           //songsPerUser = ret. //not in db room object
           self.joined = true        }
       }
@@ -75,7 +77,7 @@ struct PreviouslyHostedRoomsView: View {
       }
       .navigationBarBackButtonHidden(true)
     }
-    .navigate(to: HostController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription, votingEnabled: votingEnabled, anonUsr: anonUsr, roomCapacity: roomCapacity, songsPerUser: songsPerUser, explicitSongsAllowed: explicitSongsAllowed), when: $joined)
+    .navigate(to: HostController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription, votingEnabled: votingEnabled, anonUsr: anonUsr, roomCapacity: roomCapacity, songsPerUser: songsPerUser, explicitSongsAllowed: explicitSongsAllowed, genres: genres), when: $joined)
     .onAppear(perform: {
       if (previousRooms.count == 0) {
         for code in codes {
