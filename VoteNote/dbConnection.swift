@@ -600,6 +600,30 @@ func banUser(uid: String){
     }
 }
 
+/**
+ Gets all the votes a user has made
+ 
+ - Returns a dictionary mapping song id's to their vote value
+ */
+func getVotes(completion: @escaping ([String : Int]?, Error?) -> Void){
+    let currUser = FAuth.currentUser?.uid ?? ""
+    
+    db.collection("users").document(currUser).collection("votes").getDocuments { (docs, err) in
+        if let err = err {
+            print("err getting votes \(err)")
+            completion(nil, err)
+        } else if docs?.isEmpty ?? true {
+            completion(nil, nil)
+        } else {
+            var list: [String: Int] = [:]
+            for doc in docs!.documents {
+                list[doc.documentID] = doc.data()["vote"] as? Int ?? 0
+            }
+            completion(list, nil)
+        }
+    }
+}
+
 //MARK: Song
 /**
  add a song to the current room by the song id
@@ -717,9 +741,7 @@ func vetoSong(id: String){
     }//end getCurrRoom
 }
 
-//1 upvote, -1 downvote, 0 clear vote?
-//returns new vote number
-//id is song id
+
 /**
  allows a user to vote on a song
  
@@ -731,6 +753,51 @@ func vetoSong(id: String){
  */
 func voteSong(vote: Int, id: String, completion: @escaping  () -> ()){
     getCurrRoom { (currRoom, err) in
+        let currUser = FAuth.currentUser!.uid
+        
+        db.collection("users").document(currUser).collection("votes").document(id).getDocument { (doc, err) in
+            let queue = db.collection("room").document(currRoom).collection("queue")
+            if let err = err {
+                print("error getting user document \(err)")
+                completion()
+            } else if !(doc?.exists ?? false) {
+                //we havent voted on this song yet
+                db.collection("users").document(currUser).collection("votes").document(id).setData(["vote": vote])
+                queue.document(id).updateData(["numvotes": FieldValue.increment(Int64(vote))])
+                completion()
+            } else {
+                let v = doc?.data()?["vote"] as? Int ?? 9 //9 is magic number to tell us its invalid
+                
+                if v == 9 {
+                    print("error gettign previous vote value")
+                    completion()
+                }else if v == vote {
+                    //cancel out the vote
+                    if v == 1 {
+                        queue.document(id).updateData(["numvotes": FieldValue.increment(Int64(-1))])
+                        db.collection("users").document(currUser).collection("votes").document(id).setData(["vote": 0])
+                        completion()
+                    } else {
+                        queue.document(id).updateData(["numvotes": FieldValue.increment(Int64(1))])
+                        db.collection("users").document(currUser).collection("votes").document(id).setData(["vote": 0])
+                        completion()
+                    }
+                    
+                }else if v == 0 {
+                    queue.document(id).updateData(["numvotes": FieldValue.increment(Int64(vote))])
+                    db.collection("users").document(currUser).collection("votes").document(id).setData(["vote": vote])
+                    completion()
+                } else if v == 1 {
+                    queue.document(id).updateData(["numvotes": FieldValue.increment(Int64(-2))])
+                    db.collection("users").document(currUser).collection("votes").document(id).setData(["vote": -1])
+                    completion()
+                } else {
+                    queue.document(id).updateData(["numvotes": FieldValue.increment(Int64(2))])
+                    db.collection("users").document(currUser).collection("votes").document(id).setData(["vote": 1])
+                    completion()
+                }
+            }
+        }
         
         let queue = db.collection("room").document(currRoom).collection("queue")
         
