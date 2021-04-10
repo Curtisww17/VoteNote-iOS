@@ -50,10 +50,13 @@ class room{
     let spu: Int    //songs per user
     let playlist: String //playlist id thing
     let host: String //uid of the host
-    //need to add allowed genres
+    let genres: [String] //the allowwed genres
+    let closed: Bool //whether or not the room is open/active
+    let bannedUsers: [String]? //a list of all the users who are banned from the room
+    let currSong: String
     
     //normal constructor
-    init(name: String, desc: String? = "", anonUsr: Bool, capacity: Int, explicit: Bool, voting: Bool, spu: Int = -1, playlist: String? = nil, host: String = FAuth.currentUser!.uid) {
+    init(name: String, desc: String? = "", anonUsr: Bool, capacity: Int, explicit: Bool, voting: Bool, spu: Int = -1, playlist: String? = nil, host: String = FAuth.currentUser!.uid, genres: [String]? = [], closed: Bool? = false, bannedUsers: [String]? = [], currSong: String = "") {
         self.name = name
         self.desc = desc
         self.anonUsr = anonUsr
@@ -65,6 +68,10 @@ class room{
         self.spu = spu
         self.playlist = playlist ?? ""
         self.host = host
+        self.genres = genres ?? []
+        self.closed = closed ?? false
+        self.bannedUsers = bannedUsers
+        self.currSong = currSong
     }
     
     //constructor for firestore
@@ -80,6 +87,10 @@ class room{
         spu = rm["spu"] as? Int ?? -1
         playlist = rm["playlist"] as? String ?? ""
         host = rm["host"] as? String ?? ""
+        genres = rm["genres"] as? [String] ?? []
+        closed = rm["closed"] as? Bool ?? false
+        bannedUsers = rm["bannedUsers"] as? [String]
+        currSong = rm["currSong"] as? String ?? ""
     }
 }
 
@@ -119,7 +130,7 @@ class user: Identifiable, ObservableObject {
 }
 
 class song: Identifiable, ObservableObject{
-    let addedBy: String? //UID of who added it
+    let addedBy: String //UID of who added it
     let artist: String?  //String of all credited artsts, sperated by spaces
     let genres: [String]
     let id: String  //spotify id of the song
@@ -141,7 +152,7 @@ class song: Identifiable, ObservableObject{
     
     //firestore
     init(sng: [String: Any], id: String){
-        addedBy = sng["addedBy"] as? String
+        addedBy = sng["addedBy"] as? String ?? ""
         artist = sng["artist"] as? String
         genres = []
         self.id = id
@@ -206,7 +217,7 @@ func firebaseLogin(name: String){
  */
 func joinRoom(code: String, completion:@escaping (room?, String?) -> Void){
     //put the user in the correct room
-    //TODO: add checking for banned user and capacity
+    //TODO: add checking for capacity
     
     let upperCode = code.uppercased()
     currentQR.update(roomCode: upperCode)
@@ -236,7 +247,9 @@ func joinRoom(code: String, completion:@escaping (room?, String?) -> Void){
                     completion(nil, "You are banned from this room")
                 }
             }
-            
+            if (rm?["closed"] as? Bool ?? false){
+                completion(nil, "This room is closed")
+            }
             completion(room(rm: rm!), nil)
         }
         
@@ -392,6 +405,30 @@ func leaveRoom() -> Bool{
     return true
 }
 
+///set the current room to closed
+func closeRoom(){
+    getCurrRoom { (code, err) in
+        db.collection("room").document(code).updateData(["closed": true])
+    }
+}
+
+///set the current room to open
+func openRoom(){
+    getCurrRoom { (code, err) in
+        db.collection("room").document(code).updateData(["closed": false])
+    }
+}
+
+/**
+ Set the currently playing song
+ 
+ - Parameter id: the spotify id of the song
+ */
+func setCurrSong(id: String){
+    getCurrRoom { (code, err) in
+        db.collection("room").document(code).updateData(["currSong": id])
+    }
+}
 
 /**
  makes a new room in the db from a room obj
@@ -424,7 +461,10 @@ func makeRoom(newRoom: room) -> String{
                                         "code": code,
                                         "spu": newRoom.spu,
                                         "playlist": newRoom.playlist,
-                                        "host": newRoom.host])
+                                        "host": newRoom.host,
+                                        "genres": newRoom.genres,
+                                        "closed": newRoom.closed,
+                                        "bannedUsers": newRoom.bannedUsers])
     
     //put the user who made the room into the room
     db.collection("users").document(usr!.uid).updateData(["currentRoom": code])
@@ -560,6 +600,30 @@ func banUser(uid: String){
     }
 }
 
+/**
+ Gets all the votes a user has made
+ 
+ - Returns a dictionary mapping song id's to their vote value
+ */
+func getVotes(completion: @escaping ([String : Int]?, Error?) -> Void){
+    let currUser = FAuth.currentUser?.uid ?? ""
+    
+    db.collection("users").document(currUser).collection("votes").getDocuments { (docs, err) in
+        if let err = err {
+            print("err getting votes \(err)")
+            completion(nil, err)
+        } else if docs?.isEmpty ?? true {
+            completion(nil, nil)
+        } else {
+            var list: [String: Int] = [:]
+            for doc in docs!.documents {
+                list[doc.documentID] = doc.data()["vote"] as? Int ?? 0
+            }
+            completion(list, nil)
+        }
+    }
+}
+
 //MARK: Song
 /**
  add a song to the current room by the song id
@@ -677,9 +741,7 @@ func vetoSong(id: String){
     }//end getCurrRoom
 }
 
-//1 upvote, -1 downvote, 0 clear vote?
-//returns new vote number
-//id is song id
+
 /**
  allows a user to vote on a song
  
@@ -691,6 +753,51 @@ func vetoSong(id: String){
  */
 func voteSong(vote: Int, id: String, completion: @escaping  () -> ()){
     getCurrRoom { (currRoom, err) in
+        let currUser = FAuth.currentUser!.uid
+        
+        db.collection("users").document(currUser).collection("votes").document(id).getDocument { (doc, err) in
+            let queue = db.collection("room").document(currRoom).collection("queue")
+            if let err = err {
+                print("error getting user document \(err)")
+                completion()
+            } else if !(doc?.exists ?? false) {
+                //we havent voted on this song yet
+                db.collection("users").document(currUser).collection("votes").document(id).setData(["vote": vote])
+                queue.document(id).updateData(["numvotes": FieldValue.increment(Int64(vote))])
+                completion()
+            } else {
+                let v = doc?.data()?["vote"] as? Int ?? 9 //9 is magic number to tell us its invalid
+                
+                if v == 9 {
+                    print("error gettign previous vote value")
+                    completion()
+                }else if v == vote {
+                    //cancel out the vote
+                    if v == 1 {
+                        queue.document(id).updateData(["numvotes": FieldValue.increment(Int64(-1))])
+                        db.collection("users").document(currUser).collection("votes").document(id).setData(["vote": 0])
+                        completion()
+                    } else {
+                        queue.document(id).updateData(["numvotes": FieldValue.increment(Int64(1))])
+                        db.collection("users").document(currUser).collection("votes").document(id).setData(["vote": 0])
+                        completion()
+                    }
+                    
+                }else if v == 0 {
+                    queue.document(id).updateData(["numvotes": FieldValue.increment(Int64(vote))])
+                    db.collection("users").document(currUser).collection("votes").document(id).setData(["vote": vote])
+                    completion()
+                } else if v == 1 {
+                    queue.document(id).updateData(["numvotes": FieldValue.increment(Int64(-2))])
+                    db.collection("users").document(currUser).collection("votes").document(id).setData(["vote": -1])
+                    completion()
+                } else {
+                    queue.document(id).updateData(["numvotes": FieldValue.increment(Int64(2))])
+                    db.collection("users").document(currUser).collection("votes").document(id).setData(["vote": 1])
+                    completion()
+                }
+            }
+        }
         
         let queue = db.collection("room").document(currRoom).collection("queue")
         
