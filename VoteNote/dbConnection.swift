@@ -757,6 +757,8 @@ func vetoSong(id: String){
  - id: the id of the song to be voted on
  */
 func voteSong(vote: Int, id: String, completion: @escaping  () -> ()){
+    let UVote = Int64(vote)
+    
     getCurrRoom { (currRoom, err) in
         let currUser = FAuth.currentUser!.uid
         
@@ -765,18 +767,18 @@ func voteSong(vote: Int, id: String, completion: @escaping  () -> ()){
             if let err = err {
                 print("error getting user document \(err)")
                 completion()
-            } else if !(doc?.exists ?? false) {
+            } else if !(doc!.exists) {
                 //we havent voted on this song yet
                 db.collection("users").document(currUser).collection("votes").document(id).setData(["vote": vote])
                 queue.document(id).updateData(["numvotes": FieldValue.increment(Int64(vote))])
                 completion()
             } else {
-                let v = doc?.data()?["vote"] as? Int ?? 9 //9 is magic number to tell us its invalid
+                let v = doc?.data()?["vote"] as? Int64 ?? Int64(9) //9 is magic number to tell us its invalid
                 
                 if v == 9 {
                     print("error gettign previous vote value")
                     completion()
-                }else if v == vote {
+                }else if v == UVote {
                     //cancel out the vote
                     if v == 1 {
                         queue.document(id).updateData(["numvotes": FieldValue.increment(Int64(-1))])
@@ -804,10 +806,6 @@ func voteSong(vote: Int, id: String, completion: @escaping  () -> ()){
             }
         }
         
-        let queue = db.collection("room").document(currRoom).collection("queue")
-        
-        queue.document(id).updateData(["numvotes": FieldValue.increment(Int64(vote))])
-        completion()
         
     }//end getCurrRoom
 }
