@@ -26,7 +26,6 @@ class Spotify: ObservableObject {
   var usersSavedSongs: playlistTrackTime?
   var recommendedSongs: reccomndations?
   var savePlaylist: uniquePlaylist?
-  var saveTracks: playlistTrackTime?
   var PlaylistBase: uniquePlaylist?
   var songTimer: Int = 0
   
@@ -220,22 +219,41 @@ class Spotify: ObservableObject {
     }
   }
   
-  //creates a palylist on spotify for the user based on a json object
-  //currently not working/implemented
-  func createPlaylist(id: String, playlistData: String) {
-    self.httpRequester.headerPUT(url: "https://api.spotify.com/v1/users/\(id)/playlists --data \(playlistData)", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? "")" ]).onFinish = {
-      (response) in
-      do{
-        print(response.description)
-      } catch {
-        fatalError("bad response \(response.description)")
-      }
+  
+  func addSongsToPlaylist(Playlist: String, songs: [song]){
+    var songData = ""
+    for song in songs{
+      songData += "spotify:track:"+song.id+","
     }
+    
+    songData.dropLast()
+    let header = ["Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? "")" ]
+    let url = "https://api.spotify.com/v1/playlists/\(Playlist)/tracks?uris=\(songData)"
+    
+    
+    var request = URLRequest(urlString: url, headers: header)
+    request?.httpMethod = "POST"
+    let task = URLSession.shared.dataTask(with: request ?? URLRequest(url: URL(string: url)!)) { data, response, error in
+        guard let data = data, error == nil else {
+            print(error?.localizedDescription ?? "No data")
+            return
+        }
+        let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
+        if let responseJSON = responseJSON as? [String: Any] {
+            
+        }
+    }
+    task.resume()
   }
   
-  func createPlaylist2(id: String, json: String){
+  func createPlaylist(id: String){
     // prepare json data
 
+    let json: [String: Any] = [
+      "name": "VoteNote Playlist",
+      "description": "Made by VoteNote",
+      "public": false
+    ]
     let jsonData = try? JSONSerialization.data(withJSONObject: json)
     let header = ["Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? "")" ]
 
@@ -255,7 +273,7 @@ class Spotify: ObservableObject {
         }
         let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
         if let responseJSON = responseJSON as? [String: Any] {
-            print(responseJSON)
+            
         }
     }
 
@@ -272,34 +290,6 @@ class Spotify: ObservableObject {
         fatalError("bad response \(response.description)")
       }
     }
-  }
-  
-  func fillSavedPlaylist(playlist: MusicQueue) -> String{
-    var songlist: [songTimeAdded] = []
-    for song in playlist.musicList{
-      print(song.title)
-      songlist.append(songTimeAdded(track: SpotifyTrack(album: nil, id: song.id, name: song.title!)))
-    }
-    
-    let myList = uniquePlaylist(collaborative: false, description: "made by voteNote", id: "1", name: "voteNote", owner: sharedSpotify.currentUser!, tracks: playlistTrackTime(items: []))
-    
-    
-    
-    let serialized : String?
-    // attempt to encode this instance
-    do {
-      let encoder = JSONEncoder()
-      let data : Data = try encoder.encode(myList)
-      serialized = String(data: data, encoding: .utf8)
-    } catch {
-      serialized = nil
-    } // if serialization was successful, print the data
-    if let s = serialized {
-      print("Serialized Stadium")
-      print(s)
-      return s
-    }
-    return ""
   }
   
   
