@@ -46,7 +46,7 @@ struct AddMusicView: View {
                     
                     print("Starting Len: \(sharedSpotify.recentSearch?.tracks?.items?.count)")
                     
-                    if (Genres.count != 126 && Genres.count != 0) {
+                    if (genres.count != 126 && genres.count != 0) {
                         var count = 0
                         
                         if (sharedSpotify.recentSearch?.tracks?.items! != nil) {
@@ -57,7 +57,7 @@ struct AddMusicView: View {
                                     sharedSpotify.songGenres = currentGenres
                                 })
                                 
-                                Genres.forEach { currentGenre in
+                                genres.forEach { currentGenre in
                                     
                                     sharedSpotify.songGenres?.artists[0].genres?.forEach { curGenre in
                                         print("Song Genre: \(curGenre)")
