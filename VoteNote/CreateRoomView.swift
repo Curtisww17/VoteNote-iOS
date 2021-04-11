@@ -45,7 +45,7 @@ struct CreateRoomView: View {
   
   func createRoom(){
     //TO-DO- send info to room, songs per user
-    let newRoom: room = room(name: roomName.text, desc: roomDescription.text, anonUsr: anonUsr, capacity: userCapacity, explicit: explicitSongsAllowed, voting: votingEnabled, spu: songsPerUser, genres: Array(genres))
+    let newRoom: room = room(name: roomName.text, desc: roomDescription.text, anonUsr: anonUsr, capacity: userCapacity, explicit: explicitSongsAllowed, voting: votingEnabled, spu: songsPerUser, genres: Array(genres), currSong: (sharedSpotify.currentlyPlaying?.id ?? "6sFIWsNpZYqfjUpaCgueju"))
     let newcode = makeRoom(newRoom: newRoom)
     storePrevRoom(code: newcode)
     madeRoom = true
@@ -57,7 +57,6 @@ struct CreateRoomView: View {
     RoomCapacity = userCapacity
     SongsPerUser = songsPerUser
     ExplicitSongsAllowed = explicitSongsAllowed
-    Genres = Array(genres)
     
     self.presentationMode.wrappedValue.dismiss()
   }
@@ -158,7 +157,7 @@ struct CreateRoomView: View {
       //}
     }
     .navigationBarHidden(true)
-    .navigate(to: HostController(isInRoom: $isInRoom), when: $madeRoom)
+    .navigate(to: HostController(isInRoom: $isInRoom, genres: Array(genres)), when: $madeRoom)
     .onAppear(perform: {
       (sharedSpotify.genreList?.genres ?? []).forEach {genre in
         genres.insert(genre)

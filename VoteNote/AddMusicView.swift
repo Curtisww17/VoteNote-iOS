@@ -24,6 +24,7 @@ struct AddMusicView: View {
     }
   }
   @State private var isEditing = false
+  @State var genres: [String]
   
   @Environment(\.presentationMode) var presentationMode
     
@@ -113,7 +114,7 @@ struct AddMusicView: View {
                 if currentSearch != "" {
                   ForEach((sharedSpotify.recentSearch?.tracks?.items ?? [SpotifyTrack(album: SpotifyAlbum(id: "", images: []), artists: [SpotifyArtist(id: "", name: "", uri: "", type: "")], available_markets: nil, disc_number: 0, duration_ms: 0, explicit: false, href: "", id: "", name: "Searching...", popularity: 0, preview_url: "", track_number: 0, type: "", uri: "")])) { song in
                     
-                    if (Genres.count > 0) {
+                    if (genres.count > 0) {
                         var hasGenre: Bool = false
                         
                         var x = 0, y = 0

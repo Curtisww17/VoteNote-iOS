@@ -15,7 +15,7 @@ struct UserController: View {
   @State var notExited: Bool = false
   @State var isTiming: Bool = false
     
-  @State var genres: [String] = Genres
+  @State var genres: [String] = []
   @State var isBanned = false
     
   @State var currentView = 0
@@ -37,7 +37,7 @@ struct UserController: View {
         VStack {
             if (currentView == 0) {
                 NavigationLink(
-                    destination: AddMusicView().navigationBarTitle("Browse"),
+                  destination: AddMusicView(genres: genres).navigationBarTitle("Browse"),
                   label: {
                   Text("Add")
                   })
@@ -58,7 +58,7 @@ struct UserController: View {
       .frame(width: UIScreen.main.bounds.size.width, alignment: .top)
       
       if (currentView == 0) {
-        User_QueuePageView()
+        User_QueuePageView(genres: $genres)
           .animation(.default)
           .transition(.move(edge: .leading))
           .onAppear() {

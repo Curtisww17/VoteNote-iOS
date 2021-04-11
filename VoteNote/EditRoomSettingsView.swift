@@ -39,7 +39,7 @@ struct EditRoomView: View {
     @State var madeRoom: Bool = false
     @State var anonUsr: Bool = AnonUsr
     @State var explicitSongsAllowed: Bool = ExplicitSongsAllowed
-    @State var genres: Set<String> = Set(Genres)
+    @State var genres: Set<String>
   
   func editRoom(){
     print("Room")
@@ -53,7 +53,6 @@ struct EditRoomView: View {
     RoomCapacity = userCapacity
     SongsPerUser = songsPerUser
     ExplicitSongsAllowed = explicitSongsAllowed
-    Genres = Array(genres)
     presentationMode.wrappedValue.dismiss()
   }
   
@@ -132,7 +131,7 @@ struct EditRoomView: View {
       //}
     }
     .navigationBarHidden(true)
-    .navigate(to: HostController(isInRoom: $isInRoom), when: $madeRoom)
+    .navigate(to: HostController(isInRoom: $isInRoom, genres: Array(genres)), when: $madeRoom)
     .onAppear(perform: {
 //        getCurrRoom(completion: {code, err in
 //          if err == nil {

@@ -15,6 +15,7 @@ struct PreviouslyJoinedRoomsView: View {
   
   @State var joined = false
   @Binding var isInRoom: Bool
+  @State var genres: [String] = []
   
   
   func join(c: String) {
@@ -31,7 +32,7 @@ struct PreviouslyJoinedRoomsView: View {
           VotingEnabled = ret!.voting
           ExplicitSongsAllowed = ret!.explicit
           AnonUsr = ret!.anonUsr
-          Genres = ret!.genres
+          genres = ret!.genres
           //songsPerUser = ret. //not in db room object
           self.joined = true        }
       }
@@ -74,7 +75,7 @@ struct PreviouslyJoinedRoomsView: View {
         }
       }
     }
-    .navigate(to: UserController(isInRoom: $isInRoom), when: $joined)
+    .navigate(to: UserController(isInRoom: $isInRoom, genres: genres), when: $joined)
     .onAppear(perform: {
       for code in codes {
         getRoom(code: code, completion: { (prevRoom, err) in

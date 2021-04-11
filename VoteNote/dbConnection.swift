@@ -488,6 +488,7 @@ func makeRoom(newRoom: room) -> String{
                                         "host": newRoom.host,
                                         "genres": newRoom.genres,
                                         "closed": newRoom.closed,
+                                        "currSong": newRoom.currSong,
                                         "bannedUsers": newRoom.bannedUsers])
     
     //put the user who made the room into the room

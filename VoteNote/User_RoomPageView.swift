@@ -167,7 +167,7 @@ struct User_RoomPageView: View {
                   SongsPerUser = curRoom.spu
                   RoomCapacity = curRoom.capacity
                   ExplicitSongsAllowed = curRoom.explicit
-                  Genres = curRoom.genres
+                  genres = curRoom.genres
                 }
             })
           })
