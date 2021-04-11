@@ -18,13 +18,13 @@ struct QueueHistoryView: View {
                 
                 //button to add history as a playlist on spotify
                 Button("create Playlist") {
-                    var tracks: [[String: Any]] = []
-                    for song in songHistory.musicList {
-                        var track: [String: Any] = ["added_at":Date(), "added_by":sharedSpotify.currentUser!]
-                        tracks.append(track)
-                    }
+                    
+                    //let jsonData = try! JSONEncoder().encode(songHistory)
+                    //let jsonString = String(data: jsonData, encoding: .utf8)!
                     //let jsonObject: [String: Any] = [ ]
-                    //sharedSpotify.createPlaylist2(id: sharedSpotify.currentUser?.id ?? "", json: jsonObject)
+                    let jsonString = sharedSpotify.fillSavedPlaylist(playlist: songHistory)
+                    
+                    sharedSpotify.createPlaylist2(id: sharedSpotify.currentUser?.id ?? "", json: jsonString)
                 }
                 
                 //lists all songs previously played in the room

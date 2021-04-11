@@ -25,6 +25,8 @@ class Spotify: ObservableObject {
   var currentPlaylist: uniquePlaylist?
   var usersSavedSongs: playlistTrackTime?
   var recommendedSongs: reccomndations?
+  var savePlaylist: uniquePlaylist?
+  var saveTracks: playlistTrackTime?
   var PlaylistBase: uniquePlaylist?
   var songTimer: Int = 0
   
@@ -231,7 +233,7 @@ class Spotify: ObservableObject {
     }
   }
   
-  func createPlaylist2(id: String, json: [String:Any]){
+  func createPlaylist2(id: String, json: String){
     // prepare json data
 
     let jsonData = try? JSONSerialization.data(withJSONObject: json)
@@ -270,6 +272,34 @@ class Spotify: ObservableObject {
         fatalError("bad response \(response.description)")
       }
     }
+  }
+  
+  func fillSavedPlaylist(playlist: MusicQueue) -> String{
+    var songlist: [songTimeAdded] = []
+    for song in playlist.musicList{
+      print(song.title)
+      songlist.append(songTimeAdded(track: SpotifyTrack(album: nil, id: song.id, name: song.title!)))
+    }
+    
+    let myList = uniquePlaylist(collaborative: false, description: "made by voteNote", id: "1", name: "voteNote", owner: sharedSpotify.currentUser!, tracks: playlistTrackTime(items: []))
+    
+    
+    
+    let serialized : String?
+    // attempt to encode this instance
+    do {
+      let encoder = JSONEncoder()
+      let data : Data = try encoder.encode(myList)
+      serialized = String(data: data, encoding: .utf8)
+    } catch {
+      serialized = nil
+    } // if serialization was successful, print the data
+    if let s = serialized {
+      print("Serialized Stadium")
+      print(s)
+      return s
+    }
+    return ""
   }
   
   
