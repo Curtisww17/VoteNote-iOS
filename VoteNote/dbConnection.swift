@@ -626,21 +626,25 @@ func banUser(uid: String){
 func getVotes(completion: @escaping ([String : Int]?, Error?) -> Void){
     getCurrRoom { (currRoom, err) in
         
-    
-        let currUser = FAuth.currentUser?.uid ?? ""
+        if currRoom == "" {
+            print("getVotes was called with the user not in a room")
+        } else {
         
-        db.collection("users").document(currUser).collection(currRoom).getDocuments { (docs, err) in
-            if let err = err {
-                print("err getting votes \(err)")
-                completion(nil, err)
-            } else if docs?.isEmpty ?? true {
-                completion(nil, nil)
-            } else {
-                var list: [String: Int] = [:]
-                for doc in docs!.documents {
-                    list[doc.documentID] = doc.data()["vote"] as? Int ?? 0
+            let currUser = FAuth.currentUser?.uid ?? ""
+            
+            db.collection("users").document(currUser).collection(currRoom).getDocuments { (docs, err) in
+                if let err = err {
+                    print("err getting votes \(err)")
+                    completion(nil, err)
+                } else if docs?.isEmpty ?? true {
+                    completion(nil, nil)
+                } else {
+                    var list: [String: Int] = [:]
+                    for doc in docs!.documents {
+                        list[doc.documentID] = doc.data()["vote"] as? Int ?? 0
+                    }
+                    completion(list, nil)
                 }
-                completion(list, nil)
             }
         }
     }
