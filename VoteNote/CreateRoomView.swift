@@ -49,6 +49,16 @@ struct CreateRoomView: View {
     let newcode = makeRoom(newRoom: newRoom)
     storePrevRoom(code: newcode)
     madeRoom = true
+    
+    RoomName = roomName.text
+    RoomDescription = roomDescription.text
+    VotingEnabled = votingEnabled
+    AnonUsr = anonUsr
+    RoomCapacity = userCapacity
+    SongsPerUser = songsPerUser
+    ExplicitSongsAllowed = explicitSongsAllowed
+    Genres = Array(genres)
+    
     self.presentationMode.wrappedValue.dismiss()
   }
   
@@ -148,7 +158,7 @@ struct CreateRoomView: View {
       //}
     }
     .navigationBarHidden(true)
-    .navigate(to: HostController(isInRoom: $isInRoom, roomName: roomName.text, roomDescription: roomDescription.text, votingEnabled: votingEnabled, anonUsr: anonUsr, roomCapacity: userCapacity, songsPerUser: songsPerUser, explicitSongsAllowed: explicitSongsAllowed, genres: Array(genres)), when: $madeRoom)
+    .navigate(to: HostController(isInRoom: $isInRoom), when: $madeRoom)
     .onAppear(perform: {
       (sharedSpotify.genreList?.genres ?? []).forEach {genre in
         genres.insert(genre)
@@ -196,6 +206,11 @@ class TextBindingManager: ObservableObject {
     
     init(limit: Int = 20) {
         characterLimit = limit
+    }
+    
+    init(limit: Int = 20, text: String) {
+        characterLimit = limit
+        self.text = text
     }
 }
 

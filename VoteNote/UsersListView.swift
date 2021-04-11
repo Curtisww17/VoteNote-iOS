@@ -29,8 +29,8 @@ struct UsersListView: View {
       .navigationTitle("Users")
       
     }
-      .navigate(to: HostUserDetailView(selectedUserUID: ObservableString(stringValue: userID), votingEnabled: ObservableBoolean(boolValue: votingEnabled)), when: $gotoHostView)
-      .navigate(to: UserUserDetailView(selectedUserUID: ObservableString(stringValue: userID), votingEnabled: ObservableBoolean(boolValue: votingEnabled)), when: $gotoUserView)
+      .navigate(to: HostUserDetailView(selectedUserUID: ObservableString(stringValue: userID)), when: $gotoHostView)
+      .navigate(to: UserUserDetailView(selectedUserUID: ObservableString(stringValue: userID)), when: $gotoUserView)
       .onAppear(perform: {
         getUsers(completion: {usersOut, err in
           self.users = usersOut

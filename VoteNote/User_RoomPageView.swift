@@ -13,15 +13,9 @@ import SwiftUI
  */
 struct User_RoomPageView: View {
   @State var currentView = 1
-  @State var roomName: String
-  @State var roomDescription: String
-  @State var roomCapacity: Int
-  @State var songsPerUser: Int
-  @State var votingEnabled: Bool
-  @Binding var anonUsr: Bool
-  @ObservedObject var currentRoom: CurrentRoom = CurrentRoom()
   @Binding var isTiming: Bool
   @Binding var notExited: Bool
+    
   @Binding var genres: [String]
   
   @Binding var showNav: Bool
@@ -43,7 +37,7 @@ struct User_RoomPageView: View {
           VStack {
             
             Form {
-              Section(header: Text(roomName)
+              Section(header: Text(RoomName)
                         .font(.title)
                         .fontWeight(.bold)
                         .foregroundColor(Color.black)
@@ -67,7 +61,7 @@ struct User_RoomPageView: View {
                                     Text("History")
                                   }
                                 })
-                NavigationLink(destination: UsersListView(isHost: isHost, votingEnabled: votingEnabled)
+                NavigationLink(destination: UsersListView(isHost: isHost, votingEnabled: VotingEnabled)
                                 .onAppear(perform: {
                                   showNav = false
                                 })
@@ -98,21 +92,21 @@ struct User_RoomPageView: View {
               }
               
               Section(header: Text("Room Settings")) {
-                if roomDescription == "" {
+                if RoomDescription == "" {
                     Text("A VoteNote room")
                 } else {
-                    Text(roomDescription)
+                    Text(RoomDescription)
                 }
                 HStack{
                   Text("Room Capacity")
                   Spacer()
-                  Text("\(roomCapacity)")
+                  Text("\(RoomCapacity)")
                 }
                 
                 HStack{
                   Text("Songs Per User")
                   Spacer()
-                  Text("\(songsPerUser)")
+                  Text("\(SongsPerUser)")
                 }
                 
                 NavigationLink(
@@ -126,7 +120,7 @@ struct User_RoomPageView: View {
                   })
                 
                 HStack{
-                    if votingEnabled {
+                    if VotingEnabled {
                         Text("Voting Enabled")
                     } else {
                         Text("Voting Disabled")
@@ -136,7 +130,7 @@ struct User_RoomPageView: View {
                 HStack{
                   Text("Anonymize All Users:")
                   Spacer()
-                    if anonUsr {
+                    if AnonUsr {
                         Text("True")
                     } else {
                         Text("False")
@@ -159,7 +153,24 @@ struct User_RoomPageView: View {
               }
             }
           }
-          .navigationTitle("Room")
+          .navigationTitle("Room").onAppear(perform: {
+            var curRoom: room = room(name: "", anonUsr: false, capacity: 0, explicit: false, voting: true)
+            getRoom(code: currentQR.roomCode, completion: {room, err in
+                if (room != nil) {
+                
+                  curRoom = room!
+                    
+                  RoomName = curRoom.name
+                  RoomDescription = curRoom.desc!
+                  VotingEnabled = curRoom.voting
+                  AnonUsr = curRoom.anonUsr
+                  SongsPerUser = curRoom.spu
+                  RoomCapacity = curRoom.capacity
+                  ExplicitSongsAllowed = curRoom.explicit
+                  Genres = curRoom.genres
+                }
+            })
+          })
           .navigationBarHidden(true).navigationViewStyle(StackNavigationViewStyle())
 
         }.frame(height: geo.size.height)

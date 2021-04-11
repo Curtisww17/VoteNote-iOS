@@ -14,15 +14,7 @@ struct PreviouslyJoinedRoomsView: View {
   @State var previousRooms: [room] = []
   
   @State var joined = false
-  @State var roomName: String = ""
-  @State var roomDescription: String = ""
-  @State var roomCapacity: Int = 0
-  @State var songsPerUser: Int = 0
-  @State var votingEnabled: Bool = true
-  @State var explicitSongsAllowed: Bool = false
-  @State var anonUsr: Bool = false
   @Binding var isInRoom: Bool
-  @State var genres: [String] = []
   
   
   func join(c: String) {
@@ -32,14 +24,14 @@ struct PreviouslyJoinedRoomsView: View {
       }else{
         self.joined = true
         if ret != nil {
-          roomName = ret!.name
-          roomDescription = (ret?.desc)!
-          roomCapacity = ret!.capacity
-          songsPerUser = ret!.spu
-          votingEnabled = ret!.voting
-          explicitSongsAllowed = ret!.explicit
-          anonUsr = ret!.anonUsr
-          genres = ret!.genres
+          RoomName = ret!.name
+          RoomDescription = (ret?.desc)!
+          RoomCapacity = ret!.capacity
+          SongsPerUser = ret!.spu
+          VotingEnabled = ret!.voting
+          ExplicitSongsAllowed = ret!.explicit
+          AnonUsr = ret!.anonUsr
+          Genres = ret!.genres
           //songsPerUser = ret. //not in db room object
           self.joined = true        }
       }
@@ -75,7 +67,7 @@ struct PreviouslyJoinedRoomsView: View {
         }
       }
     }
-    .navigate(to: UserController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser, votingEnabled: votingEnabled, anonUsr: anonUsr, explicitSongsAllowed: explicitSongsAllowed, genres: genres), when: $joined)
+    .navigate(to: UserController(isInRoom: $isInRoom), when: $joined)
     .onAppear(perform: {
       for code in codes {
         getRoom(code: code, completion: { (prevRoom, err) in
