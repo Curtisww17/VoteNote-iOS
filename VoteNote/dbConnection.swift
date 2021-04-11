@@ -401,6 +401,13 @@ func leaveRoom() -> Bool{
     //take the user out of the room
     let usr = FAuth.currentUser
     db.collection("users").document(usr!.uid).updateData(["currentRoom": ""])
+    db.collection("users").document(usr!.uid).collection("votes").getDocuments { (docs, err) in
+        //delete all the votes the user made
+        //TODO: we need to store votes by room and not delete them when you leave the room
+        for doc in docs!.documents {
+            db.collection("users").document(usr!.uid).collection("votes").document(doc.documentID).delete()
+        }
+    }
     
     return true
 }
