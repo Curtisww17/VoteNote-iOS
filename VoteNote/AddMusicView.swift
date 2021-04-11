@@ -19,7 +19,7 @@ struct AddMusicView: View {
       if currentSearch != "" {
         sharedSpotify.searchSong(completion: { search in
           sharedSpotify.recentSearch = search
-        },Query: currentSearch, limit: "20", offset: "0")
+        },Query: currentSearch, limit: "30", offset: "0")
       }
     }
   }
@@ -42,7 +42,45 @@ struct AddMusicView: View {
                 TextField("Search Music", text: $currentSearch).onChange(of: self.currentSearch, perform: { value in
                   sharedSpotify.searchSong(completion: { search in
                     sharedSpotify.recentSearch = search
-                  },Query: currentSearch, limit: "20", offset: "0")
+                    
+                    print("Starting Len: \(sharedSpotify.recentSearch?.tracks?.items?.count)")
+                    
+                    if (Genres.count != 126 && Genres.count != 0) {
+                        var count = 0
+                        
+                        if (sharedSpotify.recentSearch?.tracks?.items! != nil) {
+                            while (count < (sharedSpotify.recentSearch?.tracks?.items!.count)!) {
+                                var found = false
+                                
+                                sharedSpotify.getSongGenre(artistID: (sharedSpotify.recentSearch?.tracks?.items![count].artists![0].id)!, completion: { currentGenres in
+                                    sharedSpotify.songGenres = currentGenres
+                                })
+                                
+                                Genres.forEach { currentGenre in
+                                    
+                                    sharedSpotify.songGenres?.artists[0].genres?.forEach { curGenre in
+                                        print("Song Genre: \(curGenre)")
+                                        print("Allowed Genre: \(currentGenre)")
+                                        
+                                        if (currentGenre.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() == curGenre.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()) {
+                                            found = true
+                                            print("Did match")
+                                        }
+                                    }
+                                }
+                                
+                                if (!found) {
+                                    sharedSpotify.recentSearch?.tracks?.items!.remove(at: count)
+                                } else {
+                                    count = count + 1
+                                }
+                            }
+                        }
+                    }
+                    
+                    print("Ending Len: \(sharedSpotify.recentSearch?.tracks?.items?.count)")
+                    
+                  },Query: currentSearch, limit: "30", offset: "0")
                 })
                 .padding(7)
                 .padding(.horizontal, 25)
@@ -112,15 +150,6 @@ struct AddMusicView: View {
                 //if you have searched something display search results
                 if currentSearch != "" {
                   ForEach((sharedSpotify.recentSearch?.tracks?.items ?? [SpotifyTrack(album: SpotifyAlbum(id: "", images: []), artists: [SpotifyArtist(id: "", name: "", uri: "", type: "")], available_markets: nil, disc_number: 0, duration_ms: 0, explicit: false, href: "", id: "", name: "Searching...", popularity: 0, preview_url: "", track_number: 0, type: "", uri: "")])) { song in
-                    
-                    if (Genres.count > 0) {
-                        var hasGenre: Bool = false
-                        
-                        var x = 0, y = 0
-                        //while (x < Genres.count) {
-                            //while (y < song.)
-                        //}
-                    }
                     
                     if (song.album?.images?.count ?? 0 > 0) {
                         if (!ExplicitSongsAllowed && !song.explicit!) || ExplicitSongsAllowed {
