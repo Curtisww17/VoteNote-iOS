@@ -233,6 +233,7 @@ class Spotify: ObservableObject {
         fatalError("Couldn't parse \(response.description)")
       }
     }
+  }
   
   func addSongsToPlaylist(Playlist: String, songs: [song]){
     var songData = ""
