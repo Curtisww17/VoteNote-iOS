@@ -49,7 +49,7 @@ struct Host_RoomPageView: View {
             
           }
           
-            Section(footer: NavigationLink(destination: EditRoomView(isInRoom: $inRoom)) {
+            Section(footer: NavigationLink(destination: EditRoomView(isInRoom: $inRoom, genres: Set(genres))) {
                 Text("Edit").foregroundColor(Color.blue)
             }) {
             NavigationLink(destination: QueueHistoryView( songHistory: songHistory)

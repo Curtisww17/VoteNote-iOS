@@ -15,7 +15,6 @@ var AnonUsr: Bool = false
 var RoomCapacity: Int = 20
 var SongsPerUser: Int = 4
 var ExplicitSongsAllowed: Bool = false
-var Genres: [String] = [""]
 
 struct HostController: View {
   @ObservedObject var spotify = sharedSpotify
@@ -24,7 +23,7 @@ struct HostController: View {
   @State var notExited: Bool = false
   @State var isTiming = false
 
-  @State var genres = Genres
+  @State var genres: [String]
   
   @State var currentView = 1
   var body: some View {
@@ -44,7 +43,7 @@ struct HostController: View {
           VStack {
             if (currentView == 0) {
               NavigationLink(
-                destination: AddMusicView().navigationBarTitle("Browse"),
+                destination: AddMusicView(genres: genres).navigationBarTitle("Browse"),
                 label: {
                   Text("Add")
                 })

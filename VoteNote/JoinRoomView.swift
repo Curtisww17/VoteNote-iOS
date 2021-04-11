@@ -22,6 +22,7 @@ struct JoinRoomView: View {
   @State var prevJoinedRooms: [String] = []
   @State var showingAlert = false
   @State var alertMsg = ""
+  @State var genres: [String] = []
   
   func join(c: String) {
     joinRoom(code: c){ (ret, message) in
@@ -39,7 +40,7 @@ struct JoinRoomView: View {
           VotingEnabled = ret!.voting
           ExplicitSongsAllowed = ret!.explicit
           AnonUsr = ret!.anonUsr
-          Genres = ret!.genres
+          genres = ret!.genres
           //songsPerUser = ret. //not in db room object
           self.joined = true        }
       }
@@ -118,7 +119,7 @@ struct JoinRoomView: View {
     .sheet(isPresented: $isShowingScanner) {
       CodeScannerView(codeTypes: [.qr], simulatedData: "1QCXT", completion: self.handleScan)
     }
-    .navigate(to: UserController(isInRoom: $isInRoom), when: $joined)
+    .navigate(to: UserController(isInRoom: $isInRoom, genres: genres), when: $joined)
     .onAppear(perform: {
     })
     .navigationViewStyle(StackNavigationViewStyle())

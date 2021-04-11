@@ -18,6 +18,7 @@ struct User_QueuePageView: View {
     @ObservedObject var isViewingUser: ObservableBoolean = ObservableBoolean(boolValue: false)
     @State var isTiming: Bool = false
     @State var canMaximize: Bool = false
+  @Binding var genres: [String]
     
   var body: some View {
     GeometryReader { geo in
@@ -51,7 +52,7 @@ struct User_QueuePageView: View {
                   SongsPerUser = curRoom.spu
                   RoomCapacity = curRoom.capacity
                   ExplicitSongsAllowed = curRoom.explicit
-                  Genres = curRoom.genres
+                  genres = curRoom.genres
                 }
             })
             
@@ -99,7 +100,7 @@ struct NowPlayingViewUserMinimized: View {
                 Spacer()
                 Spacer()
                 Spacer()
-              if (sharedSpotify.currentlyPlaying != nil) {
+              if (currentSongImageURL.stringValue != nil && currentSongImageURL.stringValue != "") {
                 RemoteImage(url: currentSongImageURL.stringValue)
                   .frame(width: 40, height: 40)
               } else {

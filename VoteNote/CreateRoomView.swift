@@ -40,26 +40,34 @@ struct CreateRoomView: View {
   @State var explicitSongsAllowed: Bool = false
   @State var prevHostedRooms: [String] = []
   @State var genres: Set<String> = []
+  @State var showingAlert = false
+  @State var alertMsg = ""
   
   @Environment(\.presentationMode) var presentationMode
   
   func createRoom(){
     //TO-DO- send info to room, songs per user
-    let newRoom: room = room(name: roomName.text, desc: roomDescription.text, anonUsr: anonUsr, capacity: userCapacity, explicit: explicitSongsAllowed, voting: votingEnabled, spu: songsPerUser, genres: Array(genres))
-    let newcode = makeRoom(newRoom: newRoom)
-    storePrevRoom(code: newcode)
-    madeRoom = true
-    
-    RoomName = roomName.text
-    RoomDescription = roomDescription.text
-    VotingEnabled = votingEnabled
-    AnonUsr = anonUsr
-    RoomCapacity = userCapacity
-    SongsPerUser = songsPerUser
-    ExplicitSongsAllowed = explicitSongsAllowed
-    Genres = Array(genres)
-    
-    self.presentationMode.wrappedValue.dismiss()
+    let usr = sharedSpotify.currentUser!
+    print (sharedSpotify.currentUser!.product ?? "NO PRODUCT")
+    if (sharedSpotify.currentUser?.product ?? "" == "premium") {
+      let newRoom: room = room(name: roomName.text, desc: roomDescription.text, anonUsr: anonUsr, capacity: userCapacity, explicit: explicitSongsAllowed, voting: votingEnabled, spu: songsPerUser, genres: Array(genres), currSong: (sharedSpotify.currentlyPlaying?.id ?? "6sFIWsNpZYqfjUpaCgueju"))
+      let newcode = makeRoom(newRoom: newRoom)
+      storePrevRoom(code: newcode)
+      madeRoom = true
+      
+      RoomName = roomName.text
+      RoomDescription = roomDescription.text
+      VotingEnabled = votingEnabled
+      AnonUsr = anonUsr
+      RoomCapacity = userCapacity
+      SongsPerUser = songsPerUser
+      ExplicitSongsAllowed = explicitSongsAllowed
+      
+      self.presentationMode.wrappedValue.dismiss()
+    } else {
+      alertMsg = "Must be a premium member to host a room"
+      showingAlert = true
+    }
   }
   
   var body: some View {
@@ -158,7 +166,10 @@ struct CreateRoomView: View {
       //}
     }
     .navigationBarHidden(true)
-    .navigate(to: HostController(isInRoom: $isInRoom), when: $madeRoom)
+    .navigate(to: HostController(isInRoom: $isInRoom, genres: Array(genres)), when: $madeRoom)
+    .alert(isPresented: $showingAlert) {
+      Alert(title: Text("Cannot Create Room"), message: Text(alertMsg), dismissButton: .default(Text("Got it!")))
+    }
     .onAppear(perform: {
       (sharedSpotify.genreList?.genres ?? []).forEach {genre in
         genres.insert(genre)

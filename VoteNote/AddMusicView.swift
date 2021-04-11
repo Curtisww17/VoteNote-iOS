@@ -24,6 +24,7 @@ struct AddMusicView: View {
     }
   }
   @State private var isEditing = false
+  @State var genres: [String]
   
   @Environment(\.presentationMode) var presentationMode
     
@@ -150,6 +151,15 @@ struct AddMusicView: View {
                 //if you have searched something display search results
                 if currentSearch != "" {
                   ForEach((sharedSpotify.recentSearch?.tracks?.items ?? [SpotifyTrack(album: SpotifyAlbum(id: "", images: []), artists: [SpotifyArtist(id: "", name: "", uri: "", type: "")], available_markets: nil, disc_number: 0, duration_ms: 0, explicit: false, href: "", id: "", name: "Searching...", popularity: 0, preview_url: "", track_number: 0, type: "", uri: "")])) { song in
+                    
+                    if (genres.count > 0) {
+                        var hasGenre: Bool = false
+                        
+                        var x = 0, y = 0
+                        //while (x < Genres.count) {
+                            //while (y < song.)
+                        //}
+                    }
                     
                     if (song.album?.images?.count ?? 0 > 0) {
                         if (!ExplicitSongsAllowed && !song.explicit!) || ExplicitSongsAllowed {
