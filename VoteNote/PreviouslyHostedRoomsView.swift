@@ -33,6 +33,7 @@ struct PreviouslyHostedRoomsView: View {
           ExplicitSongsAllowed = ret!.explicit
           AnonUsr = ret!.anonUsr
           Genres = ret!.genres
+          openRoom()
           self.joined = true        }
       }
     }

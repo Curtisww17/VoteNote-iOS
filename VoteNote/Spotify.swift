@@ -26,6 +26,8 @@ class Spotify: ObservableObject {
   var usersSavedSongs: playlistTrackTime?
   var recommendedSongs: reccomndations?
   var PlaylistBase: uniquePlaylist?
+  var songGenres: currentArtists?
+  
   var genreList: genres?
   var songTimer: Int = 0
   
@@ -273,9 +275,7 @@ class Spotify: ObservableObject {
   //gets information on a song based of off a song uri
   func getTrackInfo(track_uri: String, completion: @escaping (SpotifyTrack?) -> ()) {
     var track_id = track_uri
-    if (track_id.contains(":")) {
-      track_id = String(track_uri.split(separator: ":").last!)
-    }
+    
     
     self.httpRequester.headerGet(url: "https://api.spotify.com/v1/tracks/\(track_id)", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? "")" ]).onFinish = { (response) in
       do {
@@ -283,6 +283,17 @@ class Spotify: ObservableObject {
         try completion( decoder.decode(SpotifyTrack.self, from: response.data))
       } catch {
         print(track_id)
+        fatalError("Couldn't parse \(response.description)")
+      }
+    }
+  }
+  
+  func getSongGenre(artistID: String, completion: @escaping (currentArtists?) -> ()){
+    self.httpRequester.headerGet(url: "https://api.spotify.com/v1/artists?ids=\(artistID)", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? "")" ]).onFinish = { (response) in
+      do {
+        let decoder = JSONDecoder()
+        try completion( decoder.decode(currentArtists.self, from: response.data))
+      } catch {
         fatalError("Couldn't parse \(response.description)")
       }
     }
@@ -352,6 +363,7 @@ struct _spotifyTrack: Codable {
 struct SpotifyAlbum: Codable, Identifiable {
   var id: String
   var images: [SpotifyImage]?
+  var genres: [String]?
 }
 
 struct _spotifyPlaylists: Codable{
@@ -387,6 +399,15 @@ struct playlistTrackTime: Codable{
 struct songTimeAdded: Codable{
   var track: SpotifyTrack
   
+}
+
+struct currentArtists: Codable{
+  var artists: [currentGenres]
+}
+
+struct currentGenres: Codable{
+  var genres: [String]?
+  var id: String
 }
 
 struct reccomndations: Codable{

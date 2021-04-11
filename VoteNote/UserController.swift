@@ -15,7 +15,8 @@ struct UserController: View {
   @State var notExited: Bool = false
   @State var isTiming: Bool = false
     
-    @State var genres: [String] = Genres
+  @State var genres: [String] = Genres
+  @State var isBanned = false
     
   @State var currentView = 0
     
@@ -60,6 +61,16 @@ struct UserController: View {
         User_QueuePageView()
           .animation(.default)
           .transition(.move(edge: .leading))
+          .onAppear() {
+            
+            getRoom(code: currentQR.roomCode, completion: { (room, err) in
+              if ((room!.bannedUsers ?? []).contains(getUID())) {
+                  leaveRoom()
+                  isTiming = false
+                  notExited = true
+              }
+            })
+          }
       } else {
         User_RoomPageView(isTiming: $isTiming, notExited: $notExited, genres: $genres, showNav: $showNav)
           .animation(.default)

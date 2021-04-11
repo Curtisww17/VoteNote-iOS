@@ -25,7 +25,7 @@ struct Host_RoomPageView: View {
         Causes the current user to leave the room
      */
   func exitRoom() {
-    print("Left Room")
+    closeRoom()
     leaveRoom()
     isTiming = false
     notExited = true
@@ -154,7 +154,7 @@ struct Host_RoomPageView: View {
               }, label: {
                 HStack {
                   Spacer()
-                  Text("Leave Room")
+                  Text("Close Room")
                     .foregroundColor(Color.red)
                   Spacer()
                 }
