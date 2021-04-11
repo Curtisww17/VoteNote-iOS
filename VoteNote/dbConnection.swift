@@ -407,9 +407,7 @@ func leaveRoom() -> Bool{
 
 ///set the current room to closed
 func closeRoom(){
-    getCurrRoom { (code, err) in
-        db.collection("room").document(code).updateData(["closed": true])
-    }
+  db.collection("room").document(currentQR.roomCode).updateData(["closed": true])
 }
 
 ///set the current room to open

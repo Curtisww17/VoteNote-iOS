@@ -41,6 +41,7 @@ struct PreviouslyHostedRoomsView: View {
           explicitSongsAllowed = ret!.explicit
           anonUsr = ret!.anonUsr
           genres = ret!.genres
+          openRoom()
           //songsPerUser = ret. //not in db room object
           self.joined = true        }
       }

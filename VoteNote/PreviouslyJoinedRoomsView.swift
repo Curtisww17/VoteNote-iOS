@@ -69,8 +69,13 @@ struct PreviouslyJoinedRoomsView: View {
           Button(action: {
             join(c: currRoom.code)
           }, label: {
+            if (currRoom.closed) {
+              Text(currRoom.name)
+                .foregroundColor(.gray)
+            } else {
             Text(currRoom.name)
               .foregroundColor(.primary)
+            }
           })
         }
       }

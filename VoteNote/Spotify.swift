@@ -273,9 +273,7 @@ class Spotify: ObservableObject {
   //gets information on a song based of off a song uri
   func getTrackInfo(track_uri: String, completion: @escaping (SpotifyTrack?) -> ()) {
     var track_id = track_uri
-    if (track_id.contains(":")) {
-      track_id = String(track_uri.split(separator: ":").last!)
-    }
+    
     
     self.httpRequester.headerGet(url: "https://api.spotify.com/v1/tracks/\(track_id)", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? "")" ]).onFinish = { (response) in
       do {
