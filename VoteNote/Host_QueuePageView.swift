@@ -307,7 +307,28 @@ struct QueueEntry: View {
                     Spacer()
                     
                     if !isHistoryView {
-                        Image(systemName: "chevron.right").resizable().frame(width: 10.0, height: 20.0).foregroundColor(Color.gray)
+                        /*Button(action: {if self.offset.width < 50 {
+                            self.scale = 1
+                            self.offset.width = -60
+                            opened = true
+                          } else {
+                            self.scale = 0.5
+                            self.offset = .zero
+                            opened = false
+                          }}) {
+                            Image(systemName: "chevron.right").resizable().frame(width: 10.0, height: 20.0).foregroundColor(Color.gray)
+                        }*/
+                        Image(systemName: "chevron.right").resizable().frame(width: 10.0, height: 20.0).foregroundColor(Color.gray).onTapGesture {
+                            if self.offset.width < 50 {
+                              self.scale = 1
+                              self.offset.width = -60
+                              opened = true
+                            } else {
+                              self.scale = 0.5
+                              self.offset = .zero
+                              opened = false
+                            }
+                        }
                     }
                     
                     
