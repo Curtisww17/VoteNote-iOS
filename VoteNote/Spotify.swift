@@ -36,7 +36,7 @@ class Spotify: ObservableObject {
   
   
   //scopes that we request access for, add more as needed
-  let SCOPES: SPTScope = [ .userReadRecentlyPlayed, .userTopRead, .streaming, .userReadEmail, .appRemoteControl, .playlistModifyPrivate, .playlistModifyPublic, .playlistReadPrivate, .userModifyPlaybackState, .userReadPlaybackState, .userReadCurrentlyPlaying, .userLibraryRead, .userLibraryModify]
+  let SCOPES: SPTScope = [ .userReadRecentlyPlayed, .userTopRead, .streaming, .userReadEmail, .appRemoteControl, .playlistModifyPrivate, .playlistModifyPublic, .playlistReadPrivate, .userModifyPlaybackState, .userReadPlaybackState, .userReadCurrentlyPlaying, .userLibraryRead, .userLibraryModify, .userReadPrivate]
   
   @Published var loggedIn: Bool
   @Published var isAnon: Bool
