@@ -830,6 +830,15 @@ func voteSong(vote: Int, id: String, completion: @escaping  () -> ()){
 }
 
 /**
+ deletes the current user's vote for the song referenced by id
+ 
+ - parameter id: the id of the song that the user voted on
+ */
+func deleteVote(id: String){
+    db.collection("users").document(FAuth.currentUser!.uid).collection("votes").document(id).delete()
+}
+
+/**
  get the queue from the current room
  */
 func getQueue(completion: @escaping ([song]?, Error?) -> Void){
