@@ -811,18 +811,21 @@ func voteSong(vote: Int, id: String, completion: @escaping  () -> ()){
 func getQueue(completion: @escaping ([song]?, Error?) -> Void){
     
     getCurrRoom { (currRoom, err) in
-        
-        db.collection("room").document(currRoom).collection("queue").order(by: "time").getDocuments { (queue, err) in
-            if let err = err, queue?.isEmpty ?? true{
-                print("error getting queue \(err)")
-                completion(nil, err)
-            } else {
-                var songs: [song] = []
-                
-                for doc in queue!.documents {
-                    songs.append(song(sng: doc.data() , id: doc.documentID))
+        if currRoom == "" {
+            print("getQueue was called while a user was not in a room")
+        } else {
+            db.collection("room").document(currRoom).collection("queue").order(by: "time").getDocuments { (queue, err) in
+                if let err = err, queue?.isEmpty ?? true{
+                    print("error getting queue \(err)")
+                    completion(nil, err)
+                } else {
+                    var songs: [song] = []
+                    
+                    for doc in queue!.documents {
+                        songs.append(song(sng: doc.data() , id: doc.documentID))
+                    }
+                    completion(songs, nil)
                 }
-                completion(songs, nil)
             }
         }
     }//end getCurrRoom
@@ -837,21 +840,24 @@ func getHistory(completion: @escaping ([song]?, Error?) -> Void){
     
     getCurrRoom { (currRoom, err) in
         
-        
-        db.collection("room").document(currRoom).collection("history").order(by: "time").getDocuments { (hist, err) in
-            if let err = err{
-                print("error getting history \(err)")
-                completion(nil, err)
-            } else if hist?.isEmpty ?? true{
-                print("history is empty")
-                completion(nil, nil)
-            }else {
-                var songs: [song] = []
-                
-                for doc in hist!.documents {
-                    songs.append(song(sng: doc.data() , id: doc.documentID))
+        if currRoom == "" {
+            print("getHistory was called while a user was not in a room")
+        } else {
+            db.collection("room").document(currRoom).collection("history").order(by: "time").getDocuments { (hist, err) in
+                if let err = err{
+                    print("error getting history \(err)")
+                    completion(nil, err)
+                } else if hist?.isEmpty ?? true{
+                    print("history is empty")
+                    completion(nil, nil)
+                }else {
+                    var songs: [song] = []
+                    
+                    for doc in hist!.documents {
+                        songs.append(song(sng: doc.data() , id: doc.documentID))
+                    }
+                    completion(songs, nil)
                 }
-                completion(songs, nil)
             }
         }
         
