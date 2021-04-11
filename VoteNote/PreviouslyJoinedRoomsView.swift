@@ -59,7 +59,9 @@ struct PreviouslyJoinedRoomsView: View {
       Form {
         ForEach(previousRooms, id: \.code) {currRoom in
           Button(action: {
-            join(c: currRoom.code)
+            if (!currRoom.closed) {
+              join(c: currRoom.code)
+            }
           }, label: {
             if (currRoom.closed) {
               Text(currRoom.name)
