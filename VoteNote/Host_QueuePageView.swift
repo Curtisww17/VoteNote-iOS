@@ -405,7 +405,6 @@ struct NowPlayingViewHostMaximized: View {
     func playSong(){
         print("Play Song")
         sharedSpotify.resume()
-        
         RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
         
         if !(sharedSpotify.isPaused ?? true) {
