@@ -401,13 +401,7 @@ func leaveRoom() -> Bool{
     //take the user out of the room
     let usr = FAuth.currentUser
     db.collection("users").document(usr!.uid).updateData(["currentRoom": ""])
-    db.collection("users").document(usr!.uid).collection("votes").getDocuments { (docs, err) in
-        //delete all the votes the user made
-        //TODO: we need to store votes by room and not delete them when you leave the room
-        for doc in docs!.documents {
-            db.collection("users").document(usr!.uid).collection("votes").document(doc.documentID).delete()
-        }
-    }
+    
     
     return true
 }
@@ -611,20 +605,24 @@ func banUser(uid: String){
  - Returns a dictionary mapping song id's to their vote value
  */
 func getVotes(completion: @escaping ([String : Int]?, Error?) -> Void){
-    let currUser = FAuth.currentUser?.uid ?? ""
+    getCurrRoom { (currRoom, err) in
+        
     
-    db.collection("users").document(currUser).collection("votes").getDocuments { (docs, err) in
-        if let err = err {
-            print("err getting votes \(err)")
-            completion(nil, err)
-        } else if docs?.isEmpty ?? true {
-            completion(nil, nil)
-        } else {
-            var list: [String: Int] = [:]
-            for doc in docs!.documents {
-                list[doc.documentID] = doc.data()["vote"] as? Int ?? 0
+        let currUser = FAuth.currentUser?.uid ?? ""
+        
+        db.collection("users").document(currUser).collection(currRoom).getDocuments { (docs, err) in
+            if let err = err {
+                print("err getting votes \(err)")
+                completion(nil, err)
+            } else if docs?.isEmpty ?? true {
+                completion(nil, nil)
+            } else {
+                var list: [String: Int] = [:]
+                for doc in docs!.documents {
+                    list[doc.documentID] = doc.data()["vote"] as? Int ?? 0
+                }
+                completion(list, nil)
             }
-            completion(list, nil)
         }
     }
 }
@@ -762,14 +760,14 @@ func voteSong(vote: Int, id: String, completion: @escaping  () -> ()){
     getCurrRoom { (currRoom, err) in
         let currUser = FAuth.currentUser!.uid
         
-        db.collection("users").document(currUser).collection("votes").document(id).getDocument { (doc, err) in
+        db.collection("users").document(currUser).collection(currRoom).document(id).getDocument { (doc, err) in
             let queue = db.collection("room").document(currRoom).collection("queue")
             if let err = err {
                 print("error getting user document \(err)")
                 completion()
             } else if !(doc!.exists) {
                 //we havent voted on this song yet
-                db.collection("users").document(currUser).collection("votes").document(id).setData(["vote": vote])
+                db.collection("users").document(currUser).collection(currRoom).document(id).setData(["vote": vote])
                 queue.document(id).updateData(["numvotes": FieldValue.increment(Int64(vote))])
                 completion()
             } else {
@@ -782,25 +780,25 @@ func voteSong(vote: Int, id: String, completion: @escaping  () -> ()){
                     //cancel out the vote
                     if v == 1 {
                         queue.document(id).updateData(["numvotes": FieldValue.increment(Int64(-1))])
-                        db.collection("users").document(currUser).collection("votes").document(id).setData(["vote": 0])
+                        db.collection("users").document(currUser).collection(currRoom).document(id).setData(["vote": 0])
                         completion()
                     } else {
                         queue.document(id).updateData(["numvotes": FieldValue.increment(Int64(1))])
-                        db.collection("users").document(currUser).collection("votes").document(id).setData(["vote": 0])
+                        db.collection("users").document(currUser).collection(currRoom).document(id).setData(["vote": 0])
                         completion()
                     }
                     
                 }else if v == 0 {
                     queue.document(id).updateData(["numvotes": FieldValue.increment(Int64(vote))])
-                    db.collection("users").document(currUser).collection("votes").document(id).setData(["vote": vote])
+                    db.collection("users").document(currUser).collection(currRoom).document(id).setData(["vote": vote])
                     completion()
                 } else if v == 1 {
                     queue.document(id).updateData(["numvotes": FieldValue.increment(Int64(-2))])
-                    db.collection("users").document(currUser).collection("votes").document(id).setData(["vote": -1])
+                    db.collection("users").document(currUser).collection(currRoom).document(id).setData(["vote": -1])
                     completion()
                 } else {
                     queue.document(id).updateData(["numvotes": FieldValue.increment(Int64(2))])
-                    db.collection("users").document(currUser).collection("votes").document(id).setData(["vote": 1])
+                    db.collection("users").document(currUser).collection(currRoom).document(id).setData(["vote": 1])
                     completion()
                 }
             }
@@ -816,7 +814,9 @@ func voteSong(vote: Int, id: String, completion: @escaping  () -> ()){
  - parameter id: the id of the song that the user voted on
  */
 func deleteVote(id: String){
-    db.collection("users").document(FAuth.currentUser!.uid).collection("votes").document(id).delete()
+    getCurrRoom { (currRoom, err) in
+        db.collection("users").document(FAuth.currentUser!.uid).collection(currRoom).document(id).delete()
+    }
 }
 
 /**
