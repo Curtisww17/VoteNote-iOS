@@ -13,22 +13,19 @@ import SwiftUI
  */
 struct Host_RoomPageView: View {
   @State var currentView = 1
-  @State var roomName: String
-  @State var roomDescription: String
-  @State var roomCapacity: Int
-  @State var songsPerUser: Int
-  @State var votingEnabled: Bool
-  @Binding var anonUsr: Bool
   @Binding var showNav: Bool
   @Binding var notExited: Bool
   @Binding var isTiming: Bool
   @State var inRoom: Bool = true
+  let isHost = true
+    
+  @Binding var genres: [String]
   
     /**
         Causes the current user to leave the room
      */
   func exitRoom() {
-    print("Left Room")
+    closeRoom()
     leaveRoom()
     isTiming = false
     notExited = true
@@ -43,7 +40,7 @@ struct Host_RoomPageView: View {
       VStack {
         
         Form {
-          Section(header: Text(roomName)
+          Section(header: Text(RoomName)
                     .font(.title)
                     .fontWeight(.bold)
                     .foregroundColor(Color.black)
@@ -69,7 +66,7 @@ struct Host_RoomPageView: View {
                                 Text("History")
                               }
                             })
-            NavigationLink(destination: UsersListView()
+              NavigationLink(destination: UsersListView(isHost: isHost, votingEnabled: VotingEnabled)
                             .onAppear(perform: {
                               showNav = false
                             })
@@ -100,21 +97,21 @@ struct Host_RoomPageView: View {
           }
           
           Section(header: Text("Room Settings")) {
-            if roomDescription == "" {
+            if RoomDescription == "" {
                 Text("A VoteNote room")
             } else {
-                Text(roomDescription)
+                Text(RoomDescription)
             }
             HStack{
               Text("Room Capacity")
               Spacer()
-              Text("\(roomCapacity)")
+              Text("\(RoomCapacity)")
             }
             
             HStack{
               Text("Songs Per User")
               Spacer()
-              Text("\(songsPerUser)")
+              Text("\(SongsPerUser)")
             }
             
             HStack{
@@ -123,8 +120,18 @@ struct Host_RoomPageView: View {
                 Text("\(sharedSpotify.PlaylistBase?.name ?? "no base")")
             }
             
+            NavigationLink(
+                destination: GenreView(genres: $genres),
+              label: {
+                HStack{
+                  Text("Genres Allowed")
+                  Spacer()
+                    //Text("\(sharedSpotify.PlaylistBase?.name ?? "no base")")
+                }
+              })
+            
             HStack{
-                if votingEnabled {
+                if VotingEnabled {
                     Text("Voting Enabled")
                 } else {
                     Text("Voting Disabled")
@@ -134,7 +141,7 @@ struct Host_RoomPageView: View {
             HStack{
               Text("Anonymize All Users:")
               Spacer()
-                if anonUsr {
+                if AnonUsr {
                     Text("True")
                 } else {
                     Text("False")
@@ -147,7 +154,7 @@ struct Host_RoomPageView: View {
               }, label: {
                 HStack {
                   Spacer()
-                  Text("Leave Room")
+                  Text("Close Room")
                     .foregroundColor(Color.red)
                   Spacer()
                 }
@@ -160,12 +167,7 @@ struct Host_RoomPageView: View {
       .navigationBarHidden(true).navigationViewStyle(StackNavigationViewStyle())
         
     }
-    .frame(height: geo.size.height)
-    /*.onAppear(perform: {
-        notExited = false
-    }).navigate(to: LandingPageView(), when: $notExited)*/.navigationViewStyle(StackNavigationViewStyle())
+    .frame(height: geo.size.height).navigationViewStyle(StackNavigationViewStyle())
+    }
   }
-  }
-  
-  
 }

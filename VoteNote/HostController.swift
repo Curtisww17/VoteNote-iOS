@@ -8,22 +8,23 @@
 import Foundation
 import SwiftUI
 
+var RoomName: String = ""
+var RoomDescription: String = ""
+var VotingEnabled: Bool = false
+var AnonUsr: Bool = false
+var RoomCapacity: Int = 20
+var SongsPerUser: Int = 4
+var ExplicitSongsAllowed: Bool = false
+var Genres: [String] = [""]
 
 struct HostController: View {
   @ObservedObject var spotify = sharedSpotify
   @Binding var isInRoom: Bool
   @State var showNav = true
-  @State var roomName: String
-  @State var roomDescription: String
-  @State var votingEnabled: Bool
-  @State var anonUsr: Bool
-  @State var roomCapacity: Int
-  @State var songsPerUser: Int
-  @State var explicitSongsAllowed: Bool
   @State var notExited: Bool = false
   @State var isTiming = false
 
-  
+  @State var genres = Genres
   
   @State var currentView = 1
   var body: some View {
@@ -43,7 +44,7 @@ struct HostController: View {
           VStack {
             if (currentView == 0) {
               NavigationLink(
-                destination: AddMusicView(songsPerUser: songsPerUser, explicitSongsAllowed: explicitSongsAllowed).navigationBarTitle("Browse"),
+                destination: AddMusicView().navigationBarTitle("Browse"),
                 label: {
                   Text("Add")
                 })
@@ -67,11 +68,11 @@ struct HostController: View {
       .frame(width: UIScreen.main.bounds.size.width, alignment: .top)
       
       if (currentView == 0) {
-        Host_QueuePageView(votingEnabled: ObservableBoolean(boolValue: votingEnabled))
+        Host_QueuePageView()
           .animation(.default)
           .transition(.move(edge: .leading))
       } else {
-        Host_RoomPageView(roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser, votingEnabled: votingEnabled, anonUsr: $anonUsr, showNav: $showNav, notExited: $notExited, isTiming: $isTiming)
+        Host_RoomPageView(showNav: $showNav, notExited: $notExited, isTiming: $isTiming, genres: $genres)
           .animation(.default)
           .transition(.move(edge: .trailing))
         
@@ -93,17 +94,3 @@ struct HostController: View {
   }
   
 }
-
-/*struct HostController_PreviewContainer: View {
- @State var isInRoom: Bool = true
- 
- var body: some View {
- HostController(isInRoom: $isInRoom, roomName: "Primanti Bros", roomDescription: "Description Goes Here")
- }
- }
- 
- struct HostController_Previews: PreviewProvider {
- static var previews: some View {
- HostController_PreviewContainer()
- }
- }*/

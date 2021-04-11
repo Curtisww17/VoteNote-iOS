@@ -14,35 +14,32 @@ struct JoinRoomView: View {
   @Binding var isInRoom: Bool
   //@ObservedObject var spotify: Spotify = sharedSpotify
   
-  @State var code = ""
+  @ObservedObject var code = TextBindingManager(limit: 5)
   @State var joined = false
   @State private var isShowingScanner = false
   
-  @State var roomName: String = ""
-  @State var roomDescription: String = ""
-  @State var roomCapacity: Int = 0
-  @State var songsPerUser: Int = 0
   @State private var isShowingJoinAlert = false
-  @State var votingEnabled: Bool = true
-  @State var explicitSongsAllowed: Bool = false
-  @State var anonUsr: Bool = false
   @State var prevJoinedRooms: [String] = []
+  @State var showingAlert = false
+  @State var alertMsg = ""
   
   func join(c: String) {
     joinRoom(code: c){ (ret, message) in
       if message != nil {
-        //TODO: popup that they cannot join the room
+        alertMsg = message!
+        showingAlert = true
       }else{
         storePrevRoom(code: c)
         self.joined = true
         if ret != nil {
-          roomName = ret!.name
-          roomDescription = (ret?.desc)!
-          roomCapacity = ret!.capacity
-          songsPerUser = ret!.spu
-          votingEnabled = ret!.voting
-          explicitSongsAllowed = ret!.explicit
-          anonUsr = ret!.anonUsr
+          RoomName = ret!.name
+          RoomDescription = (ret?.desc)!
+          RoomCapacity = ret!.capacity
+          SongsPerUser = ret!.spu
+          VotingEnabled = ret!.voting
+          ExplicitSongsAllowed = ret!.explicit
+          AnonUsr = ret!.anonUsr
+          Genres = ret!.genres
           //songsPerUser = ret. //not in db room object
           self.joined = true        }
       }
@@ -78,14 +75,16 @@ struct JoinRoomView: View {
           isShowingJoinAlert.toggle()
         })
         if (isShowingJoinAlert) {
-          TextField("Room Code", text: $code)
+          TextField("Room Code", text: $code.text)
             .textFieldStyle(RoundedBorderTextFieldStyle())
-          Button(action: {
-            join(c: code)
-          }, label: {
-            Text("Join")
-          })
-          .frame(width: UIScreen.main.bounds.width * 0.8, height: 60, alignment: .center)
+          if code.text.count == 5 {
+            Button(action: {
+              join(c: code.text)
+            }, label: {
+              Text("Join")
+            })
+            .frame(width: UIScreen.main.bounds.width * 0.8, height: 60, alignment: .center)
+          }
         }
       }
       // Not implemented yet
@@ -98,6 +97,9 @@ struct JoinRoomView: View {
        })
        }
        }
+    }
+    .alert(isPresented: $showingAlert) {
+      Alert(title: Text("Cannot Join Room"), message: Text(alertMsg), dismissButton: .default(Text("Got it!")))
     }
     .onAppear(perform: {
       getPrevJoinedRooms(completion: {(codes, err) in
@@ -116,10 +118,8 @@ struct JoinRoomView: View {
     .sheet(isPresented: $isShowingScanner) {
       CodeScannerView(codeTypes: [.qr], simulatedData: "1QCXT", completion: self.handleScan)
     }
-    .navigate(to: UserController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser, votingEnabled: votingEnabled, anonUsr: anonUsr, explicitSongsAllowed: explicitSongsAllowed), when: $joined)
+    .navigate(to: UserController(isInRoom: $isInRoom), when: $joined)
     .onAppear(perform: {
-      sharedSpotify.pause()
-      
     })
     .navigationViewStyle(StackNavigationViewStyle())
   }
@@ -137,20 +137,4 @@ struct JoinRoomView: View {
     
   }
 }
-
-struct JoinRoomView_PreviewsContainer: View {
-  //@State var spotify: Spotify = Spotify()
-  @State var isInRoom = false
-  var body: some View {
-    JoinRoomView(isInRoom: $isInRoom)
-  }
-}
-
-struct JoinRoomView_Previews: PreviewProvider {
-  static var previews: some View {
-    JoinRoomView_PreviewsContainer()
-  }
-}
-
-
 

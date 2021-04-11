@@ -27,6 +27,9 @@ class Spotify: ObservableObject {
   var recommendedSongs: reccomndations?
   var savePlaylist: uniquePlaylist?
   var PlaylistBase: uniquePlaylist?
+  var songGenres: currentArtists?
+  
+  var genreList: genres?
   var songTimer: Int = 0
   
   var sessionManager: SPTSessionManager?
@@ -219,6 +222,17 @@ class Spotify: ObservableObject {
     }
   }
   
+  func getGenreList(completion: @escaping (genres?) -> ()) -> (){
+    self.httpRequester.headerGet(url: "https://api.spotify.com/v1/recommendations/available-genre-seeds", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ]).onFinish = {
+      (response) in
+      do {
+        //print(" testingssdssds \(response.description)")
+        let decoder = JSONDecoder()
+        try completion( decoder.decode(genres.self, from: response.data))
+      } catch {
+        fatalError("Couldn't parse \(response.description)")
+      }
+    }
   
   func addSongsToPlaylist(Playlist: String, songs: [song]){
     var songData = ""
@@ -285,7 +299,7 @@ class Spotify: ObservableObject {
     self.httpRequester.headerPUT(url: "https://api.spotify.com/v1/me/tracks?ids=\(id)",header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ]).onFinish = {
       (response) in
       do{
-        print(response.description)
+        print("\(response.description)")
       } catch {
         fatalError("bad response \(response.description)")
       }
@@ -309,7 +323,6 @@ class Spotify: ObservableObject {
   //gets information on a song based of off a song uri
   func getTrackInfo(track_uri: String, completion: @escaping (SpotifyTrack?) -> ()) {
     var track_id = track_uri
-      track_id = String(track_uri.split(separator: ":").last!)
     
     
     self.httpRequester.headerGet(url: "https://api.spotify.com/v1/tracks/\(track_id)", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? "")" ]).onFinish = { (response) in
@@ -318,6 +331,17 @@ class Spotify: ObservableObject {
         try completion( decoder.decode(SpotifyTrack.self, from: response.data))
       } catch {
         print(track_id)
+        fatalError("Couldn't parse \(response.description)")
+      }
+    }
+  }
+  
+  func getSongGenre(artistID: String, completion: @escaping (currentArtists?) -> ()){
+    self.httpRequester.headerGet(url: "https://api.spotify.com/v1/artists?ids=\(artistID)", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? "")" ]).onFinish = { (response) in
+      do {
+        let decoder = JSONDecoder()
+        try completion( decoder.decode(currentArtists.self, from: response.data))
+      } catch {
         fatalError("Couldn't parse \(response.description)")
       }
     }
@@ -387,6 +411,7 @@ struct _spotifyTrack: Codable {
 struct SpotifyAlbum: Codable, Identifiable {
   var id: String
   var images: [SpotifyImage]?
+  var genres: [String]?
 }
 
 struct _spotifyPlaylists: Codable{
@@ -424,6 +449,19 @@ struct songTimeAdded: Codable{
   
 }
 
+struct currentArtists: Codable{
+  var artists: [currentGenres]
+}
+
+struct currentGenres: Codable{
+  var genres: [String]?
+  var id: String
+}
+
 struct reccomndations: Codable{
   var tracks: [SpotifyTrack]
+}
+
+struct genres: Codable{
+  var genres: [String]
 }

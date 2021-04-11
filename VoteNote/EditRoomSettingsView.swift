@@ -15,14 +15,14 @@ struct EditRoomView: View {
     
   @Environment(\.presentationMode) var presentationMode
   
-  @State var userCapacity: Int = 20 {
+  @State var userCapacity: Int = RoomCapacity {
     didSet {
       if userCapacity < 1 {
         userCapacity = 1
       }
     }
   }
-  @State var songsPerUser: Int = 4 {
+  @State var songsPerUser: Int = SongsPerUser {
     didSet {
       if songsPerUser < 1 {
         songsPerUser = 1
@@ -30,20 +30,30 @@ struct EditRoomView: View {
     }
   }
   
-  @State var roomName: String = ""
-  @State var roomDescription: String = ""
-  @State var votingEnabled: Bool = true
-  @State var madeRoom: Bool = false
-  @State var anonUsr: Bool = false
-  @State var explicitSongsAllowed: Bool = false
+    //TO-DO: limit chars when editing
+    //@ObservedObject var roomName = TextBindingManager(limit: 20, text: RoomName.trimmingCharacters(in: .whitespacesAndNewlines))
+    //@ObservedObject var roomDescription = TextBindingManager(limit: 20, text: RoomDescription.trimmingCharacters(in: .whitespacesAndNewlines))
+    @State var roomName: String = RoomName
+    @State var roomDescription = RoomDescription
+    @State var votingEnabled: Bool = VotingEnabled
+    @State var madeRoom: Bool = false
+    @State var anonUsr: Bool = AnonUsr
+    @State var explicitSongsAllowed: Bool = ExplicitSongsAllowed
+    @State var genres: Set<String> = Set(Genres)
   
   func editRoom(){
-    //TO-DO- send info to room, songs per user
     print("Room")
-    /*let newRoom: room = room(name: roomName, desc: roomDescription, anonUsr: anonUsr, capacity: userCapacity, explicit: explicitSongsAllowed, voting: votingEnabled, spu: songsPerUser)
-    let newcode = makeRoom(newRoom: newRoom)
-    storePrevRoom(code: newcode)
-    madeRoom = true*/
+    let newRoom: room = room(name: roomName, desc: roomDescription, anonUsr: anonUsr, capacity: userCapacity, explicit: explicitSongsAllowed, voting: votingEnabled, code: currentQR.roomCode, spu: songsPerUser, genres: Array(genres))
+    makeRoom(newRoom: newRoom)
+    
+    RoomName = roomName
+    RoomDescription = roomDescription
+    VotingEnabled = votingEnabled
+    AnonUsr = anonUsr
+    RoomCapacity = userCapacity
+    SongsPerUser = songsPerUser
+    ExplicitSongsAllowed = explicitSongsAllowed
+    Genres = Array(genres)
     presentationMode.wrappedValue.dismiss()
   }
   
@@ -71,6 +81,15 @@ struct EditRoomView: View {
                 .padding(.trailing)
               Stepper("\(songsPerUser)", onIncrement: { songsPerUser+=1}, onDecrement: { songsPerUser-=1})
                 .padding(.leading)
+            }
+            
+            HStack{
+                NavigationLink(
+                    destination: GenreSelectView(genres: $genres)
+                    .navigationBarBackButtonHidden(true).navigationBarHidden(true),
+                  label: {
+                    Text("Genres Allowed")
+                  })
             }
             
             HStack {
@@ -113,7 +132,7 @@ struct EditRoomView: View {
       //}
     }
     .navigationBarHidden(true)
-    .navigate(to: HostController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription, votingEnabled: votingEnabled, anonUsr: anonUsr, roomCapacity: userCapacity, songsPerUser: songsPerUser, explicitSongsAllowed: explicitSongsAllowed), when: $madeRoom)
+    .navigate(to: HostController(isInRoom: $isInRoom), when: $madeRoom)
     .onAppear(perform: {
 //        getCurrRoom(completion: {code, err in
 //          if err == nil {
@@ -121,22 +140,25 @@ struct EditRoomView: View {
 //          }
 //        })
         
-        RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+        //RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
         
-        var curRoom: room = room(name: "", anonUsr: false, capacity: 0, explicit: false, voting: true)
+        /*var curRoom: room = room(name: "", anonUsr: false, capacity: 0, explicit: false, voting: true)
         getRoom(code: currentQR.roomCode, completion: {room, err in
             if (room != nil) {
-                curRoom = room!
-            }
-        })
+                curRoom = room!*/
+              
+              /*roomName.text = RoomName
+              roomDescription.text = RoomDescription
+              votingEnabled = VotingEnabled
+              anonUsr = AnonUsr
+              songsPerUser = SongsPerUser
+              userCapacity = RoomCapacity
+              explicitSongsAllowed = ExplicitSongsAllowed
+              genres = Set(Genres)*/
+            /*}
+        })*/
         
-        RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
-        
-        roomName = curRoom.name
-        roomDescription = curRoom.desc!
-        votingEnabled = curRoom.voting
-        anonUsr = curRoom.anonUsr
-        explicitSongsAllowed = curRoom.explicit
+        //RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
     })
     .navigationViewStyle(StackNavigationViewStyle())
   }

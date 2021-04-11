@@ -12,15 +12,11 @@ struct UserController: View {
   @ObservedObject var spotify = sharedSpotify
   @Binding var isInRoom: Bool
   @State var showNav = true;
-  @State var roomName: String
-  @State var roomDescription: String
-  @State var roomCapacity: Int
-  @State var songsPerUser: Int
-  @State var votingEnabled: Bool
-  @State var anonUsr: Bool
-  @State var explicitSongsAllowed: Bool
   @State var notExited: Bool = false
   @State var isTiming: Bool = false
+    
+  @State var genres: [String] = Genres
+  @State var isBanned = false
     
   @State var currentView = 0
     
@@ -41,7 +37,7 @@ struct UserController: View {
         VStack {
             if (currentView == 0) {
                 NavigationLink(
-                    destination: AddMusicView(songsPerUser: songsPerUser, explicitSongsAllowed: explicitSongsAllowed).navigationBarTitle("Browse"),
+                    destination: AddMusicView().navigationBarTitle("Browse"),
                   label: {
                   Text("Add")
                   })
@@ -62,11 +58,21 @@ struct UserController: View {
       .frame(width: UIScreen.main.bounds.size.width, alignment: .top)
       
       if (currentView == 0) {
-        User_QueuePageView(votingEnabled: ObservableBoolean(boolValue: votingEnabled))
+        User_QueuePageView()
           .animation(.default)
           .transition(.move(edge: .leading))
+          .onAppear() {
+            
+            getRoom(code: currentQR.roomCode, completion: { (room, err) in
+              if ((room!.bannedUsers ?? []).contains(getUID())) {
+                  leaveRoom()
+                  isTiming = false
+                  notExited = true
+              }
+            })
+          }
       } else {
-        User_RoomPageView(roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser, votingEnabled: votingEnabled, anonUsr: $anonUsr, isTiming: $isTiming, notExited: $notExited, showNav: $showNav)
+        User_RoomPageView(isTiming: $isTiming, notExited: $notExited, genres: $genres, showNav: $showNav)
           .animation(.default)
           .transition(.move(edge: .trailing))
         

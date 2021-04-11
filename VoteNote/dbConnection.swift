@@ -50,10 +50,13 @@ class room{
     let spu: Int    //songs per user
     let playlist: String //playlist id thing
     let host: String //uid of the host
-    //need to add allowed genres
+    let genres: [String] //the allowwed genres
+    let closed: Bool //whether or not the room is open/active
+    let bannedUsers: [String]? //a list of all the users who are banned from the room
+    let currSong: String
     
     //normal constructor
-    init(name: String, desc: String? = "", anonUsr: Bool, capacity: Int, explicit: Bool, voting: Bool, spu: Int = -1, playlist: String? = nil, host: String = FAuth.currentUser!.uid) {
+    init(name: String, desc: String? = "", anonUsr: Bool, capacity: Int, explicit: Bool, voting: Bool, spu: Int = -1, playlist: String? = nil, host: String = FAuth.currentUser!.uid, genres: [String]? = [], closed: Bool? = false, bannedUsers: [String]? = [], currSong: String = "") {
         self.name = name
         self.desc = desc
         self.anonUsr = anonUsr
@@ -65,6 +68,29 @@ class room{
         self.spu = spu
         self.playlist = playlist ?? ""
         self.host = host
+        self.genres = genres ?? []
+        self.closed = closed ?? false
+        self.bannedUsers = bannedUsers
+        self.currSong = currSong
+    }
+    
+    //constructor for edit room
+    init(name: String, desc: String? = "", anonUsr: Bool, capacity: Int, explicit: Bool, voting: Bool, code: String, spu: Int = -1, playlist: String? = nil, host: String = FAuth.currentUser!.uid, genres: [String]? = [], closed: Bool? = false, bannedUsers: [String]? = [], currSong: String = "") {
+        self.name = name
+        self.desc = desc
+        self.anonUsr = anonUsr
+        self.capacity = capacity
+        self.explicit = explicit
+        self.voting = voting
+        queue = []
+        self.code = code
+        self.spu = spu
+        self.playlist = playlist ?? ""
+        self.host = host
+        self.genres = genres ?? []
+        self.closed = closed ?? false
+        self.bannedUsers = bannedUsers
+        self.currSong = currSong
     }
     
     //constructor for firestore
@@ -80,6 +106,10 @@ class room{
         spu = rm["spu"] as? Int ?? -1
         playlist = rm["playlist"] as? String ?? ""
         host = rm["host"] as? String ?? ""
+        genres = rm["genres"] as? [String] ?? []
+        closed = rm["closed"] as? Bool ?? false
+        bannedUsers = rm["bannedUsers"] as? [String]
+        currSong = rm["currSong"] as? String ?? ""
     }
 }
 
@@ -88,7 +118,7 @@ class user: Identifiable, ObservableObject {
     var profilePic: String //link to pfp
     var isAnon: Bool?       //is the user anonymized
     var anon_name: String  //the user's anonymous name
-    let uid: String?
+    var uid: String?
     
     //TODO: refactor this out
     init(name: String, profilePic: String){
@@ -119,7 +149,7 @@ class user: Identifiable, ObservableObject {
 }
 
 class song: Identifiable, ObservableObject{
-    let addedBy: String? //UID of who added it
+    let addedBy: String //UID of who added it
     let artist: String?  //String of all credited artsts, sperated by spaces
     let genres: [String]
     let id: String  //spotify id of the song
@@ -141,7 +171,7 @@ class song: Identifiable, ObservableObject{
     
     //firestore
     init(sng: [String: Any], id: String){
-        addedBy = sng["addedBy"] as? String
+        addedBy = sng["addedBy"] as? String ?? ""
         artist = sng["artist"] as? String
         genres = []
         self.id = id
@@ -206,7 +236,7 @@ func firebaseLogin(name: String){
  */
 func joinRoom(code: String, completion:@escaping (room?, String?) -> Void){
     //put the user in the correct room
-    //TODO: add checking for banned user and capacity
+    //TODO: add checking for capacity
     
     let upperCode = code.uppercased()
     currentQR.update(roomCode: upperCode)
@@ -215,9 +245,7 @@ func joinRoom(code: String, completion:@escaping (room?, String?) -> Void){
     let usr = FAuth.currentUser
     
     
-    let joiningQuery = db.collection("room").whereField("code", isEqualTo: upperCode)
-    
-    joiningQuery.getDocuments() { (query, err) in
+    db.collection("room").document(upperCode).getDocument(completion: { (doc, err) in
         if let err = err{
             print("err gerring documents \(err)")
             completion(nil, err.localizedDescription)
@@ -229,7 +257,7 @@ func joinRoom(code: String, completion:@escaping (room?, String?) -> Void){
             
             //if joining a nonexistent room this will crash rn
             //TODO: fix this crash
-            let rm = query?.documents[0].data()
+            let rm = doc?.data()
             
             //check if banned
             for u in (rm?["bannedUsers"] as? [String] ?? []){
@@ -238,11 +266,13 @@ func joinRoom(code: String, completion:@escaping (room?, String?) -> Void){
                     completion(nil, "You are banned from this room")
                 }
             }
-            
+            if (rm?["closed"] as? Bool ?? false){
+                completion(nil, "This room is closed")
+            }
             completion(room(rm: rm!), nil)
         }
         
-    }
+    })
     
 }
 
@@ -355,33 +385,31 @@ func getPrevHostedRooms(completion: @escaping ([String]?, Error?) -> Void){
  */
 func getRoom(code: String, completion: @escaping (room?, Error?) -> Void){
     
+    if code == "" {
+        print("getRoom was called with no code given")
+        completion(nil, nil)
+    } else {
     
-    let joiningQuery = db.collection("room").whereField("code", isEqualTo: code)
-    
-    joiningQuery.getDocuments() { (query, err) in
+    db.collection("room").document(code).getDocument { (doc, err) in
         if let err = err{
             print("err gerring documents \(err)")
             completion(nil, err)
         }
-        else if query!.isEmpty { //make sure the querey returns a room
-            completion(nil, nil)
+        else if !(doc?.exists ?? false) { //make sure the querey returns a room
+            enum newError: Error {
+                case documentError(String)
+            }
+            completion(nil, newError.documentError("no room with that code could be found"))
         } else {
             
-            let rm = query?.documents[0].data()
+            let rm = doc?.data()
             
-            //if we didn't find the document
-            if rm == nil{
-                enum newError: Error {
-                    case documentError(String)
-                }
-                completion(nil, newError.documentError("no room with that code could be found"))
-            }
             
             //return the room
             completion(room(rm: rm!), nil)
         }
-        
-    }//end joiningquerey
+    }
+    }
     
     
     
@@ -392,10 +420,39 @@ func leaveRoom() -> Bool{
     //take the user out of the room
     let usr = FAuth.currentUser
     db.collection("users").document(usr!.uid).updateData(["currentRoom": ""])
+    db.collection("users").document(usr!.uid).collection("votes").getDocuments { (docs, err) in
+        //delete all the votes the user made
+        //TODO: we need to store votes by room and not delete them when you leave the room
+        for doc in docs!.documents {
+            db.collection("users").document(usr!.uid).collection("votes").document(doc.documentID).delete()
+        }
+    }
     
     return true
 }
 
+///set the current room to closed
+func closeRoom(){
+  db.collection("room").document(currentQR.roomCode).updateData(["closed": true])
+}
+
+///set the current room to open
+func openRoom(){
+    getCurrRoom { (code, err) in
+        db.collection("room").document(code).updateData(["closed": false])
+    }
+}
+
+/**
+ Set the currently playing song
+ 
+ - Parameter id: the spotify id of the song
+ */
+func setCurrSong(id: String){
+    getCurrRoom { (code, err) in
+        db.collection("room").document(code).updateData(["currSong": id])
+    }
+}
 
 /**
  makes a new room in the db from a room obj
@@ -418,7 +475,7 @@ func makeRoom(newRoom: room) -> String{
   currentQR.update(roomCode: code.uppercased())
     
     //make the room in the db
-    db.collection("room").addDocument(data: [
+    db.collection("room").document(code).setData([
                                         "name": newRoom.name,
                                         "desc": newRoom.desc ?? "",
                                         "anonUsr": newRoom.anonUsr,
@@ -428,7 +485,10 @@ func makeRoom(newRoom: room) -> String{
                                         "code": code,
                                         "spu": newRoom.spu,
                                         "playlist": newRoom.playlist,
-                                        "host": newRoom.host])
+                                        "host": newRoom.host,
+                                        "genres": newRoom.genres,
+                                        "closed": newRoom.closed,
+                                        "bannedUsers": newRoom.bannedUsers])
     
     //put the user who made the room into the room
     db.collection("users").document(usr!.uid).updateData(["currentRoom": code])
@@ -497,6 +557,7 @@ func getUsers(completion: @escaping ([user]?, Error?) -> Void){
                             if (currRoom!.anonUsr) {
                                 newusr.name = newusr.anon_name
                             }
+                          newusr.uid = usr.documentID
                             users.append(newusr)
                         }
                         completion(users, nil)
@@ -563,6 +624,30 @@ func banUser(uid: String){
     }
 }
 
+/**
+ Gets all the votes a user has made
+ 
+ - Returns a dictionary mapping song id's to their vote value
+ */
+func getVotes(completion: @escaping ([String : Int]?, Error?) -> Void){
+    let currUser = FAuth.currentUser?.uid ?? ""
+    
+    db.collection("users").document(currUser).collection("votes").getDocuments { (docs, err) in
+        if let err = err {
+            print("err getting votes \(err)")
+            completion(nil, err)
+        } else if docs?.isEmpty ?? true {
+            completion(nil, nil)
+        } else {
+            var list: [String: Int] = [:]
+            for doc in docs!.documents {
+                list[doc.documentID] = doc.data()["vote"] as? Int ?? 0
+            }
+            completion(list, nil)
+        }
+    }
+}
+
 //MARK: Song
 /**
  add a song to the current room by the song id
@@ -599,23 +684,21 @@ func addsong(id: String, completion: @escaping () -> () ){
             
             
             //add the song to the queue
-            db.collection("room").whereField("code", isEqualTo: currRoom).getDocuments { (query, err) in
-                if let err = err {
+            db.collection("room").document(currRoom).getDocument { (doc, err) in
+                if let err = err, !(doc?.exists ?? false) {
                     print("Error getting room \(err)")
                 }else {
-                    let docid = query?.documents[0].documentID
                     //make a map to put into the db
                     let sng = ["title": title,
                                "artist": artist,
                                "length": length,
                                "addedBy": addedBy,
                                "imageurl": imageUrl,
-                               "numvotes": 0] as [String : Any]
+                               "numvotes": 0,
+                               "time": FieldValue.serverTimestamp()] as [String : Any]
                     
                     //put the map into the queue
-                    db.collection("room").document(docid!).updateData([
-                        "queue.\(id)": sng
-                    ])
+                    db.collection("room").document(currRoom).collection("queue").document(id).setData(sng)
                 }
               completion()
             }
@@ -625,44 +708,7 @@ func addsong(id: String, completion: @escaping () -> () ){
     
 }
 
-//used to get details like who posted the song
-/**
- gets a songs details by it's id
- 
- used to get details like who posted the song and how many votes it has
- 
- - Parameter id: the spotify id of the song
- */
-func getSong(id: String, completion: @escaping (song?, Error?) -> Void){
-    
-    getCurrRoom { (currRoom, err) in
-        
-        
-        var songout: song? = nil
-        
-        //grab our room
-        db.collection("room").document(currRoom).getDocument { (doc, err) in
-            if let err = err {
-                print("Error getting song \(err)")
-                completion(nil, err)
-            } else{
-                //grab the queue
-                let queue: Dictionary? = doc?.data()?["queue"] as? Dictionary<String, Any?>
-                if queue != nil {
-                    //grab the song from the queue
-                    let sng: Dictionary = queue![id] as! Dictionary<String, Any?>
-                    
-                    //convert from the db map of song to song obj
-                    songout = song(sng: sng, id: id)
-                    completion(songout, nil)
-                }
-                completion(nil, nil)
-            }
-        }
-    }//end getCurrRoom
-    
-    //return songout
-}
+
 
 /**
  removes a song from the queue and puts it into the history
@@ -675,37 +721,26 @@ func dequeue(id: String){
     getCurrRoom { (currRoom, err) in
         
         
-        //grab our room
-        db.collection("room").whereField("code", isEqualTo: currRoom).getDocuments { (docs, err) in
-            if let err = err {
-                print("Error getting song \(err)")
-                //completion(nil, err)
-            } else if (!(docs?.isEmpty ?? true)){
-                let doc = docs?.documents[0]
-                let docid = doc!.documentID
-                //grab the queue
-                let queue: Dictionary? = doc?.data()["queue"] as? Dictionary<String, Any?>
-                if queue != nil {
-                    //grab the song from the queue
-                    let sng: Dictionary? = queue![id] as? Dictionary<String, Any?>
-                    
-                    
-                    if sng != nil{
-                        //put our thing in the history
-                        db.collection("room").document(docid).updateData([
-                            "history.\(id)": sng!
-                        ])
-                        
-                        //remove the old song
-                        vetoSong(id: id)
-                    } else {
-                        print("\n\ninvalid song id recieved in dequeue")
-                    }
-                    //completion(songout, nil)
-                }
-                //completion(nil, nil)
+        //grab the room
+        let rm = db.collection("room").document(currRoom)
+        
+        //grab the song from the queue
+        rm.collection("queue").document(id).getDocument { (doc, err) in
+            //confirm we got a document
+            if let err = err, !(doc?.exists ?? false){
+                print("error finding queue in dequeue \(err)")
+            } else {
+                //store the song
+                var sng = doc!.data()!
+                sng["time"] = FieldValue.serverTimestamp()
+                
+                //delete the song from the queue
+                rm.collection("queue").document(id).delete()
+                
+                //put the song into history
+                rm.collection("history").document(id).setData(sng)
             }
-        }
+        }//end queue
     }//end getCurrRoom
 }
 
@@ -719,25 +754,18 @@ func vetoSong(id: String){
     
     getCurrRoom { (currRoom, err) in
         
-        let _ = db.collection("room").whereField("code", isEqualTo: currRoom).getDocuments { (doc, Err) in
-            if let err = err {
-                print("/n/nerror getting doc \(err.localizedDescription)")
-            }else if !doc!.isEmpty{
-                
-                let docid = doc?.documents[0].documentID
-                
-                //remove the song from the queue
-                db.collection("room").document(docid!).updateData(["queue.\(id)" : FieldValue.delete()])
-            }
-        }
+            
+        let rm = db.collection("room").document(currRoom)
+            
+        rm.collection("queue").document(id).delete()
+        
+        
         
         
     }//end getCurrRoom
 }
 
-//1 upvote, -1 downvote, 0 clear vote?
-//returns new vote number
-//id is song id
+
 /**
  allows a user to vote on a song
  
@@ -747,17 +775,53 @@ func vetoSong(id: String){
  - vote: the vote of the song 1 for up, -1 for down
  - id: the id of the song to be voted on
  */
-func voteSong(vote: Int, id: String){
+func voteSong(vote: Int, id: String, completion: @escaping  () -> ()){
+    let UVote = Int64(vote)
+    
     getCurrRoom { (currRoom, err) in
+        let currUser = FAuth.currentUser!.uid
         
-        let _ = db.collection("room").whereField("code", isEqualTo: currRoom).getDocuments { (doc, Err) in
+        db.collection("users").document(currUser).collection("votes").document(id).getDocument { (doc, err) in
+            let queue = db.collection("room").document(currRoom).collection("queue")
             if let err = err {
-                print("/n/nerror getting doc \(err.localizedDescription)")
-            }else if !doc!.isEmpty{
+                print("error getting user document \(err)")
+                completion()
+            } else if !(doc!.exists) {
+                //we havent voted on this song yet
+                db.collection("users").document(currUser).collection("votes").document(id).setData(["vote": vote])
+                queue.document(id).updateData(["numvotes": FieldValue.increment(Int64(vote))])
+                completion()
+            } else {
+                let v = doc?.data()?["vote"] as? Int64 ?? Int64(9) //9 is magic number to tell us its invalid
                 
-                let docid = doc?.documents[0].documentID
-                
-                db.collection("room").document(docid!).updateData(["queue.\(id).numvotes": FieldValue.increment(Int64(vote))])
+                if v == 9 {
+                    print("error gettign previous vote value")
+                    completion()
+                }else if v == UVote {
+                    //cancel out the vote
+                    if v == 1 {
+                        queue.document(id).updateData(["numvotes": FieldValue.increment(Int64(-1))])
+                        db.collection("users").document(currUser).collection("votes").document(id).setData(["vote": 0])
+                        completion()
+                    } else {
+                        queue.document(id).updateData(["numvotes": FieldValue.increment(Int64(1))])
+                        db.collection("users").document(currUser).collection("votes").document(id).setData(["vote": 0])
+                        completion()
+                    }
+                    
+                }else if v == 0 {
+                    queue.document(id).updateData(["numvotes": FieldValue.increment(Int64(vote))])
+                    db.collection("users").document(currUser).collection("votes").document(id).setData(["vote": vote])
+                    completion()
+                } else if v == 1 {
+                    queue.document(id).updateData(["numvotes": FieldValue.increment(Int64(-2))])
+                    db.collection("users").document(currUser).collection("votes").document(id).setData(["vote": -1])
+                    completion()
+                } else {
+                    queue.document(id).updateData(["numvotes": FieldValue.increment(Int64(2))])
+                    db.collection("users").document(currUser).collection("votes").document(id).setData(["vote": 1])
+                    completion()
+                }
             }
         }
         
@@ -771,34 +835,22 @@ func voteSong(vote: Int, id: String){
 func getQueue(completion: @escaping ([song]?, Error?) -> Void){
     
     getCurrRoom { (currRoom, err) in
-        
-        //find the current room doc
-        let joiningQuery = db.collection("room").whereField("code", isEqualTo: currRoom)
-        
-        joiningQuery.getDocuments { (docs, err) in
-            if let err = err {
-                print("\n\n\n Error Getting Queue \(err)")
-                completion(nil, err)
-            } else {
-                //if no documents were returned from the querey
-                if docs?.documents.isEmpty ?? true {
-                    print("No documents found for getQueue")
-                    completion(nil, nil)
-                }else{
-                
-                    //grab the queue from the room
-                    let queue = docs?.documents[0].data()["queue"] as? [String: Any]
+        if currRoom == "" {
+            print("getQueue was called while a user was not in a room")
+        } else {
+            db.collection("room").document(currRoom).collection("queue").order(by: "time").getDocuments { (queue, err) in
+                if let err = err, queue?.isEmpty ?? true{
+                    print("error getting queue \(err)")
+                    completion(nil, err)
+                } else {
                     var songs: [song] = []
-                    if queue != nil {
-                        //iterate through the queue and convert it into an array of song
-                        for (id, s) in queue!{
-                            songs.append(song(sng: s as! [String: Any], id: id))
-                        }
+                    
+                    for doc in queue!.documents {
+                        songs.append(song(sng: doc.data() , id: doc.documentID))
                     }
                     completion(songs, nil)
                 }
             }
-            completion(nil, nil)
         }
     }//end getCurrRoom
     
@@ -812,39 +864,27 @@ func getHistory(completion: @escaping ([song]?, Error?) -> Void){
     
     getCurrRoom { (currRoom, err) in
         
-        //find the current room doc
-        let joiningQuery = db.collection("room").whereField("code", isEqualTo: currRoom)
-        
-        joiningQuery.getDocuments { (docs, err) in
-            if let err = err {
-                print("\n\n\n Error Getting History \(err)")
-                completion(nil, err)
-            } else {
-                //if no documents were returned from the querey
-                if docs?.documents.isEmpty ?? true {
-                    print("No documents found for getHistory")
+        if currRoom == "" {
+            print("getHistory was called while a user was not in a room")
+        } else {
+            db.collection("room").document(currRoom).collection("history").order(by: "time").getDocuments { (hist, err) in
+                if let err = err{
+                    print("error getting history \(err)")
+                    completion(nil, err)
+                } else if hist?.isEmpty ?? true{
+                    print("history is empty")
                     completion(nil, nil)
-                }else{
-                    //grab the history from the room
-                    let queue = docs?.documents[0].data()["history"] as? [String: Any]
+                }else {
                     var songs: [song] = []
-                    if queue != nil {
-                        //iterate through the queue and convert it into an array of song
-                        for (id, s) in queue!{
-                            songs.append(song(sng: s as! [String: Any], id: id))
-                        }
-                    } else {
-                        print("\n\n\n Error Getting History")
-                        enum newError: Error {
-                            case documentError(String)
-                        }
-                        completion(nil, newError.documentError("history does not exist"))
+                    
+                    for doc in hist!.documents {
+                        songs.append(song(sng: doc.data() , id: doc.documentID))
                     }
                     completion(songs, nil)
                 }
             }
-            completion(nil, nil)
         }
+        
     }//end getCurrRoom
     
     

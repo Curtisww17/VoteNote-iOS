@@ -14,13 +14,6 @@ struct PreviouslyJoinedRoomsView: View {
   @State var previousRooms: [room] = []
   
   @State var joined = false
-  @State var roomName: String = ""
-  @State var roomDescription: String = ""
-  @State var roomCapacity: Int = 0
-  @State var songsPerUser: Int = 0
-  @State var votingEnabled: Bool = true
-  @State var explicitSongsAllowed: Bool = false
-  @State var anonUsr: Bool = false
   @Binding var isInRoom: Bool
   
   
@@ -31,13 +24,14 @@ struct PreviouslyJoinedRoomsView: View {
       }else{
         self.joined = true
         if ret != nil {
-          roomName = ret!.name
-          roomDescription = (ret?.desc)!
-          roomCapacity = ret!.capacity
-          songsPerUser = ret!.spu
-          votingEnabled = ret!.voting
-          explicitSongsAllowed = ret!.explicit
-          anonUsr = ret!.anonUsr
+          RoomName = ret!.name
+          RoomDescription = (ret?.desc)!
+          RoomCapacity = ret!.capacity
+          SongsPerUser = ret!.spu
+          VotingEnabled = ret!.voting
+          ExplicitSongsAllowed = ret!.explicit
+          AnonUsr = ret!.anonUsr
+          Genres = ret!.genres
           //songsPerUser = ret. //not in db room object
           self.joined = true        }
       }
@@ -67,17 +61,24 @@ struct PreviouslyJoinedRoomsView: View {
           Button(action: {
             join(c: currRoom.code)
           }, label: {
+            if (currRoom.closed) {
+              Text(currRoom.name)
+                .foregroundColor(.gray)
+            } else {
             Text(currRoom.name)
               .foregroundColor(.primary)
+            }
           })
         }
       }
     }
-    .navigate(to: UserController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser, votingEnabled: votingEnabled, anonUsr: anonUsr, explicitSongsAllowed: explicitSongsAllowed), when: $joined)
+    .navigate(to: UserController(isInRoom: $isInRoom), when: $joined)
     .onAppear(perform: {
       for code in codes {
         getRoom(code: code, completion: { (prevRoom, err) in
+          if (!(prevRoom!.bannedUsers ?? []).contains(getUID())) {
           previousRooms.append(prevRoom!)
+          }
                 })
       }
     })

@@ -19,6 +19,8 @@ struct CreateRoomView: View {
     didSet {
       if userCapacity < 1 {
         userCapacity = 1
+      } else if userCapacity > 50 {
+        userCapacity = 50
       }
     }
   }
@@ -30,22 +32,33 @@ struct CreateRoomView: View {
     }
   }
   
-  @State var roomName: String = ""
-  @State var roomDescription: String = ""
+  @ObservedObject var roomName = TextBindingManager(limit: 20)
+  @ObservedObject var roomDescription = TextBindingManager(limit: 20)
   @State var votingEnabled: Bool = true
   @State var madeRoom: Bool = false
   @State var anonUsr: Bool = false
   @State var explicitSongsAllowed: Bool = false
   @State var prevHostedRooms: [String] = []
+  @State var genres: Set<String> = []
   
   @Environment(\.presentationMode) var presentationMode
   
   func createRoom(){
     //TO-DO- send info to room, songs per user
-    let newRoom: room = room(name: roomName, desc: roomDescription, anonUsr: anonUsr, capacity: userCapacity, explicit: explicitSongsAllowed, voting: votingEnabled, spu: songsPerUser)
+    let newRoom: room = room(name: roomName.text, desc: roomDescription.text, anonUsr: anonUsr, capacity: userCapacity, explicit: explicitSongsAllowed, voting: votingEnabled, spu: songsPerUser, genres: Array(genres))
     let newcode = makeRoom(newRoom: newRoom)
     storePrevRoom(code: newcode)
     madeRoom = true
+    
+    RoomName = roomName.text
+    RoomDescription = roomDescription.text
+    VotingEnabled = votingEnabled
+    AnonUsr = anonUsr
+    RoomCapacity = userCapacity
+    SongsPerUser = songsPerUser
+    ExplicitSongsAllowed = explicitSongsAllowed
+    Genres = Array(genres)
+    
     self.presentationMode.wrappedValue.dismiss()
   }
   
@@ -57,8 +70,8 @@ struct CreateRoomView: View {
         
         Form {
           Section(header: Text("General Room Information")) {
-            TextField("Room Name", text: $roomName)
-            TextField("Room Description", text: $roomDescription)
+            TextField("Room Name", text: $roomName.text)
+            TextField("Room Description", text: $roomDescription.text)
           }
           
           Section(header: Text("Settings")) {
@@ -83,6 +96,15 @@ struct CreateRoomView: View {
                     Text("Base Room Off Playlist")
                   }).onAppear(perform: {
                     sharedSpotify.userPlaylists(completion: {playlist in sharedSpotify.userPlaylists = playlist}, limit: "10")
+                  })
+            }
+            
+            HStack{
+                NavigationLink(
+                    destination: GenreSelectView(genres: $genres)
+                    .navigationBarBackButtonHidden(true).navigationBarHidden(true),
+                  label: {
+                    Text("Genres Allowed")
                   })
             }
             
@@ -124,7 +146,7 @@ struct CreateRoomView: View {
           }
         }
         
-        if self.roomName != "" {
+        if self.roomName.text != "" {
           Button(action: {createRoom()}) {
             Text("Create Room")
             
@@ -136,8 +158,11 @@ struct CreateRoomView: View {
       //}
     }
     .navigationBarHidden(true)
-    .navigate(to: HostController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription, votingEnabled: votingEnabled, anonUsr: anonUsr, roomCapacity: userCapacity, songsPerUser: songsPerUser, explicitSongsAllowed: explicitSongsAllowed), when: $madeRoom)
+    .navigate(to: HostController(isInRoom: $isInRoom), when: $madeRoom)
     .onAppear(perform: {
+      (sharedSpotify.genreList?.genres ?? []).forEach {genre in
+        genres.insert(genre)
+      }
       getPrevHostedRooms(completion: {(codes, err) in
         if err != nil {
           print(err as Any)
@@ -167,6 +192,26 @@ struct CreateRoomView_Previews: PreviewProvider {
     
     CreateRoomView_PreviewContainer()
   }
+}
+
+class TextBindingManager: ObservableObject {
+    @Published var text = "" {
+        didSet {
+            if text.count > characterLimit && oldValue.count <= characterLimit {
+                text = oldValue
+            }
+        }
+    }
+    let characterLimit: Int
+    
+    init(limit: Int = 20) {
+        characterLimit = limit
+    }
+    
+    init(limit: Int = 20, text: String) {
+        characterLimit = limit
+        self.text = text
+    }
 }
 
 //Derived from George_E on Stack Overflow

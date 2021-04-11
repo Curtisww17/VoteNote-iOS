@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		28F890B3034C8378C0692212 /* Pods_VoteNote_VoteNoteUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 41BEB690DF3619F4699E478F /* Pods_VoteNote_VoteNoteUITests.framework */; };
+		443353FA261FE4DF0061E1CD /* GenreSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 443353F9261FE4DF0061E1CD /* GenreSelectView.swift */; };
 		445F0AF325C72EE700EF80F5 /* Spotify.swift in Sources */ = {isa = PBXBuildFile; fileRef = 445F0AF225C72EE700EF80F5 /* Spotify.swift */; };
 		448572AE25BF421E006C5C07 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 448572AD25BF421E006C5C07 /* AppDelegate.swift */; };
 		448572B025BF421E006C5C07 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 448572AF25BF421E006C5C07 /* SceneDelegate.swift */; };
@@ -76,6 +77,7 @@
 /* Begin PBXFileReference section */
 		39AD64E6A738124428F8C23F /* Pods_VoteNote.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_VoteNote.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		41BEB690DF3619F4699E478F /* Pods_VoteNote_VoteNoteUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_VoteNote_VoteNoteUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		443353F9261FE4DF0061E1CD /* GenreSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenreSelectView.swift; sourceTree = "<group>"; };
 		445F0AF225C72EE700EF80F5 /* Spotify.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = Spotify.swift; sourceTree = "<group>"; tabWidth = 2; };
 		448572AA25BF421E006C5C07 /* VoteNote.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VoteNote.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		448572AD25BF421E006C5C07 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -221,6 +223,7 @@
 				44A2834A25FE83A500DDF229 /* PreviouslyJoinedRoomsView.swift */,
 				67222A2925FEE5CE0021D963 /* QueueHistoryView.swift */,
 				44A283552602D34100DDF229 /* PreviouslyHostedRoomsView.swift */,
+				443353F9261FE4DF0061E1CD /* GenreSelectView.swift */,
 			);
 			path = VoteNote;
 			sourceTree = "<group>";
@@ -554,6 +557,7 @@
 				44C07DB325E5664100D3667A /* RoomCodeView.swift in Sources */,
 				448572EB25BF75CE006C5C07 /* CreateRoomView.swift in Sources */,
 				448572FA25BF818F006C5C07 /* Host_QueuePageView.swift in Sources */,
+				443353FA261FE4DF0061E1CD /* GenreSelectView.swift in Sources */,
 				4485731025BF8390006C5C07 /* Host_RoomPageView.swift in Sources */,
 				448572B225BF421E006C5C07 /* ContentView.swift in Sources */,
 				448572E125BF7317006C5C07 /* LoginWithSpotifyView.swift in Sources */,

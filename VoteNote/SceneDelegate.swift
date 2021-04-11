@@ -114,7 +114,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate,
     sharedSpotify.isPaused = playerState.isPaused
     sharedSpotify.currentlyPlayingPos = playerState.playbackPosition
     sharedSpotify.currentlyPlayingPercent = (Float)(playerState.playbackPosition) / (Float)(playerState.track.duration)
-    sharedSpotify.getTrackInfo(track_uri: playerState.track.uri, completion: {(currPlaying) in
+    sharedSpotify.getTrackInfo(track_uri: String(playerState.track.uri.split(separator: ":").last ?? ""), completion: {(currPlaying) in
       if (currPlaying != nil) {
         OperationQueue.main.addOperation {
           sharedSpotify.currentlyPlaying = currPlaying
@@ -180,6 +180,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate,
         //login user to db
         firebaseLogin(name: (user?.display_name)!)
         
+        sharedSpotify.getGenreList(completion: {genres in sharedSpotify.genreList = genres})
         
         
       })
