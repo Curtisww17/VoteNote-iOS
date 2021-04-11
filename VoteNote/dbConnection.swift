@@ -74,6 +74,25 @@ class room{
         self.currSong = currSong
     }
     
+    //constructor for edit room
+    init(name: String, desc: String? = "", anonUsr: Bool, capacity: Int, explicit: Bool, voting: Bool, code: String, spu: Int = -1, playlist: String? = nil, host: String = FAuth.currentUser!.uid, genres: [String]? = [], closed: Bool? = false, bannedUsers: [String]? = [], currSong: String = "") {
+        self.name = name
+        self.desc = desc
+        self.anonUsr = anonUsr
+        self.capacity = capacity
+        self.explicit = explicit
+        self.voting = voting
+        queue = []
+        self.code = code
+        self.spu = spu
+        self.playlist = playlist ?? ""
+        self.host = host
+        self.genres = genres ?? []
+        self.closed = closed ?? false
+        self.bannedUsers = bannedUsers
+        self.currSong = currSong
+    }
+    
     //constructor for firestore
     init(rm: [String: Any]) {
         self.name = rm["name"] as! String

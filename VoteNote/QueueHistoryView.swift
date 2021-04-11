@@ -33,7 +33,7 @@ struct QueueHistoryView: View {
                 Section(header: Text("History")) {
                     List {
                         ForEach(songHistory.musicList) { song in
-                            QueueEntry(curSong: song, isDetailView: true, isUserQueue: false, isHistoryView: true, votingEnabled: ObservableBoolean(boolValue: false), localVotes: ObservableInteger(intValue: song.numVotes!))
+                            QueueEntry(curSong: song, isDetailView: true, isUserQueue: false, isHistoryView: true, localVotes: ObservableInteger(intValue: song.numVotes!))
                         }
                     }
                 }
