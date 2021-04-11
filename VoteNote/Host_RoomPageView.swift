@@ -23,6 +23,7 @@ struct Host_RoomPageView: View {
   @Binding var notExited: Bool
   @Binding var isTiming: Bool
   @State var inRoom: Bool = true
+  @Binding var genres: [String]
   let isHost = true
   
     /**
@@ -123,6 +124,16 @@ struct Host_RoomPageView: View {
               Spacer()
                 Text("\(sharedSpotify.PlaylistBase?.name ?? "no base")")
             }
+            
+            NavigationLink(
+              destination: GenreView(genres: $genres),
+              label: {
+                HStack{
+                  Text("Genres Allowed")
+                  Spacer()
+                    //Text("\(sharedSpotify.PlaylistBase?.name ?? "no base")")
+                }
+              })
             
             HStack{
                 if votingEnabled {

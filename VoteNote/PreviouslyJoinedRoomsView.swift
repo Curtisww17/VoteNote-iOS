@@ -22,6 +22,7 @@ struct PreviouslyJoinedRoomsView: View {
   @State var explicitSongsAllowed: Bool = false
   @State var anonUsr: Bool = false
   @Binding var isInRoom: Bool
+  @State var genres: [String] = []
   
   
   func join(c: String) {
@@ -38,6 +39,7 @@ struct PreviouslyJoinedRoomsView: View {
           votingEnabled = ret!.voting
           explicitSongsAllowed = ret!.explicit
           anonUsr = ret!.anonUsr
+          genres = ret!.genres
           //songsPerUser = ret. //not in db room object
           self.joined = true        }
       }
@@ -73,11 +75,13 @@ struct PreviouslyJoinedRoomsView: View {
         }
       }
     }
-    .navigate(to: UserController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser, votingEnabled: votingEnabled, anonUsr: anonUsr, explicitSongsAllowed: explicitSongsAllowed), when: $joined)
+    .navigate(to: UserController(isInRoom: $isInRoom, roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser, votingEnabled: votingEnabled, anonUsr: anonUsr, explicitSongsAllowed: explicitSongsAllowed, genres: genres), when: $joined)
     .onAppear(perform: {
       for code in codes {
         getRoom(code: code, completion: { (prevRoom, err) in
+          if (!(prevRoom!.bannedUsers ?? []).contains(getUID())) {
           previousRooms.append(prevRoom!)
+          }
                 })
       }
     })

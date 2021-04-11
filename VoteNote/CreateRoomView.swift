@@ -39,12 +39,13 @@ struct CreateRoomView: View {
   @State var anonUsr: Bool = false
   @State var explicitSongsAllowed: Bool = false
   @State var prevHostedRooms: [String] = []
+  @State var genres: Set<String> = []
   
   @Environment(\.presentationMode) var presentationMode
   
   func createRoom(){
     //TO-DO- send info to room, songs per user
-    let newRoom: room = room(name: roomName.text, desc: roomDescription.text, anonUsr: anonUsr, capacity: userCapacity, explicit: explicitSongsAllowed, voting: votingEnabled, spu: songsPerUser)
+    let newRoom: room = room(name: roomName.text, desc: roomDescription.text, anonUsr: anonUsr, capacity: userCapacity, explicit: explicitSongsAllowed, voting: votingEnabled, spu: songsPerUser, genres: Array(genres))
     let newcode = makeRoom(newRoom: newRoom)
     storePrevRoom(code: newcode)
     madeRoom = true
@@ -85,6 +86,15 @@ struct CreateRoomView: View {
                     Text("Base Room Off Playlist")
                   }).onAppear(perform: {
                     sharedSpotify.userPlaylists(completion: {playlist in sharedSpotify.userPlaylists = playlist}, limit: "10")
+                  })
+            }
+            
+            HStack{
+                NavigationLink(
+                    destination: GenreSelectView(genres: $genres)
+                    .navigationBarBackButtonHidden(true).navigationBarHidden(true),
+                  label: {
+                    Text("Genres Allowed")
                   })
             }
             
@@ -138,9 +148,11 @@ struct CreateRoomView: View {
       //}
     }
     .navigationBarHidden(true)
-    .navigate(to: HostController(isInRoom: $isInRoom, roomName: roomName.text, roomDescription: roomDescription.text, votingEnabled: votingEnabled, anonUsr: anonUsr, roomCapacity: userCapacity, songsPerUser: songsPerUser, explicitSongsAllowed: explicitSongsAllowed), when: $madeRoom)
+    .navigate(to: HostController(isInRoom: $isInRoom, roomName: roomName.text, roomDescription: roomDescription.text, votingEnabled: votingEnabled, anonUsr: anonUsr, roomCapacity: userCapacity, songsPerUser: songsPerUser, explicitSongsAllowed: explicitSongsAllowed, genres: Array(genres)), when: $madeRoom)
     .onAppear(perform: {
-      sharedSpotify.getGenreList(completion: {genres in sharedSpotify.genreList = genres})
+      (sharedSpotify.genreList?.genres ?? []).forEach {genre in
+        genres.insert(genre)
+      }
       getPrevHostedRooms(completion: {(codes, err) in
         if err != nil {
           print(err as Any)

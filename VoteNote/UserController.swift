@@ -21,6 +21,7 @@ struct UserController: View {
   @State var explicitSongsAllowed: Bool
   @State var notExited: Bool = false
   @State var isTiming: Bool = false
+  @State var genres: [String]
     
   @State var currentView = 0
     
@@ -66,7 +67,7 @@ struct UserController: View {
           .animation(.default)
           .transition(.move(edge: .leading))
       } else {
-        User_RoomPageView(roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser, votingEnabled: votingEnabled, anonUsr: $anonUsr, isTiming: $isTiming, notExited: $notExited, showNav: $showNav)
+        User_RoomPageView(roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser, votingEnabled: votingEnabled, anonUsr: $anonUsr, isTiming: $isTiming, notExited: $notExited, genres: $genres, showNav: $showNav)
           .animation(.default)
           .transition(.move(edge: .trailing))
         

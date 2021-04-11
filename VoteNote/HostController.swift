@@ -22,6 +22,7 @@ struct HostController: View {
   @State var explicitSongsAllowed: Bool
   @State var notExited: Bool = false
   @State var isTiming = false
+  @State var genres: [String]
 
   
   
@@ -71,7 +72,7 @@ struct HostController: View {
           .animation(.default)
           .transition(.move(edge: .leading))
       } else {
-        Host_RoomPageView(roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser, votingEnabled: votingEnabled, anonUsr: $anonUsr, showNav: $showNav, notExited: $notExited, isTiming: $isTiming)
+        Host_RoomPageView(roomName: roomName, roomDescription: roomDescription, roomCapacity: roomCapacity, songsPerUser: songsPerUser, votingEnabled: votingEnabled, anonUsr: $anonUsr, showNav: $showNav, notExited: $notExited, isTiming: $isTiming, genres: $genres)
           .animation(.default)
           .transition(.move(edge: .trailing))
         

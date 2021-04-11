@@ -346,14 +346,14 @@ struct QueueEntry: View {
                                 if isUserQueue {
                                     ZStack {
                                         Text("User").scaleEffect(scale)
-                                      NavigationLink(destination: UserUserDetailView(selectedUserUID: ObservableString(stringValue: curSong.addedBy!), votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue))) {
+                                      NavigationLink(destination: UserUserDetailView(selectedUserUID: ObservableString(stringValue: curSong.addedBy), votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue))) {
                                             EmptyView()
                                         }.hidden()
                                     }.padding(.all).border(Color.black, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/).frame(width: 80, height: 80)
                                 } else {
                                     ZStack {
                                         Text("User").scaleEffect(scale)
-                                      NavigationLink(destination: HostUserDetailView(selectedUserUID: ObservableString(stringValue: curSong.addedBy!), votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue))) {
+                                      NavigationLink(destination: HostUserDetailView(selectedUserUID: ObservableString(stringValue: curSong.addedBy), votingEnabled: ObservableBoolean(boolValue: votingEnabled.boolValue))) {
                                             EmptyView()
                                         }.hidden()
                                     }.padding(.all).border(Color.black, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/).frame(width: 80, height: 80)
