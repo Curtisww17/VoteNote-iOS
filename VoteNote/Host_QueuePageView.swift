@@ -347,7 +347,7 @@ struct QueueEntry: View {
                     
                     Spacer()
                     
-                    if VotingEnabled {
+                    if VotingEnabled && !isHistoryView {
                         if (localVotes.intValue > 0) {
                             Text("+\(localVotes.intValue)")
                         } else {
