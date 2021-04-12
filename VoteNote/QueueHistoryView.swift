@@ -17,19 +17,22 @@ struct QueueHistoryView: View {
             VStack{
                 
                 //button to add history as a playlist on spotify
-                /*Button(action: sharedSpotify.createPlaylist(id: sharedSpotify.currentUser(completion: { user in
-                    sharedSpotify.currentUser = user
-                    //login user to db
-                    firebaseLogin(name: (user?.display_name)!)
-                  }), playlistData: {"""
-                    "name": "New Playlist",
-                    "description": "New playlist description",
-                    "public": false"""
-                  })) {
-                    Text("create Playlist")
-                }*/
+                Button("create Playlist") {
+                    
+                    sharedSpotify.createPlaylist(id: sharedSpotify.currentUser?.id ?? "")
+                    RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+                    sharedSpotify.userPlaylists(completion: {playlist in sharedSpotify.userPlaylists = playlist}, limit: "10")
+                    RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+                    sharedSpotify.playlistSongs(completion: {playlistSongs in sharedSpotify.savePlaylist = playlistSongs}, id: sharedSpotify.userPlaylists?.items?[0].id ?? "")
+                    
+                    RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+                    
+                    sharedSpotify.addSongsToPlaylist(Playlist: sharedSpotify.savePlaylist?.id ?? "", songs: songHistory.musicList)
+                    
+                }
                 
                 //lists all songs previously played in the room
+                
                 Section(header: Text("History")) {
                     List {
                         ForEach(songHistory.musicList) { song in

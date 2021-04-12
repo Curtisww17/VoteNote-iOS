@@ -25,6 +25,7 @@ class Spotify: ObservableObject {
   var currentPlaylist: uniquePlaylist?
   var usersSavedSongs: playlistTrackTime?
   var recommendedSongs: reccomndations?
+  var savePlaylist: uniquePlaylist?
   var PlaylistBase: uniquePlaylist?
   var songGenres: currentArtists?
   
@@ -186,6 +187,7 @@ class Spotify: ObservableObject {
     self.httpRequester.headerGet(url: "https://api.spotify.com/v1/playlists/\(id)", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ]).onFinish = {
       (response) in
       do {
+        print(response.description)
         let decoder = JSONDecoder()
         try completion( decoder.decode(uniquePlaylist.self, from: response.data))
       } catch {
@@ -233,17 +235,64 @@ class Spotify: ObservableObject {
     }
   }
   
-  //creates a palylist on spotify for the user based on a json object
-  //currently not working/implemented
-  func createPlaylist(id: String, playlistData: String) {
-    self.httpRequester.headerPUT(url: "https://api.spotify.com/v1/users/\(id)/playlists --data \(playlistData)", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? "")" ]).onFinish = {
-      (response) in
-      do{
-        print(response.description)
-      } catch {
-        fatalError("bad response \(response.description)")
-      }
+  func addSongsToPlaylist(Playlist: String, songs: [song]){
+    var songData = ""
+    for song in songs{
+      songData += "spotify:track:"+song.id+","
     }
+    
+    songData.dropLast()
+    let header = ["Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? "")" ]
+    let url = "https://api.spotify.com/v1/playlists/\(Playlist)/tracks?uris=\(songData)"
+    
+    
+    var request = URLRequest(urlString: url, headers: header)
+    request?.httpMethod = "POST"
+    let task = URLSession.shared.dataTask(with: request ?? URLRequest(url: URL(string: url)!)) { data, response, error in
+        guard let data = data, error == nil else {
+            print(error?.localizedDescription ?? "No data")
+            return
+        }
+        let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
+        if let responseJSON = responseJSON as? [String: Any] {
+            
+        }
+    }
+    task.resume()
+  }
+  
+  func createPlaylist(id: String){
+    // prepare json data
+
+    let json: [String: Any] = [
+      "name": "VoteNote Playlist",
+      "description": "Made by VoteNote",
+      "public": false
+    ]
+    let jsonData = try? JSONSerialization.data(withJSONObject: json)
+    let header = ["Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? "")" ]
+
+    // create post request
+    let url = "https://api.spotify.com/v1/users/\(id)/playlists"
+    //var request = URLRequest(url: url, headers: header)
+    var request = URLRequest(urlString: url, headers: header)
+    request?.httpMethod = "POST"
+
+    // insert json data to the request
+    request?.httpBody = jsonData
+
+    let task = URLSession.shared.dataTask(with: request ?? URLRequest(url: URL(string: url)!)) { data, response, error in
+        guard let data = data, error == nil else {
+            print(error?.localizedDescription ?? "No data")
+            return
+        }
+        let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
+        if let responseJSON = responseJSON as? [String: Any] {
+            
+        }
+    }
+
+    task.resume()
   }
   
   //adds specified to users liked/saved songs
