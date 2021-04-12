@@ -35,7 +35,7 @@ struct UserUserDetailView: View {
                     Section(header: Text("In Queue")) {
                         List {
                             ForEach(songQueue.musicList) { song in
-                                if song.addedBy == getUID() {
+                                if song.addedBy == selectedUserUID.stringValue {
                                     QueueEntry(curSong: song, isDetailView: true, isUserQueue: true, isHistoryView: false, localVotes: ObservableInteger(intValue: song.numVotes!))
                                 }
                             }
@@ -45,7 +45,7 @@ struct UserUserDetailView: View {
                     Section(header: Text("History")) {
                         List {
                             ForEach(songHistory.musicList) { song in
-                                if song.addedBy == getUID() {
+                                if song.addedBy == selectedUserUID.stringValue {
                                     QueueEntry(curSong: song, isDetailView: true, isUserQueue: true, isHistoryView: true, localVotes: ObservableInteger(intValue: song.numVotes!))
                                 }
                             }

@@ -34,6 +34,7 @@ struct Host_QueuePageView: View {
   var body: some View {
     GeometryReader { geo in
           VStack {
+            
             Form {
                 List {
                     ForEach(songQueue.musicList) { song in
@@ -49,7 +50,8 @@ struct Host_QueuePageView: View {
           .navigationBarHidden(true)
           .onAppear(perform: {
             songQueue.updateQueue()
-            if (!isTiming) {
+            //isTiming = true
+            /*if (!isTiming) {
               let _ = Timer.scheduledTimer(withTimeInterval: 10.0, repeats: true) { timer in
                 songQueue.updateQueue()
                 songHistory.updateHistory()
@@ -58,7 +60,7 @@ struct Host_QueuePageView: View {
                 }
               }
               isTiming = true
-            }
+            }*/
                   
           }).partialSheet(isPresented: $showMaxNowPlaying, content: {
             ZStack {
@@ -100,7 +102,7 @@ class MusicQueue: Identifiable, ObservableObject {
       }
   }
   
-  func updateQueue() {
+    func updateQueue() {
     var numUsersInRoom = 1
     getUsers(completion: { (users, err) in
       if err == nil {
@@ -138,36 +140,39 @@ class MusicQueue: Identifiable, ObservableObject {
             }
           }
       }
-    if(self.musicList.count > 0){
-        if((sharedSpotify.currentlyPlayingPercent ?? 0) > 0.50 && currSongID != sharedSpotify.currentlyPlaying?.id ?? "notPlaying"){
-            currSongID = sharedSpotify.currentlyPlaying?.id ?? ""
-            sharedSpotify.enqueue(songID: self.musicList[0].id) {
-              currentVotes = self.musicList[0].numVotes ?? 0
-              dequeue(id: self.musicList[0].id)
+    
+    if (IsHost) {
+        if(self.musicList.count > 0){
+            if((sharedSpotify.currentlyPlayingPercent ?? 0) > 0.50 && currSongID != sharedSpotify.currentlyPlaying?.id ?? "notPlaying"){
+                currSongID = sharedSpotify.currentlyPlaying?.id ?? ""
+                sharedSpotify.enqueue(songID: self.musicList[0].id) {
+                  currentVotes = self.musicList[0].numVotes ?? 0
+                  dequeue(id: self.musicList[0].id)
+                }
             }
-        }
-    } else if(sharedSpotify.PlaylistBase != nil) {
-        if((sharedSpotify.currentlyPlayingPercent ?? 0) > 0.50 && currSongID != sharedSpotify.currentlyPlaying?.id ?? "notPlaying"){
-            var pos = Int.random(in: 0..<(sharedSpotify.PlaylistBase?.tracks?.items?.count ?? 1))
-            currSongID = sharedSpotify.PlaylistBase?.tracks?.items?[pos].track.id ?? ""
-            sharedSpotify.enqueue(songID: sharedSpotify.PlaylistBase?.tracks?.items?[pos].track.id ?? "") {
-              currentVotes = 0
-              dequeue(id: sharedSpotify.PlaylistBase?.tracks?.items?[pos].track.id ?? "")
+        } else if(sharedSpotify.PlaylistBase != nil) {
+            if((sharedSpotify.currentlyPlayingPercent ?? 0) > 0.50 && currSongID != sharedSpotify.currentlyPlaying?.id ?? "notPlaying"){
+                var pos = Int.random(in: 0..<(sharedSpotify.PlaylistBase?.tracks?.items?.count ?? 1))
+                currSongID = sharedSpotify.PlaylistBase?.tracks?.items?[pos].track.id ?? ""
+                sharedSpotify.enqueue(songID: sharedSpotify.PlaylistBase?.tracks?.items?[pos].track.id ?? "") {
+                  currentVotes = 0
+                  dequeue(id: sharedSpotify.PlaylistBase?.tracks?.items?[pos].track.id ?? "")
+                }
             }
+        } else if(sharedSpotify.currentlyPlayingPercent ?? 0 > 0.50 ){
+            print("no music to add")
+            //self.currentlyPlaying = nil
         }
-    } else if(sharedSpotify.currentlyPlayingPercent ?? 0 > 0.50 ){
-        print("no music to add")
-        //self.currentlyPlaying = nil
     }
     
     voteList.refreshList()
     
   }
   
-  public func addMusic(songs: [song]){
+    public func addMusic(songs: [song]){
     
     //set the first song if nothing is playing
-  if self.currentlyPlaying == nil && songs.count > 0 {
+  if self.currentlyPlaying == nil && songs.count > 0 && IsHost {
     self.currentlyPlaying = selectedSongs[0]
     sharedSpotify.enqueue(songID: selectedSongs[0].id) {
       currentVotes = 0
@@ -290,23 +295,20 @@ struct QueueEntry: View {
     func upVoteSong(){
         if (!hasBeenUpvoted && hasBeenDownvoted) {
             print("Change to Upvote")
-            localVotes.intValue = localVotes.intValue + 2
-            voteSong(vote: 2, id: curSong.id){
+            voteSong(vote: 1, id: curSong.id){
               songQueue.updateQueue()
             }
             hasBeenUpvoted = true
             hasBeenDownvoted = false
         } else if (!hasBeenUpvoted) {
             print("Upvote Song")
-            localVotes.intValue = localVotes.intValue + 1
             voteSong(vote: 1, id: curSong.id){
               songQueue.updateQueue()
             }
             hasBeenUpvoted = true
         } else if (hasBeenUpvoted) {
             print("Remove Upvote")
-            localVotes.intValue = localVotes.intValue - 1
-            voteSong(vote: -1, id: curSong.id){
+            voteSong(vote: 1, id: curSong.id){
               songQueue.updateQueue()
             }
             hasBeenUpvoted = false
@@ -319,23 +321,20 @@ struct QueueEntry: View {
     func downVoteSong(){
         if (!hasBeenDownvoted && hasBeenUpvoted) {
             print("Change to Downvote")
-            localVotes.intValue = localVotes.intValue - 2
-            voteSong(vote: -2, id: curSong.id){
+            voteSong(vote: -1, id: curSong.id){
               songQueue.updateQueue()
             }
             hasBeenDownvoted = true
             hasBeenUpvoted = false
         } else if (!hasBeenDownvoted) {
             print("Downvote Song")
-            localVotes.intValue = localVotes.intValue - 1
             voteSong(vote: -1, id: curSong.id) {
               songQueue.updateQueue()
             }
             hasBeenDownvoted = true
         } else if (hasBeenDownvoted) {
             print("Remove Downvote")
-            localVotes.intValue = localVotes.intValue + 1
-            voteSong(vote: 1, id: curSong.id){
+            voteSong(vote: -1, id: curSong.id){
               songQueue.updateQueue()
             }
             hasBeenDownvoted = false

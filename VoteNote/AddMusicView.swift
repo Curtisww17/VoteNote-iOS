@@ -295,7 +295,7 @@ struct recomendedView: View{
                     
                     Spacer()
                     
-                  Button(action: {songQueue.addMusic(songs: selectedSongs)
+                    Button(action: {songQueue.addMusic(songs: selectedSongs)
                     selectedSongs.removeAll()
                     presentationMode.wrappedValue.dismiss()
                   }) {
@@ -430,7 +430,7 @@ struct likedSongsView: View{
                     
                     Spacer()
                     
-                  Button(action: {songQueue.addMusic(songs: selectedSongs)
+                    Button(action: {songQueue.addMusic(songs: selectedSongs)
                     selectedSongs.removeAll()
                     presentationMode.wrappedValue.dismiss()
                   }) {
@@ -565,7 +565,7 @@ struct uniquePlaylistView: View{
                     
                     Spacer()
                     
-                  Button(action: {songQueue.addMusic(songs: selectedSongs)
+                    Button(action: {songQueue.addMusic(songs: selectedSongs)
                     selectedSongs.removeAll()
                     presentationMode.wrappedValue.dismiss()
                   }) {

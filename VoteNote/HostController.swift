@@ -15,6 +15,7 @@ var AnonUsr: Bool = false
 var RoomCapacity: Int = 20
 var SongsPerUser: Int = 4
 var ExplicitSongsAllowed: Bool = false
+var IsHost: Bool = false
 
 struct HostController: View {
   @ObservedObject var spotify = sharedSpotify
@@ -26,6 +27,10 @@ struct HostController: View {
   @State var genres: [String]
   
   @State var currentView = 1
+    
+    let refreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    @State var queueRefreshSeconds = 10
+    
   var body: some View {
     OperationQueue.main.addOperation {
       isInRoom = true
@@ -33,14 +38,19 @@ struct HostController: View {
     return VStack {
       VStack {
         HStack {
-          Spacer()
-            .frame(width: UIScreen.main.bounds.size.width / 4)
+            Button(action: {
+                songQueue.updateQueue()
+                songHistory.updateHistory()
+                setCurrSong(id: sharedSpotify.currentlyPlaying!.id)
+            }) {
+                Image(systemName: "arrow.clockwise").resizable().frame(width: 25, height: 30)
+            }.frame(width: UIScreen.main.bounds.size.width / 4)
           Picker(selection: self.$currentView, label: Text("I don't know what this label is for")) {
             Text("Queue").tag(0)
             Text("Room").tag(1)
           }.pickerStyle(SegmentedPickerStyle())
           .frame(width: UIScreen.main.bounds.size.width / 2,  alignment: .center)
-          VStack {
+            VStack {
             if (currentView == 0) {
               NavigationLink(
                 destination: AddMusicView(genres: genres).navigationBarTitle("Browse"),
@@ -59,7 +69,23 @@ struct HostController: View {
             }
           }
           .frame(width: UIScreen.main.bounds.size.width/4)
-          
+            
+            Text("\(queueRefreshSeconds)").frame(width: 0, height: 0).hidden().onReceive(refreshTimer) {
+                            _ in
+                            if self.queueRefreshSeconds > 0 {
+                                self.queueRefreshSeconds -= 1
+                            } else {
+                                self.queueRefreshSeconds = 10
+                                
+                                if (isTiming) {
+                                    print("Updating Queue")
+                                        
+                                    songQueue.updateQueue()
+                                    songHistory.updateHistory()
+                                    setCurrSong(id: sharedSpotify.currentlyPlaying!.id)
+                                }
+                            }
+                        }
         }
         .frame(width: UIScreen.main.bounds.size.width/4)
         
@@ -79,8 +105,10 @@ struct HostController: View {
       }
     }.navigationTitle("Lobby")
     .navigationBarHidden(true).onAppear(perform: {
+      IsHost = true
       notExited = false
-      if (!isTiming) {
+      isTiming = true
+      /*if (!isTiming) {
         let _ = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
           if (!(sharedSpotify.isPaused ?? false)) {
             sharedSpotify.currentlyPlayingPos = (sharedSpotify.currentlyPlayingPos ?? 0) + 1000
@@ -88,7 +116,7 @@ struct HostController: View {
           }
         }
         isTiming = true
-      }
+      }*/
     }).navigate(to: LandingPageView(), when: $notExited).navigationViewStyle(StackNavigationViewStyle())
   }
   

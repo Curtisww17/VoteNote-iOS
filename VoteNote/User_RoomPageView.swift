@@ -154,6 +154,7 @@ struct User_RoomPageView: View {
             }
           }
           .navigationTitle("Room").onAppear(perform: {
+            sharedSpotify.pause()
             var curRoom: room = room(name: "", anonUsr: false, capacity: 0, explicit: false, voting: true)
             getRoom(code: currentQR.roomCode, completion: {room, err in
                 if (room != nil) {
