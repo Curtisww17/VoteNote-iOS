@@ -166,20 +166,7 @@ class MusicQueue: Identifiable, ObservableObject {
         print("no music to add")
         //self.currentlyPlaying = nil
     }
-    getAutoVote(completion: { (autoVote, err) in
-        if err == nil {
-            
-            if(autoVote!){
-                for song in self.musicList {
-                    var hasBeenUpvoted = voteList.hasBeenUpvoted(songID: song.id)
-                    var hasBeenDownvoted = voteList.hasBeenDownvoted(songID: song.id)
-                    if(sharedSpotify.isSongFavorited(songID: song.id) && (!hasBeenUpvoted && !hasBeenDownvoted)){
-                            voteSong(vote: 1, id: song.id){}
-                        }
-                    }
-            }
-        }
-    })
+    
     voteList.refreshList()
   }
   
@@ -494,6 +481,25 @@ struct QueueEntry: View {
         }.background(Color.white).onAppear(perform: {
             hasBeenUpvoted = voteList.hasBeenUpvoted(songID: self.curSong.id)
             hasBeenDownvoted = voteList.hasBeenDownvoted(songID: self.curSong.id)
+            
+            getAutoVote(completion: { (autoVote, err) in
+                if err == nil {
+                    
+                    if(autoVote!){
+                        
+                            /*var hasBeenUpvoted = voteList.hasBeenUpvoted(songID: song.id)
+                            var hasBeenDownvoted = voteList.hasBeenDownvoted(songID: song.id)
+                            print(hasBeenUpvoted)*/
+                        print("comp vote")
+                            if(sharedSpotify.isSongFavorited(songID: curSong.id)){
+                                if(!hasBeenUpvoted && !hasBeenDownvoted){
+                                        upVoteSong()
+                                    }
+                                }
+                            
+                    }
+                }
+            })
         })
         .offset(CGSize(width: self.offset.width , height: 0))
         .animation(.spring())

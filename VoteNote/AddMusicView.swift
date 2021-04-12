@@ -169,6 +169,9 @@ struct AddMusicView: View {
           selectedSongs.removeAll()
           }).onDisappear(perform: {
             songQueue.updateQueue()
+            
+            
+            
           }).navigationViewStyle(StackNavigationViewStyle())
       }
     
