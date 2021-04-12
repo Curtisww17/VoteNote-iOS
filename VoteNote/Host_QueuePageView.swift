@@ -281,6 +281,8 @@ struct QueueEntry: View {
     
     @ObservedObject var localVotes: ObservableInteger
     
+    @State var showingVetoSongAlert: Bool = false
+    
     /**
         Calls the DB to upvote the current song
      */
@@ -429,7 +431,7 @@ struct QueueEntry: View {
                                 Button(action: {}) {
                                     Text("Veto").foregroundColor(Color.black).scaleEffect(scale)
                                 }.padding(.all).background(Color.red).border(Color.red, width: 2).onTapGesture {
-                                    vetoMusic()
+                                    showingVetoSongAlert = true
                                 }.frame(width: 80, height: 80)
                             }
                             
@@ -491,7 +493,15 @@ struct QueueEntry: View {
                 opened = false
               }
             }
-          })
+          }).alert(isPresented:$showingVetoSongAlert) {
+            Alert(title: Text("Are you sure you want to veto this song from the Queue? This action cannot be undone."), primaryButton: .destructive(Text("Veto")) {
+                showingVetoSongAlert = false
+                vetoMusic()
+                songQueue.updateQueue()
+            }, secondaryButton: .cancel() {
+                showingVetoSongAlert = false
+            })
+          }
     }
 }
 

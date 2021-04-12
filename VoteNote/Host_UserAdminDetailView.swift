@@ -81,6 +81,7 @@ struct HostUserDetailView: View {
         }).navigationViewStyle(StackNavigationViewStyle()).alert(isPresented:$showingBanUserAlert) {
         Alert(title: Text("Are you sure you want to ban this user from the room? This action cannot be undone."), primaryButton: .destructive(Text("Ban")) {
                 banSelectedUser()
+            showingBanUserAlert = false
         }, secondaryButton: .cancel() {
             showingBanUserAlert = false
         })
