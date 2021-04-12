@@ -103,6 +103,11 @@ class MusicQueue: Identifiable, ObservableObject {
   func updateQueue() {
     var numUsersInRoom = 1
     getUsers(completion: { (users, err) in
+      if err != nil {
+        numUsersInRoom = users!.count
+      }
+    })
+    getUsers(completion: { (users, err) in
       if err == nil {
         numUsersInRoom = users!.count
       } else {
