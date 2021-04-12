@@ -19,7 +19,7 @@ struct UserUserDetailView: View {
       
     
   var body: some View {
-    return //NavigationView {
+    return
         ZStack {
             VStack {
                 
@@ -53,7 +53,6 @@ struct UserUserDetailView: View {
                     }
                 }
             }
-        //}
     }.onAppear(perform: {
         songHistory.updateHistory()
         RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))

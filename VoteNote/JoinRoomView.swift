@@ -12,8 +12,7 @@ import CodeScanner
 
 struct JoinRoomView: View {
   @Binding var isInRoom: Bool
-  //@ObservedObject var spotify: Spotify = sharedSpotify
-  
+
   @ObservedObject var code = TextBindingManager(limit: 5)
   @State var joined = false
   @State private var isShowingScanner = false

@@ -26,7 +26,7 @@ struct HostUserDetailView: View {
   }
     
   var body: some View {
-    return //NavigationView {
+    return
         ZStack {
             VStack {
                 
@@ -67,7 +67,6 @@ struct HostUserDetailView: View {
                 .padding(.vertical)
                 
             }
-        //}
         }.onAppear(perform: {
             songHistory.updateHistory()
             RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
@@ -82,6 +81,7 @@ struct HostUserDetailView: View {
         }).navigationViewStyle(StackNavigationViewStyle()).alert(isPresented:$showingBanUserAlert) {
         Alert(title: Text("Are you sure you want to ban this user from the room? This action cannot be undone."), primaryButton: .destructive(Text("Ban")) {
                 banSelectedUser()
+            showingBanUserAlert = false
         }, secondaryButton: .cancel() {
             showingBanUserAlert = false
         })

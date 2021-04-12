@@ -14,6 +14,9 @@ struct GenreSelectView: View {
   let allGenres = sharedSpotify.genreList?.genres ?? []
   @State var selectAll = true
   @State var deselectAll = false
+  @State private var isEditing = false
+  @ObservedObject var currentSearch: ObservableString = ObservableString(stringValue: "")
+  @State var searchStr: String = ""
   
   var body: some View {
     return VStack {
@@ -53,9 +56,62 @@ struct GenreSelectView: View {
         .padding([.top, .bottom, .trailing])
       }
       .frame(alignment: .leading)
+        
+        HStack {
+            
+            TextField("Search Genres", text: $searchStr).onChange(of: self.searchStr, perform: { value in
+                currentSearch.stringValue = searchStr
+            })
+            .padding(7)
+            .padding(.horizontal, 25)
+            .background(Color(.systemGray6))
+            .cornerRadius(8)
+            .overlay(
+              HStack {
+                Image(systemName: "magnifyingglass")
+                  .foregroundColor(.gray)
+                  .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+                  .padding(.leading, 8)
+                
+                if isEditing {
+                  Button(action: {
+                    self.searchStr = ""
+                    
+                  }) {
+                    Image(systemName: "multiply.circle.fill")
+                      .foregroundColor(.gray)
+                      .padding(.trailing, 8)
+                  }
+                }
+              }
+            )
+            .padding(.horizontal, 10)
+            .onTapGesture {
+              self.isEditing = true
+            }
+            
+            if isEditing {
+                Button(action: {
+                    self.isEditing = false
+                    
+                    // Dismiss the keyboard
+                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                }) {
+                    Text("Cancel")
+                }
+                .padding(.trailing, 10)
+                .transition(.move(edge: .trailing))
+                .animation(.default)
+            }
+            
+            Spacer()
+        }
+        
       Form {
         ForEach(allGenres, id: \.self) { genre in
-          GenreListItem(genreName: genre, genres: $genres)
+            if (genre.contains("\(currentSearch.stringValue.lowercased())") || currentSearch.stringValue == "") {
+                GenreListItem(genreName: genre, genres: $genres)
+            }
         }
       }
     }
@@ -98,13 +154,70 @@ struct GenreListItem: View {
 
 struct GenreView: View {
   @Binding var genres: [String]
+  @State private var isEditing = false
+  @Environment(\.presentationMode) var presentationMode
+  @ObservedObject var currentSearch: ObservableString = ObservableString(stringValue: "")
+  @State var searchStr: String = ""
   
   var body: some View {
     return VStack {
-      HStack {
+    
+        HStack {
+            
+            TextField("Search Genres", text: $searchStr).onChange(of: self.searchStr, perform: { value in
+                currentSearch.stringValue = searchStr
+            })
+            .padding(7)
+            .padding(.horizontal, 25)
+            .background(Color(.systemGray6))
+            .cornerRadius(8)
+            .overlay(
+              HStack {
+                Image(systemName: "magnifyingglass")
+                  .foregroundColor(.gray)
+                  .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+                  .padding(.leading, 8)
+                
+                if isEditing {
+                  Button(action: {
+                    self.searchStr = ""
+                    
+                  }) {
+                    Image(systemName: "multiply.circle.fill")
+                      .foregroundColor(.gray)
+                      .padding(.trailing, 8)
+                  }
+                }
+              }
+            )
+            .padding(.horizontal, 10)
+            .onTapGesture {
+              self.isEditing = true
+            }
+            
+            if isEditing {
+                Button(action: {
+                    self.isEditing = false
+                    
+                    // Dismiss the keyboard
+                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                }) {
+                    Text("Cancel")
+                }
+                .padding(.trailing, 10)
+                .transition(.move(edge: .trailing))
+                .animation(.default)
+            }
+            
+            Spacer()
+        }
+        
+    HStack {
       Form {
         ForEach(genres, id: \.self) { genre in
-          GenreViewListItem(genreName: genre)
+            if (genre.contains("\(currentSearch.stringValue.lowercased())") || currentSearch.stringValue == "") {
+                GenreViewListItem(genreName: genre)
+            }
         }
       }
     }
