@@ -142,7 +142,7 @@ struct AddMusicView: View {
                      Text("Liked Songs")
                      }
                     NavigationLink(destination: recomendedView(genres: genres).navigationBarTitle("Recommended Songs")){
-                        Text("Reccomended")
+                        Text("Recommended")
                     }
                 }
                 //if you have searched something display search results
@@ -169,6 +169,9 @@ struct AddMusicView: View {
           selectedSongs.removeAll()
           }).onDisappear(perform: {
             songQueue.updateQueue()
+            
+            
+            
           }).navigationViewStyle(StackNavigationViewStyle())
       }
     
@@ -327,7 +330,7 @@ struct recomendedView: View{
         }.onAppear(perform: {
             selectedSongs.removeAll()
 
-            sharedSpotify.recomendations(artistSeed: "4NHQUGzhtTLFvgF5SZesLK", genre: "classical", trackSeed: "0c6xIDDpzE81m2q797ordA",completion: {playlistSongs in sharedSpotify.recommendedSongs = playlistSongs})
+            sharedSpotify.recomendations(artistSeed: sharedSpotify.currentlyPlaying?.artists?[0].id ?? "4NHQUGzhtTLFvgF5SZesLK", trackSeed: sharedSpotify.currentlyPlaying?.id ?? "0c6xIDDpzE81m2q797ordA",completion: {playlistSongs in sharedSpotify.recommendedSongs = playlistSongs})
             
             print("Starting Len: \(sharedSpotify.recommendedSongs?.tracks.count)")
             

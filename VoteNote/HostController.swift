@@ -15,6 +15,7 @@ var AnonUsr: Bool = false
 var RoomCapacity: Int = 20
 var SongsPerUser: Int = 4
 var ExplicitSongsAllowed: Bool = false
+var AutoLike: Bool = false
 var IsHost: Bool = false
 
 struct HostController: View {
@@ -27,6 +28,8 @@ struct HostController: View {
   @State var genres: [String]
   
   @State var currentView = 1
+    @State var autoVote: Bool = false
+        
     
     let refreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     @State var queueRefreshSeconds = 10
@@ -59,7 +62,7 @@ struct HostController: View {
                 })
             } else {
               NavigationLink(
-                destination: ProfileView(),
+                destination: ProfileView(autoVote: $autoVote),
                 label: {
                   Image(systemName: "person")
                     .resizable()
@@ -93,11 +96,11 @@ struct HostController: View {
       .frame(width: UIScreen.main.bounds.size.width, alignment: .top)
       
       if (currentView == 0) {
-        Host_QueuePageView()
+        Host_QueuePageView(autoVote: $autoVote)
           .animation(.default)
           .transition(.move(edge: .leading))
       } else {
-        Host_RoomPageView(showNav: $showNav, notExited: $notExited, isTiming: $isTiming, genres: $genres)
+        Host_RoomPageView(showNav: $showNav, notExited: $notExited, isTiming: $isTiming, autoVote: $autoVote, genres: $genres)
           .animation(.default)
           .transition(.move(edge: .trailing))
         

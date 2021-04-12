@@ -210,8 +210,8 @@ class Spotify: ObservableObject {
   }
   
   //requests spotify for songs recommeneded based on artist, genre, and songs
-  func recomendations(artistSeed: String, genre: String, trackSeed: String,completion: @escaping (reccomndations?) -> ()) ->() {
-    self.httpRequester.headerGet(url: "https://api.spotify.com/v1/recommendations?limit=10&seed_genres=\(artistSeed)&seed_genres=\(genre)&seed_tracks=\(trackSeed)", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ]).onFinish = {
+  func recomendations(artistSeed: String, trackSeed: String,completion: @escaping (reccomndations?) -> ()) ->() {
+    self.httpRequester.headerGet(url: "https://api.spotify.com/v1/recommendations?limit=10&seed_genres=\(artistSeed)&seed_tracks=\(trackSeed)", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ]).onFinish = {
       (response) in
       do {
         let decoder = JSONDecoder()
@@ -306,6 +306,27 @@ class Spotify: ObservableObject {
       }
     }
   }
+  func unLikeSong(id: String){
+      self.httpRequester.headerDELETE(url: "https://api.spotify.com/v1/me/tracks?ids=\(id)",header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ]).onFinish = {
+        (response) in
+        do{
+          print(response.description)
+        } catch {
+          fatalError("bad response \(response.description)")
+        }
+      }
+    }
+  func isSongFavorited(songID: String) -> Bool{
+      if(self.usersSavedSongs == nil){
+        self.savedSongs(completion: {playlistSongs in self.usersSavedSongs = playlistSongs})
+      }
+      for song in self.usersSavedSongs?.items ?? [songTimeAdded(track: SpotifyTrack(album: nil, id: "", name: ""))] {
+        if(song.track.id == songID){
+          return true
+        }
+      }
+      return false
+    }
   
   
   

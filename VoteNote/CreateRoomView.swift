@@ -41,6 +41,7 @@ struct CreateRoomView: View {
   @State var genres: Set<String> = []
   @State var showingAlert = false
   @State var alertMsg = ""
+  @State var autoLike: Bool = false
   
   @Environment(\.presentationMode) var presentationMode
   
@@ -137,6 +138,13 @@ struct CreateRoomView: View {
               }
             }
             .padding(.trailing)
+            /*HStack {
+              Text("Allow Auto Liking Favorites")
+              Toggle(isOn: $autoLike) {
+                Text("")
+              }
+            }
+            .padding(.trailing)*/
           }
           
           if (prevHostedRooms.count > 0) {
@@ -240,6 +248,21 @@ struct playListBaseView: View {
     var body: some View {
         ZStack{
             VStack{
+                HStack{
+                    Button(action: {
+                      presentationMode.wrappedValue.dismiss()
+                    }, label: {
+                      HStack {
+                        Image(systemName: "chevron.left")
+                          .resizable()
+                          .frame(width: 15, height: 20)
+                          .padding(.leading)
+                        Text("Back")
+                      }
+                    })
+                    .frame(alignment: .leading)
+                    Spacer()
+                }
                 List{
                     ForEach(((sharedSpotify.userPlaylists?.items ?? [Playlist(description: "", id: "", images: nil, name: "", type: "", uri: "")]))) { list in
                         Button(list.name ?? "") {

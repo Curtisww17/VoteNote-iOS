@@ -109,12 +109,12 @@ struct EditRoomView: View {
             }
             .padding(.trailing)
             
-            HStack {
+            /*HStack {
               Text("Anonymous Users")
               Toggle(isOn: $anonUsr) {
                 Text("")
               }
-            }
+            }*/
             .padding(.trailing)
             
             HStack {
@@ -124,6 +124,7 @@ struct EditRoomView: View {
               }
             }
             .padding(.trailing)
+            
           }
           
         }

@@ -13,6 +13,8 @@ struct LandingPageView: View {
   @ObservedObject var spotify = sharedSpotify
   @State var currentView = 0
   @State var isInRoom = false
+    @State var autoLike: Bool = false
+    @State var autoVote: Bool = false
   var body: some View {
     return NavigationView {
       VStack {
@@ -30,7 +32,7 @@ struct LandingPageView: View {
               .frame(width: UIScreen.main.bounds.size.width / 2,  alignment: .center)
               VStack {
                 NavigationLink(
-                  destination: ProfileView(),
+                  destination: ProfileView(autoVote: $autoVote),
                   label: {
                     Image(systemName: "person")
                       .resizable()
@@ -48,7 +50,7 @@ struct LandingPageView: View {
               .animation(.default)
               .transition(.move(edge: .leading))
           } else {
-            CreateRoomView(isInRoom: $isInRoom, spotify: spotify)
+            CreateRoomView(isInRoom: $isInRoom, spotify: spotify, autoLike: autoLike)
               .animation(.default)
               .transition(.move(edge: .trailing))
           }
@@ -58,8 +60,16 @@ struct LandingPageView: View {
       }
     }
     .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading).onAppear(perform: {
-      spotify.pause()
       spotify.initializeAnon()
+        
+        getAutoVote { (setting, err) in
+            if err == nil {
+                self.autoVote = setting!
+                print(setting)
+            }
+            
+        }
+
     })
     .navigationViewStyle(StackNavigationViewStyle())
   }

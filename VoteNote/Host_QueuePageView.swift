@@ -30,6 +30,8 @@ struct Host_QueuePageView: View {
     @State var isTiming: Bool = false
     @State var showMaxNowPlaying: Bool = false
     @EnvironmentObject var sheetManager : PartialSheetManager
+    @Binding var autoVote: Bool
+    
     
   var body: some View {
     GeometryReader { geo in
@@ -171,7 +173,6 @@ class MusicQueue: Identifiable, ObservableObject {
     }
     
     voteList.refreshList()
-    
   }
   
     public func addMusic(songs: [song]){
@@ -221,6 +222,8 @@ class MusicQueue: Identifiable, ObservableObject {
         }
         
     }
+    
+    
 }
 
 class VoteList: Identifiable, ObservableObject {
@@ -477,6 +480,25 @@ struct QueueEntry: View {
         }.background(Color.white).onAppear(perform: {
             hasBeenUpvoted = voteList.hasBeenUpvoted(songID: self.curSong.id)
             hasBeenDownvoted = voteList.hasBeenDownvoted(songID: self.curSong.id)
+            
+            getAutoVote(completion: { (autoVote, err) in
+                if err == nil {
+                    
+                    if(autoVote!){
+                        
+                            /*var hasBeenUpvoted = voteList.hasBeenUpvoted(songID: song.id)
+                            var hasBeenDownvoted = voteList.hasBeenDownvoted(songID: song.id)
+                            print(hasBeenUpvoted)*/
+                        print("comp vote")
+                            if(sharedSpotify.isSongFavorited(songID: curSong.id)){
+                                if(!hasBeenUpvoted && !hasBeenDownvoted){
+                                        upVoteSong()
+                                    }
+                                }
+                            
+                    }
+                }
+            })
         })
         .offset(CGSize(width: self.offset.width , height: 0))
         .animation(.spring())
@@ -518,6 +540,7 @@ struct NowPlayingViewHostMaximized: View {
     @ObservedObject var isHost: ObservableBoolean
     @State var saved: Bool = false
     @Binding var isMaximized: Bool //should start as true
+    @State var isLiked = false
     
     /**
         Resumes the current song in the Spotify Queue
@@ -556,6 +579,12 @@ struct NowPlayingViewHostMaximized: View {
      */
     func skipSong(){
       songQueue.skipSong()
+        RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+        if(sharedSpotify.isSongFavorited(songID: sharedSpotify.currentlyPlaying?.id ?? "")){
+                isLiked = true
+              } else {
+                isLiked = false
+              }
     }
     
     /**
@@ -572,9 +601,15 @@ struct NowPlayingViewHostMaximized: View {
      */
     func favoriteSong(){
       if(sharedSpotify.currentlyPlaying != nil){
-        sharedSpotify.likeSong(id: sharedSpotify.currentlyPlaying!.id)
-            saved = !saved
-        }
+        if(!sharedSpotify.isSongFavorited(songID: sharedSpotify.currentlyPlaying?.id ?? "")){
+                    sharedSpotify.likeSong(id: sharedSpotify.currentlyPlaying!.id)
+                    isLiked = true
+                    }
+                else{
+                    sharedSpotify.unLikeSong(id: sharedSpotify.currentlyPlaying!.id)
+                    isLiked = false
+                }
+      }
     }
 
     var body: some View {
@@ -650,15 +685,15 @@ struct NowPlayingViewHostMaximized: View {
                         }
                         Spacer()
                         Button(action: {favoriteSong()}) {
-                            if(!saved){
-                            Image(systemName: "heart")
-                                .foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
-                            } else {
-                                Image(systemName: "heart.fill")
-                                    .foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
-                            }
-                            
-                        }
+                           if(!isLiked){
+                           Image(systemName: "heart")
+                               .foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
+                           } else {
+                               Image(systemName: "heart.fill")
+                                   .foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
+                           }
+                           
+                       }
                     }
                     .padding(.all)
                 }
@@ -674,6 +709,13 @@ struct NowPlayingViewHostMaximized: View {
         } else {
             isPlaying = true
         }
+        
+        if(sharedSpotify.isSongFavorited(songID: sharedSpotify.currentlyPlaying?.id ?? "")){
+            isLiked = true
+        } else {
+            isLiked = false
+        }
+        
       })
       
       
@@ -717,7 +759,6 @@ struct NowPlayingViewHostMinimized: View {
                         NowPlayingViewHostMaximized(isPlaying: isPlaying, isHost: isHost, isMaximized: $isMaximized)
                     }
                 }
-                
             }, label: {
                 HStack {
                     Spacer()
@@ -760,3 +801,4 @@ struct NowPlayingViewHostMinimized: View {
       })
     }
 }
+
