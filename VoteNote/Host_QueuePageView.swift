@@ -159,19 +159,17 @@ class MusicQueue: Identifiable, ObservableObject {
         //self.currentlyPlaying = nil
     }
     
-    if(autoLike){
+    //if(autoLike){
         for song in self.musicList {
-            
             var hasBeenUpvoted = voteList.hasBeenUpvoted(songID: song.id)
             var hasBeenDownvoted = voteList.hasBeenDownvoted(songID: song.id)
-                if(sharedSpotify.isSongFavorited(songID: song.id) && (!hasBeenUpvoted && !hasBeenDownvoted)){
+            if(sharedSpotify.isSongFavorited(songID: song.id) && (!hasBeenUpvoted && !hasBeenDownvoted) && song.numVotes == 0){
                     voteSong(vote: 1, id: song.id){}
+                    hasBeenUpvoted = true
                 }
             }
         
-       
-        
-    }
+    //}
     voteList.refreshList()
   }
   

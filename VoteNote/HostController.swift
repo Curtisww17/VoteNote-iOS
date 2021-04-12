@@ -15,7 +15,7 @@ var AnonUsr: Bool = false
 var RoomCapacity: Int = 20
 var SongsPerUser: Int = 4
 var ExplicitSongsAllowed: Bool = false
-var autoLike: Bool = false
+var AutoLike: Bool = false
 
 struct HostController: View {
   @ObservedObject var spotify = sharedSpotify

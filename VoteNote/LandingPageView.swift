@@ -13,6 +13,7 @@ struct LandingPageView: View {
   @ObservedObject var spotify = sharedSpotify
   @State var currentView = 0
   @State var isInRoom = false
+    @State var autoLike: Bool = false
   var body: some View {
     return NavigationView {
       VStack {
