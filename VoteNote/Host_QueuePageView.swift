@@ -130,7 +130,9 @@ class MusicQueue: Identifiable, ObservableObject {
             if (self.musicList.count > 0) {
               for i in Range(0...self.musicList.count-1) {
                 if self.musicList[i].numVotes ?? 0 < -(numUsersInRoom / 2) {
-                  vetoSong(id: self.musicList[i].id)
+                    vetoSong(id: self.musicList[i].id) {
+                        
+                    }
                 }
               }
             }
@@ -283,14 +285,28 @@ struct QueueEntry: View {
         Calls the DB to upvote the current song
      */
     func upVoteSong(){
-        if (!hasBeenUpvoted) {
+        if (!hasBeenUpvoted && hasBeenDownvoted) {
+            print("Change to Upvote")
+            localVotes.intValue = localVotes.intValue + 2
+            voteSong(vote: 2, id: curSong.id){
+              songQueue.updateQueue()
+            }
+            hasBeenUpvoted = true
+            hasBeenDownvoted = false
+        } else if (!hasBeenUpvoted) {
             print("Upvote Song")
             localVotes.intValue = localVotes.intValue + 1
             voteSong(vote: 1, id: curSong.id){
               songQueue.updateQueue()
             }
             hasBeenUpvoted = true
-            hasBeenDownvoted = false
+        } else if (hasBeenUpvoted) {
+            print("Remove Upvote")
+            localVotes.intValue = localVotes.intValue - 1
+            voteSong(vote: -1, id: curSong.id){
+              songQueue.updateQueue()
+            }
+            hasBeenUpvoted = false
         }
     }
     
@@ -298,14 +314,28 @@ struct QueueEntry: View {
         Calls the DB to downvote the current song
      */
     func downVoteSong(){
-        if (!hasBeenDownvoted) {
+        if (!hasBeenDownvoted && hasBeenUpvoted) {
+            print("Change to Downvote")
+            localVotes.intValue = localVotes.intValue - 2
+            voteSong(vote: -2, id: curSong.id){
+              songQueue.updateQueue()
+            }
+            hasBeenDownvoted = true
+            hasBeenUpvoted = false
+        } else if (!hasBeenDownvoted) {
             print("Downvote Song")
             localVotes.intValue = localVotes.intValue - 1
             voteSong(vote: -1, id: curSong.id) {
               songQueue.updateQueue()
             }
-            hasBeenUpvoted = false
             hasBeenDownvoted = true
+        } else if (hasBeenDownvoted) {
+            print("Remove Downvote")
+            localVotes.intValue = localVotes.intValue + 1
+            voteSong(vote: 1, id: curSong.id){
+              songQueue.updateQueue()
+            }
+            hasBeenDownvoted = false
         }
     }
     
@@ -314,11 +344,9 @@ struct QueueEntry: View {
      */
     func vetoMusic(){
         print("Vetoing Song")
-        vetoSong(id: curSong.id)
-        
-        songQueue.updateQueue()
-        
-        RunLoop.main.run(until: Date(timeIntervalSinceNow: 1))
+        vetoSong(id: curSong.id) {
+            songQueue.updateQueue()
+        }
     }
     
     func getUpvoteColor() -> Color {

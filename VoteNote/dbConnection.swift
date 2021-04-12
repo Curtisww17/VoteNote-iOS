@@ -753,7 +753,7 @@ func dequeue(id: String){
  
  - Parameter id: the id of the song that is to be removed
  */
-func vetoSong(id: String){
+func vetoSong(id: String, completion: @escaping  () -> ()){
     
     getCurrRoom { (currRoom, err) in
         
@@ -763,7 +763,7 @@ func vetoSong(id: String){
         rm.collection("queue").document(id).delete()
         
         
-        
+        completion()
         
     }//end getCurrRoom
 }
