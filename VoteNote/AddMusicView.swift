@@ -167,7 +167,9 @@ struct AddMusicView: View {
           }.onAppear(perform: {
             sharedSpotify.userPlaylists(completion: {playlist in sharedSpotify.userPlaylists = playlist}, limit: "10")
           selectedSongs.removeAll()
-        }).navigationViewStyle(StackNavigationViewStyle())
+          }).onDisappear(perform: {
+            songQueue.updateQueue()
+          }).navigationViewStyle(StackNavigationViewStyle())
       }
     
 }

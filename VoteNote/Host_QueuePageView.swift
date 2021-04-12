@@ -239,6 +239,7 @@ class VoteList: Identifiable, ObservableObject {
                 deleteVote(id: vote.key)
             }
         }
+        
     }
     
     func hasBeenUpvoted(songID: String) -> Bool {
