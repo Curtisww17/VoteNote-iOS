@@ -16,7 +16,6 @@ struct LandingPageView: View {
   var body: some View {
     return NavigationView {
       VStack {
-        //if !hostControllerHidden.boolValue {
         Text("Hidden Howdy").hidden()
         //}
         VStack {
@@ -63,20 +62,5 @@ struct LandingPageView: View {
       spotify.initializeAnon()
     })
     .navigationViewStyle(StackNavigationViewStyle())
-  }
-}
-
-struct LandingPageView_PreviewContainer: View {
-  
-  @State var spotify: Spotify = Spotify()
-  
-  var body: some View {
-    LandingPageView(spotify: spotify)
-  }
-}
-
-struct LandingPageView_Previews: PreviewProvider {
-  static var previews: some View {
-    LandingPageView_PreviewContainer()
   }
 }

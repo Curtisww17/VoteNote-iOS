@@ -9,7 +9,6 @@ import Foundation
 import SwiftUI
 
 struct EditRoomView: View {
-  //TODO: Create second version of this view to take in info from an existing room
   @Binding var isInRoom: Bool
   @State var showAlert: Bool = false
     
@@ -19,6 +18,8 @@ struct EditRoomView: View {
     didSet {
       if userCapacity < 1 {
         userCapacity = 1
+      } else if userCapacity > 50 {
+        userCapacity = 50
       }
     }
   }
@@ -30,16 +31,13 @@ struct EditRoomView: View {
     }
   }
   
-    //TO-DO: limit chars when editing
-    //@ObservedObject var roomName = TextBindingManager(limit: 20, text: RoomName.trimmingCharacters(in: .whitespacesAndNewlines))
-    //@ObservedObject var roomDescription = TextBindingManager(limit: 20, text: RoomDescription.trimmingCharacters(in: .whitespacesAndNewlines))
-    @State var roomName: String = RoomName
-    @State var roomDescription = RoomDescription
-    @State var votingEnabled: Bool = VotingEnabled
-    @State var madeRoom: Bool = false
-    @State var anonUsr: Bool = AnonUsr
-    @State var explicitSongsAllowed: Bool = ExplicitSongsAllowed
-    @State var genres: Set<String>
+  @State var roomName: String = RoomName
+  @State var roomDescription = RoomDescription
+  @State var votingEnabled: Bool = VotingEnabled
+  @State var madeRoom: Bool = false
+  @State var anonUsr: Bool = AnonUsr
+  @State var explicitSongsAllowed: Bool = ExplicitSongsAllowed
+  @State var genres: Set<String>
   
   func editRoom(){
     print("Room")
@@ -57,15 +55,21 @@ struct EditRoomView: View {
   }
   
   var body: some View {
-    //return NavigationView {
     ZStack {
-      //Color.white
       VStack {
         
         Form {
           Section(header: Text("General Room Information")) {
-            TextField("Room Name", text: $roomName)
-            TextField("Room Description", text: $roomDescription)
+            TextField("Room Name", text: $roomName).onChange(of: roomName, perform: { value in
+                if roomName.count > 20 {
+                    roomName.removeLast()
+                }
+            })
+            TextField("Room Description", text: $roomDescription).onChange(of: roomDescription, perform: { value in
+                if roomDescription.count > 20 {
+                    roomDescription.removeLast()
+                }
+            })
           }
           
           Section(header: Text("Settings")) {
@@ -128,37 +132,9 @@ struct EditRoomView: View {
         
         Spacer()
       }
-      //}
     }
     .navigationBarHidden(true)
     .navigate(to: HostController(isInRoom: $isInRoom, genres: Array(genres)), when: $madeRoom)
-    .onAppear(perform: {
-//        getCurrRoom(completion: {code, err in
-//          if err == nil {
-//            self.currentRoom.update(roomCode: code)
-//          }
-//        })
-        
-        //RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
-        
-        /*var curRoom: room = room(name: "", anonUsr: false, capacity: 0, explicit: false, voting: true)
-        getRoom(code: currentQR.roomCode, completion: {room, err in
-            if (room != nil) {
-                curRoom = room!*/
-              
-              /*roomName.text = RoomName
-              roomDescription.text = RoomDescription
-              votingEnabled = VotingEnabled
-              anonUsr = AnonUsr
-              songsPerUser = SongsPerUser
-              userCapacity = RoomCapacity
-              explicitSongsAllowed = ExplicitSongsAllowed
-              genres = Set(Genres)*/
-            /*}
-        })*/
-        
-        //RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
-    })
     .navigationViewStyle(StackNavigationViewStyle())
   }
 }

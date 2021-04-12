@@ -26,7 +26,7 @@ struct HostUserDetailView: View {
   }
     
   var body: some View {
-    return //NavigationView {
+    return
         ZStack {
             VStack {
                 
@@ -67,7 +67,6 @@ struct HostUserDetailView: View {
                 .padding(.vertical)
                 
             }
-        //}
         }.onAppear(perform: {
             songHistory.updateHistory()
             RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))

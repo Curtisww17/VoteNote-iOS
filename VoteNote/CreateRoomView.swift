@@ -10,7 +10,6 @@ import SwiftUI
 
 
 struct CreateRoomView: View {
-  //TODO: Create second version of this view to take in info from an existing room
   @Binding var isInRoom: Bool
   @ObservedObject var spotify: Spotify
   @State var showAlert: Bool = false
@@ -183,25 +182,6 @@ struct CreateRoomView: View {
       })
     })
     .navigationViewStyle(StackNavigationViewStyle())
-  }
-}
-
-struct CreateRoomView_PreviewContainer: View {
-  
-  @State var songsPerUser: Int = 4
-  @State var userCapacity: Int = 20
-  @State var isInRoom = false
-  @State var spotify: Spotify = Spotify()
-  
-  var body: some View {
-    CreateRoomView(isInRoom: $isInRoom, spotify: spotify, userCapacity: userCapacity, songsPerUser: songsPerUser)
-  }
-}
-
-struct CreateRoomView_Previews: PreviewProvider {
-  static var previews: some View {
-    
-    CreateRoomView_PreviewContainer()
   }
 }
 

@@ -207,6 +207,7 @@ class MusicQueue: Identifiable, ObservableObject {
                 }
             }
         }
+        
     }
 }
 
@@ -221,6 +222,21 @@ class VoteList: Identifiable, ObservableObject {
             print(err as Any)
           }
         })
+        
+        //ensures votes for songs no longer in queue are deleted
+        votes.forEach { vote in
+            var found: Bool = false
+            
+            songQueue.musicList.forEach { song in
+                if (vote.key == song.id) {
+                    found = true
+                }
+            }
+         
+            if (!found) {
+                deleteVote(id: vote.key)
+            }
+        }
     }
     
     func hasBeenUpvoted(songID: String) -> Bool {
@@ -266,7 +282,6 @@ struct QueueEntry: View {
     /**
         Calls the DB to upvote the current song
      */
-    //TO-DO: limit number of upvotes
     func upVoteSong(){
         if (!hasBeenUpvoted) {
             print("Upvote Song")
@@ -282,7 +297,6 @@ struct QueueEntry: View {
     /**
         Calls the DB to downvote the current song
      */
-    //TO-DO: limit number of downvotes
     func downVoteSong(){
         if (!hasBeenDownvoted) {
             print("Downvote Song")
@@ -384,9 +398,9 @@ struct QueueEntry: View {
                     if opened && !isHistoryView {
                         HStack {
                             if !isUserQueue {
-                                Button(action: {/*vetoMusic()*/}) {
+                                Button(action: {}) {
                                     Text("Veto").foregroundColor(Color.black).scaleEffect(scale)
-                                }.padding(.all).background(Color.red).border(/*@START_MENU_TOKEN@*/Color.red/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/2/*@END_MENU_TOKEN@*/).onTapGesture {
+                                }.padding(.all).background(Color.red).border(Color.red, width: 2).onTapGesture {
                                     vetoMusic()
                                 }.frame(width: 80, height: 80)
                             }
@@ -398,14 +412,14 @@ struct QueueEntry: View {
                                       NavigationLink(destination: UserUserDetailView(selectedUserUID: ObservableString(stringValue: curSong.addedBy))) {
                                             EmptyView()
                                         }.hidden()
-                                    }.padding(.all).border(Color.black, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/).frame(width: 80, height: 80)
+                                    }.padding(.all).border(Color.black, width: 1).frame(width: 80, height: 80)
                                 } else {
                                     ZStack {
                                         Text("User").scaleEffect(scale)
                                       NavigationLink(destination: HostUserDetailView(selectedUserUID: ObservableString(stringValue: curSong.addedBy))) {
                                             EmptyView()
                                         }.hidden()
-                                    }.padding(.all).border(Color.black, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/).frame(width: 80, height: 80)
+                                    }.padding(.all).border(Color.black, width: 1).frame(width: 80, height: 80)
                                 }
                             }
                             
@@ -431,27 +445,25 @@ struct QueueEntry: View {
         })
         .offset(CGSize(width: self.offset.width , height: 0))
         .animation(.spring())
-        .gesture(DragGesture(minimumDistance: 50)
-                  .onChanged { gesture in
-                    if !isHistoryView {
-                        self.offset.width = gesture.translation.width
-                    }
-                  }
-                    .onEnded { endedGesture in
-                        
-                      if (!isHistoryView && endedGesture.location.y - endedGesture.startLocation.y < 50) {
-                        if self.offset.width < 50 {
-                          self.scale = 1
-                          self.offset.width = -60
-                          opened = true
-                        } else {
-                          self.scale = 0.5
-                          self.offset = .zero
-                          opened = false
-                        }
-                      }
-                    }
-        )
+        .gesture(DragGesture(minimumDistance: 50).onChanged { gesture in
+            
+            if !isHistoryView {
+                self.offset.width = gesture.translation.width
+            }
+          }.onEnded { endedGesture in
+            
+            if (!isHistoryView && endedGesture.location.y - endedGesture.startLocation.y < 50) {
+              if self.offset.width < 50 {
+                self.scale = 1
+                self.offset.width = -60
+                opened = true
+              } else {
+                self.scale = 0.5
+                self.offset = .zero
+                opened = false
+              }
+            }
+          })
     }
 }
 
@@ -657,9 +669,7 @@ struct NowPlayingViewHostMinimized: View {
         ZStack {
             Button(action: {
                 if isHost.boolValue {
-                    //isMaximized = !isMaximized
                     self.sheetManager.showPartialSheet({
-                         print("normal sheet dismissed")
                     }) {
                         NowPlayingViewHostMaximized(isPlaying: isPlaying, isHost: isHost, isMaximized: $isMaximized)
                     }
@@ -701,12 +711,9 @@ struct NowPlayingViewHostMinimized: View {
                 }
                 .padding(.vertical)
             })
-            
         }
       }.onAppear(perform: {
         sharedSpotify.updateCurrentlyPlayingPosition()
       })
-      
-      
     }
 }
