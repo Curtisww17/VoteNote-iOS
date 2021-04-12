@@ -330,7 +330,7 @@ struct recomendedView: View{
         }.onAppear(perform: {
             selectedSongs.removeAll()
 
-            sharedSpotify.recomendations(artistSeed: "4NHQUGzhtTLFvgF5SZesLK", trackSeed: "0c6xIDDpzE81m2q797ordA",completion: {playlistSongs in sharedSpotify.recommendedSongs = playlistSongs})
+            sharedSpotify.recomendations(artistSeed: sharedSpotify.currentlyPlaying?.artists?[0].id ?? "4NHQUGzhtTLFvgF5SZesLK", trackSeed: sharedSpotify.currentlyPlaying?.id ?? "0c6xIDDpzE81m2q797ordA",completion: {playlistSongs in sharedSpotify.recommendedSongs = playlistSongs})
             
             print("Starting Len: \(sharedSpotify.recommendedSongs?.tracks.count)")
             
