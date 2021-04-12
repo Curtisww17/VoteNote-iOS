@@ -208,8 +208,8 @@ class Spotify: ObservableObject {
   }
   
   //requests spotify for songs recommeneded based on artist, genre, and songs
-  func recomendations(artistSeed: String, genre: String, trackSeed: String,completion: @escaping (reccomndations?) -> ()) ->() {
-    self.httpRequester.headerGet(url: "https://api.spotify.com/v1/recommendations?limit=10&seed_genres=\(artistSeed)&seed_genres=\(genre)&seed_tracks=\(trackSeed)", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ]).onFinish = {
+  func recomendations(artistSeed: String, trackSeed: String,completion: @escaping (reccomndations?) -> ()) ->() {
+    self.httpRequester.headerGet(url: "https://api.spotify.com/v1/recommendations?limit=10&seed_genres=\(artistSeed)&seed_tracks=\(trackSeed)", header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ]).onFinish = {
       (response) in
       do {
         let decoder = JSONDecoder()

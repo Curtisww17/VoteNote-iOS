@@ -165,7 +165,7 @@ class MusicQueue: Identifiable, ObservableObject {
             var hasBeenUpvoted = voteList.hasBeenUpvoted(songID: song.id)
             var hasBeenDownvoted = voteList.hasBeenDownvoted(songID: song.id)
                 if(sharedSpotify.isSongFavorited(songID: song.id) && (!hasBeenUpvoted && !hasBeenDownvoted)){
-                    //voteSong(vote: 1, id: song.id){}
+                    voteSong(vote: 1, id: song.id){}
                 }
             }
         
