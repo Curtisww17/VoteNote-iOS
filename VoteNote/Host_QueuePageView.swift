@@ -163,9 +163,8 @@ class MusicQueue: Identifiable, ObservableObject {
         for song in self.musicList {
             var hasBeenUpvoted = voteList.hasBeenUpvoted(songID: song.id)
             var hasBeenDownvoted = voteList.hasBeenDownvoted(songID: song.id)
-            if(sharedSpotify.isSongFavorited(songID: song.id) && (!hasBeenUpvoted && !hasBeenDownvoted) && song.numVotes == 0){
+            if(sharedSpotify.isSongFavorited(songID: song.id) && (!hasBeenUpvoted && !hasBeenDownvoted)){
                     voteSong(vote: 1, id: song.id){}
-                    hasBeenUpvoted = true
                 }
             }
         
