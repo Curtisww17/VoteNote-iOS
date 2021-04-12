@@ -39,11 +39,12 @@ struct EditRoomView: View {
     @State var madeRoom: Bool = false
     @State var anonUsr: Bool = AnonUsr
     @State var explicitSongsAllowed: Bool = ExplicitSongsAllowed
-    @State var genres: Set<String>
+    @Binding var genres: [String]
+  @State var genreSet: Set<String>
   
   func editRoom(){
     print("Room")
-    let newRoom: room = room(name: roomName, desc: roomDescription, anonUsr: anonUsr, capacity: userCapacity, explicit: explicitSongsAllowed, voting: votingEnabled, code: currentQR.roomCode, spu: songsPerUser, genres: Array(genres))
+    let newRoom: room = room(name: roomName, desc: roomDescription, anonUsr: anonUsr, capacity: userCapacity, explicit: explicitSongsAllowed, voting: votingEnabled, code: currentQR.roomCode, spu: songsPerUser, genres: Array(genreSet))
     makeRoom(newRoom: newRoom)
     
     RoomName = roomName
@@ -54,6 +55,7 @@ struct EditRoomView: View {
     SongsPerUser = songsPerUser
     ExplicitSongsAllowed = explicitSongsAllowed
     presentationMode.wrappedValue.dismiss()
+    genres = Array(genreSet)
   }
   
   var body: some View {
@@ -84,7 +86,7 @@ struct EditRoomView: View {
             
             HStack{
                 NavigationLink(
-                    destination: GenreSelectView(genres: $genres)
+                    destination: GenreSelectView(genres: $genreSet)
                     .navigationBarBackButtonHidden(true).navigationBarHidden(true),
                   label: {
                     Text("Genres Allowed")
