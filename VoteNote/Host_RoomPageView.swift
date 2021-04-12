@@ -18,6 +18,7 @@ struct Host_RoomPageView: View {
   @Binding var isTiming: Bool
   @State var inRoom: Bool = true
     @State var autoLike: Bool = false
+    @Binding var autoVote: Bool
   let isHost = true
 
   @Binding var genres: [String]

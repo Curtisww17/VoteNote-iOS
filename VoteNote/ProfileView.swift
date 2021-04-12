@@ -12,6 +12,7 @@ import SwiftUI
 struct ProfileView: View {
   @ObservedObject var spotify: Spotify = sharedSpotify
   @State var isAnon: Bool = sharedSpotify.isAnon
+  @Binding var autoVote: Bool
   
   var body: some View {
     return VStack {
@@ -57,6 +58,16 @@ struct ProfileView: View {
           Text("Display Name: \(spotify.currentUser!.display_name ?? "Unknown")")
             .frame(height: 50)
         }
+        HStack {
+          Text("Auto Like Favorite Songs")
+          Toggle(isOn: $autoVote) {
+            Text("")
+          }.onChange(of: self.autoVote, perform: { value in
+            print("hits here")
+            setAutoVote(setting: autoVote)
+          })
+        }
+        .padding(.trailing)
         if (spotify.loggedIn) {
           HStack {
             Spacer()
@@ -70,6 +81,5 @@ struct ProfileView: View {
         }
       }
       
-    }.navigationViewStyle(StackNavigationViewStyle())
-  }
+    }.navigationViewStyle(StackNavigationViewStyle())  }
 }

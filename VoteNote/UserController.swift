@@ -17,6 +17,7 @@ struct UserController: View {
     
   @State var genres: [String] = []
   @State var isBanned = false
+    @State var autoVote: Bool = false
     
   @State var currentView = 0
     
@@ -43,7 +44,7 @@ struct UserController: View {
                   })
             } else {
                 NavigationLink(
-                  destination: ProfileView(),
+                  destination: ProfileView(autoVote: $autoVote),
                   label: {
                       Image(systemName: "person")
                         .resizable()
@@ -81,6 +82,15 @@ struct UserController: View {
     .navigationBarBackButtonHidden(true)
     .navigationBarHidden(true).onAppear(perform: {
         notExited = false
+        
+        getAutoVote { (setting, err) in
+            if err == nil {
+                self.autoVote = setting!
+                print(setting)
+            }
+            
+        }
+
     }).navigate(to: LandingPageView(), when: $notExited).navigationViewStyle(StackNavigationViewStyle())
     }
   }

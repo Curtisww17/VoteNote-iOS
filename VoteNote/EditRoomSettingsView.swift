@@ -125,13 +125,6 @@ struct EditRoomView: View {
             }
             .padding(.trailing)
             
-            HStack {
-              Text("Allow Auto Liking Favorites")
-              Toggle(isOn: $autoLike) {
-                Text("")
-              }
-            }
-            .padding(.trailing)
           }
           
         }

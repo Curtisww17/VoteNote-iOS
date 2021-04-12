@@ -27,6 +27,8 @@ struct HostController: View {
   @State var genres: [String]
   
   @State var currentView = 1
+    @State var autoVote: Bool = false
+        
   var body: some View {
     OperationQueue.main.addOperation {
       isInRoom = true
@@ -50,7 +52,7 @@ struct HostController: View {
                 })
             } else {
               NavigationLink(
-                destination: ProfileView(),
+                destination: ProfileView(autoVote: $autoVote),
                 label: {
                   Image(systemName: "person")
                     .resizable()
@@ -68,11 +70,11 @@ struct HostController: View {
       .frame(width: UIScreen.main.bounds.size.width, alignment: .top)
       
       if (currentView == 0) {
-        Host_QueuePageView()
+        Host_QueuePageView(autoVote: $autoVote)
           .animation(.default)
           .transition(.move(edge: .leading))
       } else {
-        Host_RoomPageView(showNav: $showNav, notExited: $notExited, isTiming: $isTiming, genres: $genres)
+        Host_RoomPageView(showNav: $showNav, notExited: $notExited, isTiming: $isTiming, autoVote: $autoVote, genres: $genres)
           .animation(.default)
           .transition(.move(edge: .trailing))
         
@@ -90,6 +92,15 @@ struct HostController: View {
         }
         isTiming = true
       }
+        
+    getAutoVote { (setting, err) in
+        if err == nil {
+            self.autoVote = setting!
+            print("\n\n\n\n\n\n\(autoVote)\n\n\n\n\n\n")
+        }
+        
+    }
+
     }).navigate(to: LandingPageView(), when: $notExited).navigationViewStyle(StackNavigationViewStyle())
   }
   
