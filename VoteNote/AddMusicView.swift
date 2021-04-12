@@ -59,8 +59,6 @@ struct AddMusicView: View {
                                 genres.forEach { currentGenre in
                                     
                                     sharedSpotify.songGenres?.artists[0].genres?.forEach { curGenre in
-                                        print("Song Genre: \(curGenre)")
-                                        print("Allowed Genre: \(currentGenre)")
                                         
                                         if (currentGenre.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() == curGenre.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()) {
                                             found = true
@@ -137,13 +135,13 @@ struct AddMusicView: View {
               List {
                 //if you havent searched anything display options to see songs
                 if( currentSearch == ""){
-                    NavigationLink(destination: playListView(myPlaylists: sharedSpotify.userPlaylists?.items ?? [Playlist(id: "")]).navigationBarTitle("Playlists")) {
+                    NavigationLink(destination: playListView(myPlaylists: sharedSpotify.userPlaylists?.items ?? [Playlist(id: "")], genres: genres).navigationBarTitle("Playlists")) {
                            Text("View My Playlists")
                        }
-                    NavigationLink(destination: likedSongsView().navigationBarTitle("Liked Songs")){
+                    NavigationLink(destination: likedSongsView(genres: genres).navigationBarTitle("Liked Songs")){
                      Text("Liked Songs")
                      }
-                    NavigationLink(destination: recomendedView().navigationBarTitle("Recommended Songs")){
+                    NavigationLink(destination: recomendedView(genres: genres).navigationBarTitle("Recommended Songs")){
                         Text("Reccomended")
                     }
                 }
@@ -180,6 +178,7 @@ struct playListView: View {
     @ObservedObject var currentSearch: ObservableString = ObservableString(stringValue: "")
     @State var searchStr: String = ""
     @State private var isEditing = false
+    @State var genres: [String]
     
     var body: some View {
         ZStack{
@@ -221,7 +220,7 @@ struct playListView: View {
                     ForEach(((sharedSpotify.userPlaylists?.items ?? [Playlist(description: "", id: "", images: nil, name: "", type: "", uri: "")]))) { list in
                         
                         if (list.name!.contains("\(currentSearch.stringValue)") || currentSearch.stringValue == "") {
-                            NavigationLink(destination: uniquePlaylistView( playlistInfo: list).navigationBarTitle(list.name!)) {
+                            NavigationLink(destination: uniquePlaylistView( playlistInfo: list, genres: genres).navigationBarTitle(list.name!)) {
                                 Text(playlistEntry(playlistName: list.name!, playlistID: list.id, playlistDesc: list.description!).playlistName)
                             }
                         }
@@ -240,6 +239,7 @@ struct recomendedView: View{
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var currentSearch: ObservableString = ObservableString(stringValue: "")
     @State var searchStr: String = ""
+    @State var genres: [String]
     
     var body: some View{
         ZStack{
@@ -326,6 +326,42 @@ struct recomendedView: View{
             selectedSongs.removeAll()
 
             sharedSpotify.recomendations(artistSeed: "4NHQUGzhtTLFvgF5SZesLK", genre: "classical", trackSeed: "0c6xIDDpzE81m2q797ordA",completion: {playlistSongs in sharedSpotify.recommendedSongs = playlistSongs})
+            
+            print("Starting Len: \(sharedSpotify.recommendedSongs?.tracks.count)")
+            
+            //filtering for allowed genres
+            if (genres.count != 126 && genres.count != 0) {
+                var count = 0
+                
+                if (sharedSpotify.recommendedSongs?.tracks != nil) {
+                    while (count < (sharedSpotify.recommendedSongs?.tracks.count)!) {
+                        var found = false
+                        
+                        sharedSpotify.getSongGenre(artistID: (sharedSpotify.recommendedSongs?.tracks[count].artists![0].id)!, completion: { currentGenres in
+                            sharedSpotify.songGenres = currentGenres
+                        })
+                        
+                        genres.forEach { currentGenre in
+                            
+                            sharedSpotify.songGenres?.artists[0].genres?.forEach { curGenre in
+                                
+                                if (currentGenre.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() == curGenre.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()) {
+                                    found = true
+                                    print("Did match")
+                                }
+                            }
+                        }
+                        
+                        if (!found) {
+                            sharedSpotify.recommendedSongs?.tracks.remove(at: count)
+                        } else {
+                            count = count + 1
+                        }
+                    }
+                }
+            }
+            
+            print("Ending Len: \(sharedSpotify.recommendedSongs?.tracks.count)")
         })
     }
     
@@ -338,6 +374,7 @@ struct likedSongsView: View{
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var currentSearch: ObservableString = ObservableString(stringValue: "")
     @State var searchStr: String = ""
+    @State var genres: [String]
     
     var body: some View{
         ZStack{
@@ -424,6 +461,40 @@ struct likedSongsView: View{
             selectedSongs.removeAll()
             
             sharedSpotify.savedSongs(completion: {playlistSongs in sharedSpotify.usersSavedSongs = playlistSongs})
+            
+            //filtering for allowed genres
+            if (genres.count != 126 && genres.count != 0) {
+                var count = 0
+                
+                if (sharedSpotify.usersSavedSongs?.items != nil) {
+                    while (count < (sharedSpotify.usersSavedSongs?.items?.count)!) {
+                        var found = false
+                        
+                        sharedSpotify.getSongGenre(artistID: (sharedSpotify.usersSavedSongs?.items![count].track.artists![0].id)!, completion: { currentGenres in
+                            sharedSpotify.songGenres = currentGenres
+                        })
+                        
+                        genres.forEach { currentGenre in
+                            
+                            sharedSpotify.songGenres?.artists[0].genres?.forEach { curGenre in
+                                
+                                if (currentGenre.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() == curGenre.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()) {
+                                    found = true
+                                    print("Did match")
+                                }
+                            }
+                        }
+                        
+                        if (!found) {
+                            sharedSpotify.usersSavedSongs?.items!.remove(at: count)
+                        } else {
+                            count = count + 1
+                        }
+                    }
+                }
+            }
+            
+            print("Ending Len: \(sharedSpotify.recommendedSongs?.tracks.count)")
         })
     }
 }
@@ -437,6 +508,7 @@ struct uniquePlaylistView: View{
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var currentSearch: ObservableString = ObservableString(stringValue: "")
     @State var searchStr: String = ""
+    @State var genres: [String]
   
     
     var body: some View{
@@ -524,6 +596,40 @@ struct uniquePlaylistView: View{
                 
             sharedSpotify.playlistSongs(completion: {playlistSongs in sharedSpotify.currentPlaylist = playlistSongs}, id: playlistInfo.id)
             })
+            
+            //filtering for allowed genres
+            /*if (genres.count != 126 && genres.count != 0) {
+                var count = 0
+                
+                if (sharedSpotify.currentPlaylist?.tracks?.items != nil) {
+                    while (count < (sharedSpotify.currentPlaylist?.tracks?.items.count)) {
+                        var found = false
+                        
+                        sharedSpotify.getSongGenre(artistID: (sharedSpotify.currentPlaylist?.tracks?.items[count].track.artists![0].id)!, completion: { currentGenres in
+                            sharedSpotify.songGenres = currentGenres
+                        })
+                        
+                        genres.forEach { currentGenre in
+                            
+                            sharedSpotify.songGenres?.artists[0].genres?.forEach { curGenre in
+                                
+                                if (currentGenre.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() == curGenre.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()) {
+                                    found = true
+                                    print("Did match")
+                                }
+                            }
+                        }
+                        
+                        if (!found) {
+                            sharedSpotify.currentPlaylist?.tracks?.items.remove(at: count)
+                        } else {
+                            count = count + 1
+                        }
+                    }
+                }
+            }
+            
+            print("Ending Len: \(sharedSpotify.recommendedSongs?.tracks.count)")*/
         }
     }
 }
