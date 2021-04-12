@@ -87,6 +87,15 @@ class HttpRequester: ObservableObject {
     }!
   }
   
+  func headerDELETE(url: String, header: [String: String]) -> HTTP{
+      HTTP.DELETE(url, headers: header) { response in
+        if let err = response.error {
+          print("error: \(err.localizedDescription)")
+          return //also notify app of failure as needed
+        }
+      }!
+    }
+  
   
 }
 
