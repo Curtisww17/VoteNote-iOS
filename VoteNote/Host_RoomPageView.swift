@@ -32,12 +32,10 @@ struct Host_RoomPageView: View {
     notExited = true
   }
     //@State var notExited: Bool = true
-  //TODO- make the room capacity actually do stuff
   
   var body: some View {
     GeometryReader { geo in
-    //return NavigationView {
-    /*return*/ ZStack {
+    ZStack {
       VStack {
         
         Form {
@@ -46,11 +44,9 @@ struct Host_RoomPageView: View {
                     .fontWeight(.bold)
                     .foregroundColor(Color.black)
                     .padding(.top)) {
-            //Other Buttons will be added here
-            
           }
           
-            Section(footer: NavigationLink(destination: EditRoomView(isInRoom: $inRoom, genres: Set(genres), autoLike: autoLike)) {
+          Section(footer: NavigationLink(destination: EditRoomView(isInRoom: $inRoom, genres: $genres, genreSet: Set(genres))) {
                 Text("Edit").foregroundColor(Color.blue)
             }) {
             NavigationLink(destination: QueueHistoryView( songHistory: songHistory)

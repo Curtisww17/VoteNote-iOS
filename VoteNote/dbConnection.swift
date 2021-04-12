@@ -119,6 +119,7 @@ class user: Identifiable, ObservableObject {
     var isAnon: Bool?       //is the user anonymized
     var anon_name: String  //the user's anonymous name
     var uid: String?
+    var autoVote: Bool //whether or not they want their favorite songs auto upvoted
     
     //TODO: refactor this out
     init(name: String, profilePic: String){
@@ -127,15 +128,17 @@ class user: Identifiable, ObservableObject {
         isAnon = false
         anon_name = ""
         uid = nil
+        autoVote = false
     }
     
     //default
-    init(name: String, profilePic: String, isAnon: Bool, anon_name: String){
+    init(name: String, profilePic: String, isAnon: Bool, anon_name: String, autoVote: Bool = false){
         self.name = name
         self.profilePic = profilePic
         self.isAnon = isAnon
         self.anon_name = anon_name
         uid = nil
+        self.autoVote = autoVote
     }
     
     //for firestore
@@ -145,6 +148,7 @@ class user: Identifiable, ObservableObject {
         isAnon = usr["isAnon"] as? Bool ?? false
         anon_name = usr["anon_name"] as? String ?? ""
         uid = usr["uid"] as? String
+        autoVote = usr["autoVote"] as? Bool ?? false
     }
 }
 
@@ -507,6 +511,29 @@ func setAnonName(name: String){
 }
 
 /**
+ sets the current users auto vote setting
+ 
+ - parameter setting: the setting to set auto vote to
+ */
+func setAutoVote(setting: Bool){
+    db.collection("users").document(FAuth.currentUser!.uid).setData(["autoVote": setting], merge: true)
+}
+
+//a simple getter that returns the setting of autoVote through a completion handler
+func getAutoVote(completion: @escaping (Bool?, Error?)-> Void){
+    db.collection("users").document(FAuth.currentUser!.uid).getDocument { (doc, err) in
+        if let err=err {
+            print("an error ocurred in getAutoVote \(err)")
+            completion(nil, err)
+        }else{
+            let setting = doc?.data()?["autoVote"] as? Bool ?? false
+            completion(setting, nil)
+        }
+        
+    }
+}
+
+/**
  sets the user to anon or not
  
  - parameter isAnon: whether or not the user is anonymous
@@ -753,7 +780,7 @@ func dequeue(id: String){
  
  - Parameter id: the id of the song that is to be removed
  */
-func vetoSong(id: String){
+func vetoSong(id: String, completion: @escaping  () -> ()){
     
     getCurrRoom { (currRoom, err) in
         
@@ -763,7 +790,7 @@ func vetoSong(id: String){
         rm.collection("queue").document(id).delete()
         
         
-        
+        completion()
         
     }//end getCurrRoom
 }

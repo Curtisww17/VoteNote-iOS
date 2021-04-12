@@ -104,6 +104,11 @@ class MusicQueue: Identifiable, ObservableObject {
   func updateQueue() {
     var numUsersInRoom = 1
     getUsers(completion: { (users, err) in
+      if err != nil {
+        numUsersInRoom = users!.count
+      }
+    })
+    getUsers(completion: { (users, err) in
       if err == nil {
         numUsersInRoom = users!.count
       } else {
@@ -131,7 +136,9 @@ class MusicQueue: Identifiable, ObservableObject {
             if (self.musicList.count > 0) {
               for i in Range(0...self.musicList.count-1) {
                 if self.musicList[i].numVotes ?? 0 < -(numUsersInRoom / 2) {
-                  vetoSong(id: self.musicList[i].id)
+                    vetoSong(id: self.musicList[i].id) {
+                        
+                    }
                 }
               }
             }
@@ -217,6 +224,7 @@ class MusicQueue: Identifiable, ObservableObject {
                 }
             }
         }
+        
     }
 }
 
@@ -231,6 +239,22 @@ class VoteList: Identifiable, ObservableObject {
             print(err as Any)
           }
         })
+        
+        //ensures votes for songs no longer in queue are deleted
+        votes.forEach { vote in
+            var found: Bool = false
+            
+            songQueue.musicList.forEach { song in
+                if (vote.key == song.id) {
+                    found = true
+                }
+            }
+         
+            if (!found) {
+                deleteVote(id: vote.key)
+            }
+        }
+        
     }
     
     func hasBeenUpvoted(songID: String) -> Bool {
@@ -273,35 +297,63 @@ struct QueueEntry: View {
     
     @ObservedObject var localVotes: ObservableInteger
     
+    @State var showingVetoSongAlert: Bool = false
+    
     /**
         Calls the DB to upvote the current song
      */
-    //TO-DO: limit number of upvotes
     func upVoteSong(){
-        if (!hasBeenUpvoted) {
+        if (!hasBeenUpvoted && hasBeenDownvoted) {
+            print("Change to Upvote")
+            localVotes.intValue = localVotes.intValue + 2
+            voteSong(vote: 2, id: curSong.id){
+              songQueue.updateQueue()
+            }
+            hasBeenUpvoted = true
+            hasBeenDownvoted = false
+        } else if (!hasBeenUpvoted) {
             print("Upvote Song")
             localVotes.intValue = localVotes.intValue + 1
             voteSong(vote: 1, id: curSong.id){
               songQueue.updateQueue()
             }
             hasBeenUpvoted = true
-            hasBeenDownvoted = false
+        } else if (hasBeenUpvoted) {
+            print("Remove Upvote")
+            localVotes.intValue = localVotes.intValue - 1
+            voteSong(vote: -1, id: curSong.id){
+              songQueue.updateQueue()
+            }
+            hasBeenUpvoted = false
         }
     }
     
     /**
         Calls the DB to downvote the current song
      */
-    //TO-DO: limit number of downvotes
     func downVoteSong(){
-        if (!hasBeenDownvoted) {
+        if (!hasBeenDownvoted && hasBeenUpvoted) {
+            print("Change to Downvote")
+            localVotes.intValue = localVotes.intValue - 2
+            voteSong(vote: -2, id: curSong.id){
+              songQueue.updateQueue()
+            }
+            hasBeenDownvoted = true
+            hasBeenUpvoted = false
+        } else if (!hasBeenDownvoted) {
             print("Downvote Song")
             localVotes.intValue = localVotes.intValue - 1
             voteSong(vote: -1, id: curSong.id) {
               songQueue.updateQueue()
             }
-            hasBeenUpvoted = false
             hasBeenDownvoted = true
+        } else if (hasBeenDownvoted) {
+            print("Remove Downvote")
+            localVotes.intValue = localVotes.intValue + 1
+            voteSong(vote: 1, id: curSong.id){
+              songQueue.updateQueue()
+            }
+            hasBeenDownvoted = false
         }
     }
     
@@ -310,11 +362,9 @@ struct QueueEntry: View {
      */
     func vetoMusic(){
         print("Vetoing Song")
-        vetoSong(id: curSong.id)
-        
-        songQueue.updateQueue()
-        
-        RunLoop.main.run(until: Date(timeIntervalSinceNow: 1))
+        vetoSong(id: curSong.id) {
+            songQueue.updateQueue()
+        }
     }
     
     func getUpvoteColor() -> Color {
@@ -357,7 +407,7 @@ struct QueueEntry: View {
                     
                     Spacer()
                     
-                    if VotingEnabled {
+                    if VotingEnabled && !isHistoryView {
                         if (localVotes.intValue > 0) {
                             Text("+\(localVotes.intValue)")
                         } else {
@@ -394,10 +444,10 @@ struct QueueEntry: View {
                     if opened && !isHistoryView {
                         HStack {
                             if !isUserQueue {
-                                Button(action: {/*vetoMusic()*/}) {
+                                Button(action: {}) {
                                     Text("Veto").foregroundColor(Color.black).scaleEffect(scale)
-                                }.padding(.all).background(Color.red).border(/*@START_MENU_TOKEN@*/Color.red/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/2/*@END_MENU_TOKEN@*/).onTapGesture {
-                                    vetoMusic()
+                                }.padding(.all).background(Color.red).border(Color.red, width: 2).onTapGesture {
+                                    showingVetoSongAlert = true
                                 }.frame(width: 80, height: 80)
                             }
                             
@@ -408,14 +458,14 @@ struct QueueEntry: View {
                                       NavigationLink(destination: UserUserDetailView(selectedUserUID: ObservableString(stringValue: curSong.addedBy))) {
                                             EmptyView()
                                         }.hidden()
-                                    }.padding(.all).border(Color.black, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/).frame(width: 80, height: 80)
+                                    }.padding(.all).border(Color.black, width: 1).frame(width: 80, height: 80)
                                 } else {
                                     ZStack {
                                         Text("User").scaleEffect(scale)
                                       NavigationLink(destination: HostUserDetailView(selectedUserUID: ObservableString(stringValue: curSong.addedBy))) {
                                             EmptyView()
                                         }.hidden()
-                                    }.padding(.all).border(Color.black, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/).frame(width: 80, height: 80)
+                                    }.padding(.all).border(Color.black, width: 1).frame(width: 80, height: 80)
                                 }
                             }
                             
@@ -441,27 +491,33 @@ struct QueueEntry: View {
         })
         .offset(CGSize(width: self.offset.width , height: 0))
         .animation(.spring())
-        .gesture(DragGesture(minimumDistance: 50)
-                  .onChanged { gesture in
-                    if !isHistoryView {
-                        self.offset.width = gesture.translation.width
-                    }
-                  }
-                    .onEnded { endedGesture in
-                        
-                      if (!isHistoryView && endedGesture.location.y - endedGesture.startLocation.y < 50) {
-                        if self.offset.width < 50 {
-                          self.scale = 1
-                          self.offset.width = -60
-                          opened = true
-                        } else {
-                          self.scale = 0.5
-                          self.offset = .zero
-                          opened = false
-                        }
-                      }
-                    }
-        )
+        .gesture(DragGesture(minimumDistance: 50).onChanged { gesture in
+            
+            if !isHistoryView {
+                self.offset.width = gesture.translation.width
+            }
+          }.onEnded { endedGesture in
+            
+            if (!isHistoryView && endedGesture.location.y - endedGesture.startLocation.y < 50) {
+              if self.offset.width < 50 {
+                self.scale = 1
+                self.offset.width = -60
+                opened = true
+              } else {
+                self.scale = 0.5
+                self.offset = .zero
+                opened = false
+              }
+            }
+          }).alert(isPresented:$showingVetoSongAlert) {
+            Alert(title: Text("Are you sure you want to veto this song from the Queue? This action cannot be undone."), primaryButton: .destructive(Text("Veto")) {
+                showingVetoSongAlert = false
+                vetoMusic()
+                songQueue.updateQueue()
+            }, secondaryButton: .cancel() {
+                showingVetoSongAlert = false
+            })
+          }
     }
 }
 
@@ -687,9 +743,7 @@ struct NowPlayingViewHostMinimized: View {
         ZStack {
             Button(action: {
                 if isHost.boolValue {
-                    //isMaximized = !isMaximized
                     self.sheetManager.showPartialSheet({
-                         print("normal sheet dismissed")
                     }) {
                         NowPlayingViewHostMaximized(isPlaying: isPlaying, isHost: isHost, isMaximized: $isMaximized)
                     }
@@ -730,7 +784,6 @@ struct NowPlayingViewHostMinimized: View {
                 }
                 .padding(.vertical)
             })
-            
         }
       }.onAppear(perform: {
         sharedSpotify.updateCurrentlyPlayingPosition()

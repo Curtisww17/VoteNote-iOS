@@ -175,11 +175,7 @@ struct User_RoomPageView: View {
 
         }.frame(height: geo.size.height)
     }
-    //return NavigationView {
-    
   }
-  
-  
 }
 
 

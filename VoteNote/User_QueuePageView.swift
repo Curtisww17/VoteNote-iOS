@@ -147,10 +147,7 @@ struct NowPlayingViewUserMinimized: View {
                 }
             }
         })
-        
       })
-      
-      
     }
 }
 
