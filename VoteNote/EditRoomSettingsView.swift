@@ -55,8 +55,8 @@ struct EditRoomView: View {
     RoomCapacity = userCapacity
     SongsPerUser = songsPerUser
     ExplicitSongsAllowed = explicitSongsAllowed
-    presentationMode.wrappedValue.dismiss()
     genres = Array(genreSet)
+    presentationMode.wrappedValue.dismiss()
   }
   
   var body: some View {
@@ -140,7 +140,16 @@ struct EditRoomView: View {
       }
     }
     .navigationBarHidden(true)
-    .navigate(to: HostController(isInRoom: $isInRoom, genres: Array(genres)), when: $madeRoom)
+    .navigate(to: HostController(isInRoom: $isInRoom, genres: Array(genres)), when: $madeRoom).onDisappear(perform: {
+        RoomName = roomName
+        RoomDescription = roomDescription
+        VotingEnabled = votingEnabled
+        AnonUsr = anonUsr
+        RoomCapacity = userCapacity
+        SongsPerUser = songsPerUser
+        ExplicitSongsAllowed = explicitSongsAllowed
+        genres = Array(genreSet)
+    })
     .navigationViewStyle(StackNavigationViewStyle())
   }
 }

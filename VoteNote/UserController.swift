@@ -21,6 +21,9 @@ struct UserController: View {
     
   @State var currentView = 0
     
+    let refreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    @State var queueRefreshSeconds = 10
+    
   var body: some View {
     OperationQueue.main.addOperation {
       isInRoom = true
@@ -28,8 +31,37 @@ struct UserController: View {
     return VStack {
         VStack {
       HStack {
-        Spacer()
-          .frame(width: UIScreen.main.bounds.size.width / 4)
+        Button(action: {
+            songQueue.updateQueue()
+            songHistory.updateHistory()
+            
+            getRoom(code: currentQR.roomCode, completion: {room, err in
+                if (room != nil) {
+                    //currentSong = room?.currSong
+                    
+                    sharedSpotify.getTrackInfo(track_uri: room!.currSong) { (track) in
+                        var title = ""
+                        var artist = ""
+                        var imageUrl = ""
+                        
+                        if track != nil{
+                            
+                            for art in track!.artists! {
+                                artist += art.name + " "
+                            }
+                            title = track!.name
+                            imageUrl = track?.album?.images?[0].url ?? ""
+                        }
+                        
+                        currentSongTitle = title
+                        currentSongArtists = artist
+                        currentSongImageURL = imageUrl
+                    }
+                }
+            })
+        }) {
+            Image(systemName: "arrow.clockwise").resizable().frame(width: 25, height: 30)
+        }.frame(width: UIScreen.main.bounds.size.width / 4)
         Picker(selection: self.$currentView, label: Text("I don't know what this label is for")) {
           Text("Queue").tag(0)
           Text("Room").tag(1)
@@ -38,7 +70,7 @@ struct UserController: View {
         VStack {
             if (currentView == 0) {
                 NavigationLink(
-                  destination: AddMusicView(genres: genres).navigationBarTitle("Browse"),
+                    destination: AddMusicView(genres: genres).navigationBarTitle("Browse"),
                   label: {
                   Text("Add")
                   })
@@ -55,6 +87,47 @@ struct UserController: View {
         }
         .frame(width: UIScreen.main.bounds.size.width/4)
         
+        Text("\(queueRefreshSeconds)").frame(width: 0, height: 0).hidden().onReceive(refreshTimer) {
+                        _ in
+                        if self.queueRefreshSeconds > 0 {
+                            self.queueRefreshSeconds -= 1
+                        } else {
+                            self.queueRefreshSeconds = 10
+                            
+                            if (isTiming) {
+                                print("Updating Queue")
+                                    
+                                songQueue.updateQueue()
+                                songHistory.updateHistory()
+                                
+                                getRoom(code: currentQR.roomCode, completion: {room, err in
+                                    if (room != nil) {
+                                        //currentSong = room?.currSong
+                                        
+                                        sharedSpotify.getTrackInfo(track_uri: room!.currSong) { (track) in
+                                            var title = ""
+                                            var artist = ""
+                                            var imageUrl = ""
+                                            
+                                            if track != nil{
+                                                
+                                                for art in track!.artists! {
+                                                    artist += art.name + " "
+                                                }
+                                                title = track!.name
+                                                imageUrl = track?.album?.images?[0].url ?? ""
+                                            }
+                                            
+                                            currentSongTitle = title
+                                            currentSongArtists = artist
+                                            currentSongImageURL = imageUrl
+                                        }
+                                    }
+                                })
+                            }
+                        }
+                    }
+        
       }
       .frame(width: UIScreen.main.bounds.size.width, alignment: .top)
       
@@ -64,6 +137,7 @@ struct UserController: View {
           .transition(.move(edge: .leading))
           .onAppear() {
             
+            isTiming = true
             getRoom(code: currentQR.roomCode, completion: { (room, err) in
               if ((room!.bannedUsers ?? []).contains(getUID())) {
                   leaveRoom()
@@ -81,6 +155,7 @@ struct UserController: View {
     }
     .navigationBarBackButtonHidden(true)
     .navigationBarHidden(true).onAppear(perform: {
+        IsHost = false
         notExited = false
         
         getAutoVote { (setting, err) in

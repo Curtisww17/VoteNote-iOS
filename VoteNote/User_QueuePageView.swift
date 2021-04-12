@@ -9,6 +9,10 @@ import Foundation
 import SwiftUI
 import PartialSheet
 
+var currentSongTitle: String = "None Playing"
+var currentSongArtists: String = ""
+var currentSongImageURL: String = ""
+
 /**
     The UI for the host's version of the Queue View
  */
@@ -39,6 +43,7 @@ struct User_QueuePageView: View {
           .navigationBarHidden(true)
           .onAppear(perform: {
             
+            sharedSpotify.pause()
             var curRoom: room = room(name: "", anonUsr: false, capacity: 0, explicit: false, voting: true)
             getRoom(code: currentQR.roomCode, completion: {room, err in
                 if (room != nil) {
@@ -57,13 +62,38 @@ struct User_QueuePageView: View {
             })
             
             songQueue.updateQueue()
-            if (!isTiming) {
+            /*if (!isTiming) {
               let _ = Timer.scheduledTimer(withTimeInterval: 10.0, repeats: true) { timer in
                 songQueue.updateQueue()
                 songHistory.updateHistory()
+                
+                getRoom(code: currentQR.roomCode, completion: {room, err in
+                    if (room != nil) {
+                        //currentSong = room?.currSong
+                        
+                        sharedSpotify.getTrackInfo(track_uri: room!.currSong) { (track) in
+                            var title = ""
+                            var artist = ""
+                            var imageUrl = ""
+                            
+                            if track != nil{
+                                
+                                for art in track!.artists! {
+                                    artist += art.name + " "
+                                }
+                                title = track!.name
+                                imageUrl = track?.album?.images?[0].url ?? ""
+                            }
+                            
+                            currentSongTitle = title
+                            currentSongArtists = artist
+                            currentSongImageURL = imageUrl
+                        }
+                    }
+                })
               }
               isTiming = true
-            }
+            }*/
                   
           })
     }
@@ -76,10 +106,7 @@ struct User_QueuePageView: View {
 struct NowPlayingViewUserMinimized: View {
     @State var isPlaying: Bool
     @State var saved: Bool = false
-    @ObservedObject var currentSongTitle: ObservableString = ObservableString(stringValue: "None Playing")
-    @ObservedObject var currentSongArtists: ObservableString = ObservableString(stringValue: "")
-    @ObservedObject var currentSongImageURL: ObservableString = ObservableString(stringValue: "")
-    
+
     /**
         Favorites the current song in the Spotify Queue
      */
@@ -100,19 +127,19 @@ struct NowPlayingViewUserMinimized: View {
                 Spacer()
                 Spacer()
                 Spacer()
-              if (currentSongImageURL.stringValue != nil && currentSongImageURL.stringValue != "") {
-                RemoteImage(url: currentSongImageURL.stringValue)
+              if (currentSongImageURL != nil && currentSongImageURL != "") {
+                RemoteImage(url: currentSongImageURL)
                   .frame(width: 40, height: 40)
               } else {
                 Image(systemName: "person.crop.square.fill").resizable().frame(width: 40.0, height: 40.0)
               }
                 VStack {
                     HStack {
-                        Text(currentSongTitle.stringValue).padding(.leading)
+                        Text(currentSongTitle).padding(.leading)
                         Spacer()
                     }
                     HStack {
-                        Text(currentSongArtists.stringValue).font(.caption)
+                        Text(currentSongArtists).font(.caption)
                                 .foregroundColor(Color.gray).padding(.leading)
                         Spacer()
                     }
@@ -141,9 +168,9 @@ struct NowPlayingViewUserMinimized: View {
                         imageUrl = track?.album?.images?[0].url ?? ""
                     }
                     
-                    currentSongTitle.stringValue = title
-                    currentSongArtists.stringValue = artist
-                    currentSongImageURL.stringValue = imageUrl
+                    currentSongTitle = title
+                    currentSongArtists = artist
+                    currentSongImageURL = imageUrl
                 }
             }
         })
