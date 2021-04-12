@@ -169,9 +169,10 @@ class MusicQueue: Identifiable, ObservableObject {
                 }
             }
         
-        voteList.refreshList()
+       
         
     }
+    voteList.refreshList()
   }
   
   public func addMusic(songs: [song]){
