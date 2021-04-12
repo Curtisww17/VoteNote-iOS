@@ -40,6 +40,7 @@ struct EditRoomView: View {
     @State var anonUsr: Bool = AnonUsr
     @State var explicitSongsAllowed: Bool = ExplicitSongsAllowed
     @State var genres: Set<String>
+    @State var autoLike: Bool
   
   func editRoom(){
     print("Room")
@@ -111,6 +112,14 @@ struct EditRoomView: View {
             HStack {
               Text("Voting Enabled")
               Toggle(isOn: $votingEnabled) {
+                Text("")
+              }
+            }
+            .padding(.trailing)
+            
+            HStack {
+              Text("Allow Auto Liking Favorites")
+              Toggle(isOn: $autoLike) {
                 Text("")
               }
             }

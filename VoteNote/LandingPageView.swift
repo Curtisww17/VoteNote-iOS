@@ -49,7 +49,7 @@ struct LandingPageView: View {
               .animation(.default)
               .transition(.move(edge: .leading))
           } else {
-            CreateRoomView(isInRoom: $isInRoom, spotify: spotify)
+            CreateRoomView(isInRoom: $isInRoom, spotify: spotify, autoLike: autoLike)
               .animation(.default)
               .transition(.move(edge: .trailing))
           }

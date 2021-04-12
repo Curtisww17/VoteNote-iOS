@@ -42,6 +42,7 @@ struct CreateRoomView: View {
   @State var genres: Set<String> = []
   @State var showingAlert = false
   @State var alertMsg = ""
+    @State var autoLike: Bool
   
   @Environment(\.presentationMode) var presentationMode
   
@@ -140,6 +141,13 @@ struct CreateRoomView: View {
               }
             }
             .padding(.trailing)
+            HStack {
+              Text("Allow Auto Liking Favorites")
+              Toggle(isOn: $autoLike) {
+                Text("")
+              }
+            }
+            .padding(.trailing)
           }
           
           if (prevHostedRooms.count > 0) {
@@ -194,7 +202,7 @@ struct CreateRoomView_PreviewContainer: View {
   @State var spotify: Spotify = Spotify()
   
   var body: some View {
-    CreateRoomView(isInRoom: $isInRoom, spotify: spotify, userCapacity: userCapacity, songsPerUser: songsPerUser)
+    CreateRoomView(isInRoom: $isInRoom, spotify: spotify, userCapacity: userCapacity, songsPerUser: songsPerUser, autoLike: autoLike)
   }
 }
 

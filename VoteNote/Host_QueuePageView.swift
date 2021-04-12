@@ -31,6 +31,7 @@ struct Host_QueuePageView: View {
     @State var showMaxNowPlaying: Bool = false
     @EnvironmentObject var sheetManager : PartialSheetManager
     
+    
   var body: some View {
     GeometryReader { geo in
           VStack {
@@ -158,17 +159,19 @@ class MusicQueue: Identifiable, ObservableObject {
         //self.currentlyPlaying = nil
     }
     
-    for song in self.musicList {
-        
-        var hasBeenUpvoted = voteList.hasBeenUpvoted(songID: song.id)
-        var hasBeenDownvoted = voteList.hasBeenDownvoted(songID: song.id)
-            if(sharedSpotify.isSongFavorited(songID: song.id) && (!hasBeenUpvoted || hasBeenDownvoted)){
-                voteSong(vote: 1, id: song.id){}
+    if(autoLike){
+        for song in self.musicList {
+            
+            var hasBeenUpvoted = voteList.hasBeenUpvoted(songID: song.id)
+            var hasBeenDownvoted = voteList.hasBeenDownvoted(songID: song.id)
+                if(sharedSpotify.isSongFavorited(songID: song.id) && (!hasBeenUpvoted && !hasBeenDownvoted)){
+                    //voteSong(vote: 1, id: song.id){}
+                }
             }
-        }
-    
-    voteList.refreshList()
-    
+        
+        voteList.refreshList()
+        
+    }
   }
   
   public func addMusic(songs: [song]){
