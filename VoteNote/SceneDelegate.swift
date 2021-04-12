@@ -175,7 +175,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate,
       sharedSpotify.appRemote = self.appRemote
       sharedSpotify.getCurrentUser(completion: { user in
         if sharedSpotify.currentUser == nil {
-          appRemote.playerAPI?.pause(nil)
+          //appRemote.playerAPI?.pause(nil)
         }
         sharedSpotify.currentUser = user
         //login user to db

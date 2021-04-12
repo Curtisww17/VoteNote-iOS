@@ -332,7 +332,7 @@ class Spotify: ObservableObject {
         try completion( decoder.decode(SpotifyTrack.self, from: response.data))
       } catch {
         print(track_id)
-        fatalError("Couldn't parse \(response.description)")
+        //fatalError("Couldn't parse \(response.description)")
       }
     }
   }
