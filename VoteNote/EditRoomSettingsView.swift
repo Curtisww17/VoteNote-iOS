@@ -31,9 +31,6 @@ struct EditRoomView: View {
     }
   }
   
-    //TO-DO: limit chars when editing
-    //@ObservedObject var roomName = TextBindingManager(limit: 20, text: RoomName.trimmingCharacters(in: .whitespacesAndNewlines))
-    //@ObservedObject var roomDescription = TextBindingManager(limit: 20, text: RoomDescription.trimmingCharacters(in: .whitespacesAndNewlines))
     @State var roomName: String = RoomName
     @State var roomDescription = RoomDescription
     @State var votingEnabled: Bool = VotingEnabled
