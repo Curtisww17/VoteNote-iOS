@@ -8,6 +8,9 @@
 import Foundation
 import SwiftUI
 
+/**
+    The UI for for the navigation bar on the Room and Queue pages for host's
+ */
 struct UserController: View {
   @ObservedObject var spotify = sharedSpotify
   @Binding var isInRoom: Bool
@@ -17,12 +20,12 @@ struct UserController: View {
     
   @State var genres: [String] = []
   @State var isBanned = false
-    @State var autoVote: Bool = false
+  @State var autoVote: Bool = false
     
   @State var currentView = 0
     
-    let refreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-    @State var queueRefreshSeconds = 10
+  let refreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+  @State var queueRefreshSeconds = 10
     
   var body: some View {
     OperationQueue.main.addOperation {
@@ -37,12 +40,11 @@ struct UserController: View {
             
             getRoom(code: currentQR.roomCode, completion: {room, err in
                 if (room != nil) {
-                    //currentSong = room?.currSong
-                    
                     sharedSpotify.getTrackInfo(track_uri: room!.currSong) { (track) in
                         var title = ""
                         var artist = ""
                         var imageUrl = ""
+                        var id = ""
                         
                         if track != nil{
                             
@@ -51,11 +53,13 @@ struct UserController: View {
                             }
                             title = track!.name
                             imageUrl = track?.album?.images?[0].url ?? ""
+                            id = track?.id ?? ""
                         }
                         
                         currentSongTitle = title
                         currentSongArtists = artist
                         currentSongImageURL = imageUrl
+                        currentSongID = id
                     }
                 }
             })
@@ -102,12 +106,11 @@ struct UserController: View {
                                 
                                 getRoom(code: currentQR.roomCode, completion: {room, err in
                                     if (room != nil) {
-                                        //currentSong = room?.currSong
-                                        
                                         sharedSpotify.getTrackInfo(track_uri: room!.currSong) { (track) in
                                             var title = ""
                                             var artist = ""
                                             var imageUrl = ""
+                                            var id = ""
                                             
                                             if track != nil{
                                                 
@@ -116,11 +119,13 @@ struct UserController: View {
                                                 }
                                                 title = track!.name
                                                 imageUrl = track?.album?.images?[0].url ?? ""
+                                                id = track?.id ?? ""
                                             }
                                             
                                             currentSongTitle = title
                                             currentSongArtists = artist
                                             currentSongImageURL = imageUrl
+                                            currentSongID = id
                                         }
                                     }
                                 })

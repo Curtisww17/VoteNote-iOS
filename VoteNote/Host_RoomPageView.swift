@@ -32,7 +32,6 @@ struct Host_RoomPageView: View {
     isTiming = false
     notExited = true
   }
-    //@State var notExited: Bool = true
   
   var body: some View {
     GeometryReader { geo in
@@ -124,7 +123,6 @@ struct Host_RoomPageView: View {
                 HStack{
                   Text("Genres Allowed")
                   Spacer()
-                    //Text("\(sharedSpotify.PlaylistBase?.name ?? "no base")")
                 }
               })
             

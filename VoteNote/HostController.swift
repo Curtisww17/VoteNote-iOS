@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 
+//the global room settings
 var RoomName: String = ""
 var RoomDescription: String = ""
 var VotingEnabled: Bool = false
@@ -18,6 +19,9 @@ var ExplicitSongsAllowed: Bool = false
 var AutoLike: Bool = false
 var IsHost: Bool = false
 
+/**
+    The UI for for the navigation bar on the Room and Queue pages for host's
+ */
 struct HostController: View {
   @ObservedObject var spotify = sharedSpotify
   @Binding var isInRoom: Bool
@@ -28,11 +32,10 @@ struct HostController: View {
   @State var genres: [String]
   
   @State var currentView = 1
-    @State var autoVote: Bool = false
+  @State var autoVote: Bool = false
         
-    
-    let refreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-    @State var queueRefreshSeconds = 10
+  let refreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+  @State var queueRefreshSeconds = 10
     
   var body: some View {
     OperationQueue.main.addOperation {
@@ -73,6 +76,7 @@ struct HostController: View {
           }
           .frame(width: UIScreen.main.bounds.size.width/4)
             
+            //the refresh timer for the host
             Text("\(queueRefreshSeconds)").frame(width: 0, height: 0).hidden().onReceive(refreshTimer) {
                             _ in
                             if self.queueRefreshSeconds > 0 {
@@ -113,16 +117,6 @@ struct HostController: View {
       IsHost = true
       notExited = false
       isTiming = true
-      /*if (!isTiming) {
-        let _ = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
-          if (!(sharedSpotify.isPaused ?? false)) {
-            sharedSpotify.currentlyPlayingPos = (sharedSpotify.currentlyPlayingPos ?? 0) + 1000
-            sharedSpotify.updateCurrentlyPlayingPosition()
-          }
-        }
-        isTiming = true
-      }*/
     }).navigate(to: LandingPageView(), when: $notExited).navigationViewStyle(StackNavigationViewStyle())
   }
-  
 }

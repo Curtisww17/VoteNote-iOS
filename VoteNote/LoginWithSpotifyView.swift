@@ -8,6 +8,9 @@
 import Foundation
 import SwiftUI
 
+/**
+    The UI view for the Login page
+ */
 struct LoginWithSpotifyView: View {
   @ObservedObject var spotify: Spotify
   @ObservedObject var httpRequester = HttpRequester()

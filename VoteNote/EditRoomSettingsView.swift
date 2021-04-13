@@ -8,6 +8,9 @@
 import Foundation
 import SwiftUI
 
+/**
+    The UI view for the Edit Room View
+ */
 struct EditRoomView: View {
   @Binding var isInRoom: Bool
   @State var showAlert: Bool = false
@@ -40,6 +43,9 @@ struct EditRoomView: View {
     @Binding var genres: [String]
   @State var genreSet: Set<String>
   
+    /**
+        Sends the editted room settings to the DB and updates them locally
+     */
   func editRoom(){
     print("Room")
     let newRoom: room = room(name: roomName, desc: roomDescription, anonUsr: anonUsr, capacity: userCapacity, explicit: explicitSongsAllowed, voting: votingEnabled, code: currentQR.roomCode, spu: songsPerUser, genres: Array(genreSet))
@@ -104,14 +110,6 @@ struct EditRoomView: View {
                 Text("")
               }
             }
-            .padding(.trailing)
-            
-            /*HStack {
-              Text("Anonymous Users")
-              Toggle(isOn: $anonUsr) {
-                Text("")
-              }
-            }*/
             .padding(.trailing)
             
             HStack {

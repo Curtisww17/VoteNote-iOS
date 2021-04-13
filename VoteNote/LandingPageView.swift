@@ -8,7 +8,9 @@
 import Foundation
 import SwiftUI
 
-
+/**
+    The UI view for the landing page
+ */
 struct LandingPageView: View {
   @ObservedObject var spotify = sharedSpotify
   @State var currentView = 0
@@ -18,8 +20,8 @@ struct LandingPageView: View {
   var body: some View {
     return NavigationView {
       VStack {
-        Text("Hidden Howdy").hidden()
-        //}
+        Text("Hidden Howdy").hidden() //for spacing
+
         VStack {
           if (!isInRoom) {
             HStack {
@@ -67,9 +69,7 @@ struct LandingPageView: View {
                 self.autoVote = setting!
                 print(setting)
             }
-            
         }
-
     })
     .navigationViewStyle(StackNavigationViewStyle())
   }

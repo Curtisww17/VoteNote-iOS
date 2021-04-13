@@ -8,7 +8,9 @@
 import Foundation
 import SwiftUI
 
-
+/**
+    The UI view for the Create Room View
+ */
 struct CreateRoomView: View {
   @Binding var isInRoom: Bool
   @ObservedObject var spotify: Spotify
@@ -45,8 +47,10 @@ struct CreateRoomView: View {
   
   @Environment(\.presentationMode) var presentationMode
   
+    /**
+        Creates a new Room in the DB and saves the settings locally
+     */
   func createRoom(){
-    //TO-DO- send info to room, songs per user
     if (sharedSpotify.currentUser?.product ?? "" == "premium") {
       let newRoom: room = room(name: roomName.text, desc: roomDescription.text, anonUsr: anonUsr, capacity: userCapacity, explicit: explicitSongsAllowed, voting: votingEnabled, spu: songsPerUser, genres: Array(genres), currSong: (sharedSpotify.currentlyPlaying?.id ?? "6sFIWsNpZYqfjUpaCgueju"))
       let newcode = makeRoom(newRoom: newRoom)
@@ -69,7 +73,6 @@ struct CreateRoomView: View {
   }
   
   var body: some View {
-    //return NavigationView {
     ZStack {
       Color.white
       VStack {
@@ -138,13 +141,6 @@ struct CreateRoomView: View {
               }
             }
             .padding(.trailing)
-            /*HStack {
-              Text("Allow Auto Liking Favorites")
-              Toggle(isOn: $autoLike) {
-                Text("")
-              }
-            }
-            .padding(.trailing)*/
           }
           
           if (prevHostedRooms.count > 0) {
@@ -168,7 +164,6 @@ struct CreateRoomView: View {
         
         Spacer()
       }
-      //}
     }
     .navigationBarHidden(true)
     .navigate(to: HostController(isInRoom: $isInRoom, genres: Array(genres)), when: $madeRoom)
@@ -239,6 +234,9 @@ extension View {
   }
 }
 
+/**
+    The UI view for chossing a rooms base playlist
+ */
 struct playListBaseView: View {
     @State var songsPerUser: Int
     @State var myPlaylists: [Playlist]
@@ -263,11 +261,13 @@ struct playListBaseView: View {
                     .frame(alignment: .leading)
                     Spacer()
                 }
-                List{
-                    ForEach(((sharedSpotify.userPlaylists?.items ?? [Playlist(description: "", id: "", images: nil, name: "", type: "", uri: "")]))) { list in
-                        Button(list.name ?? "") {
-                            sharedSpotify.playlistSongs(completion: {playlistSongs in sharedSpotify.PlaylistBase = playlistSongs}, id: list.id)
-                            self.presentationMode.wrappedValue.dismiss()
+                Form {
+                    List{
+                        ForEach(((sharedSpotify.userPlaylists?.items ?? [Playlist(description: "", id: "", images: nil, name: "", type: "", uri: "")]))) { list in
+                            Button(list.name ?? "") {
+                                sharedSpotify.playlistSongs(completion: {playlistSongs in sharedSpotify.PlaylistBase = playlistSongs}, id: list.id)
+                                self.presentationMode.wrappedValue.dismiss()
+                            }.foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
                         }
                     }
                 }

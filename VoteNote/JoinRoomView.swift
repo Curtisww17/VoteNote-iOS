@@ -9,7 +9,9 @@ import Foundation
 import SwiftUI
 import CodeScanner
 
-
+/**
+  The UI view for the Join Room View
+ */
 struct JoinRoomView: View {
   @Binding var isInRoom: Bool
 
@@ -23,6 +25,9 @@ struct JoinRoomView: View {
   @State var alertMsg = ""
   @State var genres: [String] = []
   
+  /**
+      The function for joining a VoteNote room
+   */
   func join(c: String) {
     joinRoom(code: c){ (ret, message) in
       if message != nil {
@@ -87,15 +92,14 @@ struct JoinRoomView: View {
           }
         }
       }
-      // Not implemented yet
+
        if (prevJoinedRooms.count > 0) {
-       Section() {
-       NavigationLink(
-        destination: PreviouslyJoinedRoomsView(codes: prevJoinedRooms, isInRoom: $isInRoom).navigationBarHidden(true).navigationBarBackButtonHidden(true),
-       label: {
-       Text("Previously Joined Rooms")
-       })
-       }
+        Section() {
+          NavigationLink(destination: PreviouslyJoinedRoomsView(codes: prevJoinedRooms, isInRoom: $isInRoom).navigationBarHidden(true).navigationBarBackButtonHidden(true),
+          label: {
+            Text("Previously Joined Rooms")
+          })
+        }
        }
     }
     .alert(isPresented: $showingAlert) {
@@ -124,6 +128,9 @@ struct JoinRoomView: View {
     .navigationViewStyle(StackNavigationViewStyle())
   }
   
+  /**
+      Handles scanning the QR code
+   */
   func handleScan(result: Result<String, CodeScannerView.ScanError>) {
     self.isShowingScanner = false
     // Handle the scan

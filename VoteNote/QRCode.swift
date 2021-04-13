@@ -9,7 +9,9 @@ import Foundation
 import CoreImage.CIFilterBuiltins
 
 
-//Generates a qr code of the string parameter
+/**
+    Generates a qr code of the string parameter
+ */
 func generateQRCode(from string: String) -> UIImage {
   
   let context = CIContext()
@@ -27,7 +29,7 @@ func generateQRCode(from string: String) -> UIImage {
 }
 
 /**
- resizes an image because for some reason the qr code you get out of generateQRCode
+ Resizes an image because for some reason the qr code you get out of generateQRCode
  is about 5 pixels by 5 pixels
  */
 func resizeImage(image: UIImage, targetSize: CGSize) -> UIImage {
