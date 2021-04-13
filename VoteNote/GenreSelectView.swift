@@ -8,6 +8,9 @@
 import Foundation
 import SwiftUI
 
+/*
+ view to select genres for the room
+ */
 struct GenreSelectView: View {
   @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
   @Binding var genres: Set<String>
@@ -118,6 +121,9 @@ struct GenreSelectView: View {
   }
 }
 
+/*
+ list of genres for the room to be based off of
+ */
 struct GenreListItem: View {
   let genreName: String
   @Binding var genres: Set<String>
@@ -151,7 +157,9 @@ struct GenreListItem: View {
   }
 }
 
-
+/*
+ view of one genre in the list
+ */
 struct GenreView: View {
   @Binding var genres: [String]
   @State private var isEditing = false
@@ -226,6 +234,9 @@ struct GenreView: View {
   
 }
 
+/*
+ view of one genre in the list just for viewing
+ */
 struct GenreViewListItem: View {
   let genreName: String
   

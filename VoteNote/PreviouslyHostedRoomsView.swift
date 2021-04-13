@@ -9,6 +9,9 @@ import Foundation
 import SwiftUI
 
 
+/*
+ view to see rooms that the user has previously hosted
+ */
 struct PreviouslyHostedRoomsView: View {
   @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
   @State var codes: [String]
