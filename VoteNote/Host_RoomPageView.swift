@@ -50,7 +50,7 @@ struct Host_RoomPageView: View {
           Section(footer: NavigationLink(destination: EditRoomView(isInRoom: $inRoom, genres: $genres, genreSet: Set(genres))) {
                 Text("Edit").foregroundColor(Color.blue)
             }) {
-            NavigationLink(destination: QueueHistoryView( songHistory: songHistory)
+            NavigationLink(destination: QueueHistoryView().navigationTitle("History")
                             .onAppear(perform: {
                               showNav = false
                             })
@@ -64,7 +64,7 @@ struct Host_RoomPageView: View {
                                 Text("History")
                               }
                             })
-              NavigationLink(destination: UsersListView(isHost: isHost, votingEnabled: VotingEnabled)
+              NavigationLink(destination: UsersListView(isHost: isHost, votingEnabled: VotingEnabled).navigationTitle("Users")
                             .onAppear(perform: {
                               showNav = false
                             })
@@ -78,7 +78,7 @@ struct Host_RoomPageView: View {
                                 Text("Users")
                               }
                             })
-            NavigationLink(destination: RoomCodeView()
+            NavigationLink(destination: RoomCodeView().navigationTitle("Code")
                             .onAppear(perform: {
                               showNav = false
                             })
@@ -119,7 +119,7 @@ struct Host_RoomPageView: View {
             }
             
             NavigationLink(
-                destination: GenreView(genres: $genres),
+                destination: GenreView(genres: $genres).navigationTitle("Genres"),
               label: {
                 HStack{
                   Text("Genres Allowed")
@@ -140,9 +140,9 @@ struct Host_RoomPageView: View {
               Text("Anonymize All Users:")
               Spacer()
                 if AnonUsr {
-                    Text("True")
+                    Text("Enabled")
                 } else {
-                    Text("False")
+                    Text("Disabled")
                 }
             }
           }

@@ -224,7 +224,7 @@ struct playListView: View {
                     
                     ForEach(((sharedSpotify.userPlaylists?.items ?? [Playlist(description: "", id: "", images: nil, name: "", type: "", uri: "")]))) { list in
                         
-                        if (list.name!.contains("\(currentSearch.stringValue)") || currentSearch.stringValue == "") {
+                        if (list.name!.lowercased().contains("\(currentSearch.stringValue.lowercased())") || currentSearch.stringValue == "") {
                             NavigationLink(destination: uniquePlaylistView( playlistInfo: list, genres: genres).navigationBarTitle(list.name!)) {
                                 Text(playlistEntry(playlistName: list.name!, playlistID: list.id, playlistDesc: list.description!).playlistName)
                             }
@@ -310,7 +310,7 @@ struct recomendedView: View{
                 List{
                     ForEach((sharedSpotify.recommendedSongs?.tracks ?? [SpotifyTrack(album: nil, id: "", name: "")]), id: \.id){ songs in
                         
-                        if (songs.name.contains("\(currentSearch.stringValue)") || currentSearch.stringValue == "") {
+                        if (songs.name.lowercased().contains("\(currentSearch.stringValue.lowercased())") || currentSearch.stringValue == "") {
                             if (songs.album?.images?.count ?? 0 > 0) {
                                 if (!ExplicitSongsAllowed && !songs.explicit!) || ExplicitSongsAllowed {
                                     SearchEntry(songTitle: songs.name, songArtist: (songs.artists?[0].name)!, songID: songs.id, imageURL: (songs.album?.images?[0].url) ?? nil, isExplicit: songs.explicit!)
@@ -445,7 +445,7 @@ struct likedSongsView: View{
                 List{
                     ForEach((sharedSpotify.usersSavedSongs?.items ?? [songTimeAdded(track: SpotifyTrack(album: nil, id: "", name: ""))]), id: \.track.id){ songs in
                         
-                        if (songs.track.name.contains("\(currentSearch.stringValue)") || currentSearch.stringValue == "") {
+                        if (songs.track.name.lowercased().contains("\(currentSearch.stringValue.lowercased())") || currentSearch.stringValue == "") {
                             if (songs.track.album?.images?.count ?? 0 > 0) {
                                 if (!ExplicitSongsAllowed && !songs.track.explicit!) || ExplicitSongsAllowed {
                                     SearchEntry(songTitle: songs.track.name, songArtist: (songs.track.artists?[0].name)!, songID: songs.track.id, imageURL: (songs.track.album?.images?[0].url) ?? nil, isExplicit: songs.track.explicit!)
@@ -580,7 +580,7 @@ struct uniquePlaylistView: View{
                 List{
                     ForEach((sharedSpotify.currentPlaylist?.tracks?.items ?? [songTimeAdded(track: SpotifyTrack(album: nil, id: "", name: ""))]), id: \.track.id){ songs in
                         
-                        if (songs.track.name.contains("\(currentSearch.stringValue)") || currentSearch.stringValue == "") {
+                        if (songs.track.name.lowercased().contains("\(currentSearch.stringValue.lowercased())") || currentSearch.stringValue == "") {
                             if (songs.track.album?.images?.count ?? 0 > 0) {
                                 if (!ExplicitSongsAllowed && !songs.track.explicit!) || ExplicitSongsAllowed {
                                     SearchEntry(songTitle: songs.track.name, songArtist: (songs.track.artists?[0].name)!, songID: songs.track.id, imageURL: (songs.track.album?.images?[0].url) ?? nil, isExplicit: songs.track.explicit!)

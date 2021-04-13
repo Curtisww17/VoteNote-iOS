@@ -109,7 +109,7 @@ struct GenreSelectView: View {
         
       Form {
         ForEach(allGenres, id: \.self) { genre in
-            if (genre.contains("\(currentSearch.stringValue.lowercased())") || currentSearch.stringValue == "") {
+            if (genre.lowercased().contains("\(currentSearch.stringValue.lowercased())") || currentSearch.stringValue == "") {
                 GenreListItem(genreName: genre, genres: $genres)
             }
         }
@@ -215,7 +215,7 @@ struct GenreView: View {
     HStack {
       Form {
         ForEach(genres, id: \.self) { genre in
-            if (genre.contains("\(currentSearch.stringValue.lowercased())") || currentSearch.stringValue == "") {
+            if (genre.lowercased().contains("\(currentSearch.stringValue.lowercased())") || currentSearch.stringValue == "") {
                 GenreViewListItem(genreName: genre)
             }
         }

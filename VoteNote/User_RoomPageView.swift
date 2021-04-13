@@ -47,7 +47,7 @@ struct User_RoomPageView: View {
               }
               
               Section() {
-                NavigationLink(destination: QueueHistoryView( songHistory: songHistory)
+                NavigationLink(destination: QueueHistoryView().navigationTitle("History")
                                 .onAppear(perform: {
                                   showNav = false
                                 })
@@ -61,7 +61,7 @@ struct User_RoomPageView: View {
                                     Text("History")
                                   }
                                 })
-                NavigationLink(destination: UsersListView(isHost: isHost, votingEnabled: VotingEnabled)
+                NavigationLink(destination: UsersListView(isHost: isHost, votingEnabled: VotingEnabled).navigationTitle("Users")
                                 .onAppear(perform: {
                                   showNav = false
                                 })
@@ -110,7 +110,7 @@ struct User_RoomPageView: View {
                 }
                 
                 NavigationLink(
-                  destination: GenreView(genres: $genres),
+                  destination: GenreView(genres: $genres).navigationTitle("Genres"),
                   label: {
                     HStack{
                       Text("Genres Allowed")

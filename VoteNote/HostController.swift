@@ -85,7 +85,9 @@ struct HostController: View {
                                         
                                     songQueue.updateQueue()
                                     songHistory.updateHistory()
-                                    setCurrSong(id: sharedSpotify.currentlyPlaying!.id)
+                                    if (sharedSpotify.currentlyPlaying != nil) {
+                                        setCurrSong(id: sharedSpotify.currentlyPlaying!.id)
+                                    }
                                 }
                             }
                         }

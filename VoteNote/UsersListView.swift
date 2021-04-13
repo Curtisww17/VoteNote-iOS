@@ -18,15 +18,15 @@ struct UsersListView: View {
   
   var body: some View {
     
-    return NavigationView {
-      List {
+    return ZStack {
+      
+        List {
         ForEach (users ?? []) { user in
           UserListItem(user: user, isHost: isHost, gotoHostView: $gotoHostView, gotoUserView: $gotoUserView, votingEnabled: $votingEnabled, userID: $userID)
             .frame(height: 60)
         }
       }
       .frame(width: UIScreen.main.bounds.width)
-      .navigationTitle("Users")
       
     }
       .navigate(to: HostUserDetailView(selectedUserUID: ObservableString(stringValue: userID)), when: $gotoHostView)
@@ -35,7 +35,7 @@ struct UsersListView: View {
         getUsers(completion: {usersOut, err in
           self.users = usersOut
         })
-      })
+      }).navigationViewStyle(StackNavigationViewStyle())
     
   }
 }
