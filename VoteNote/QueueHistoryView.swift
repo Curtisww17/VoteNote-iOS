@@ -8,6 +8,9 @@
 import Foundation
 import SwiftUI
 
+/**
+    The UI view for the Song History View
+ */
 struct QueueHistoryView: View {
     @State private var isEditing = false
     @State var currentSearch: String = ""
