@@ -431,7 +431,7 @@ struct QueueEntry: View {
                     Spacer()
                     Spacer()
                     
-                    if !isHistoryView {
+                    if !isHistoryView && !(isDetailView && isUserQueue) {
                         Image(systemName: "chevron.right").resizable().frame(width: 10.0, height: 20.0).foregroundColor(Color.gray).onTapGesture {
                             if self.offset.width < 50 {
                               self.scale = 1
@@ -511,12 +511,12 @@ struct QueueEntry: View {
         .animation(.spring())
         .gesture(DragGesture(minimumDistance: 50).onChanged { gesture in
             
-            if !isHistoryView {
+            if !isHistoryView && !(isDetailView && isUserQueue) {
                 self.offset.width = gesture.translation.width
             }
           }.onEnded { endedGesture in
             
-            if (!isHistoryView && endedGesture.location.y - endedGesture.startLocation.y < 50) {
+            if (!isHistoryView && endedGesture.location.y - endedGesture.startLocation.y < 50 && !(isDetailView && isUserQueue)) {
               if self.offset.width < 50 {
                 self.scale = 1
                 self.offset.width = -60
