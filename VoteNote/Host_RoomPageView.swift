@@ -127,6 +127,14 @@ struct Host_RoomPageView: View {
               })
             
             HStack{
+                if ExplicitSongsAllowed {
+                    Text("Explicit Songs Allowed")
+                } else {
+                    Text("Explicit Songs Not Allowed")
+                }
+            }
+            
+            HStack{
                 if VotingEnabled {
                     Text("Voting Enabled")
                 } else {
