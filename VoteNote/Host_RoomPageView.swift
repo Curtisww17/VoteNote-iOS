@@ -78,7 +78,7 @@ struct Host_RoomPageView: View {
                                 Text("Users")
                               }
                             })
-            NavigationLink(destination: RoomCodeView().navigationTitle("Code")
+            NavigationLink(destination: RoomCodeView()
                             .onAppear(perform: {
                               showNav = false
                             })
