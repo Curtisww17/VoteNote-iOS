@@ -12,6 +12,7 @@ import PartialSheet
 var currentSongTitle: String = "None Playing"
 var currentSongArtists: String = ""
 var currentSongImageURL: String = ""
+var currentSongID: String = ""
 
 /**
     The UI for the host's version of the Queue View
@@ -62,39 +63,7 @@ struct User_QueuePageView: View {
             })
             
             songQueue.updateQueue()
-            /*if (!isTiming) {
-              let _ = Timer.scheduledTimer(withTimeInterval: 10.0, repeats: true) { timer in
-                songQueue.updateQueue()
-                songHistory.updateHistory()
-                
-                getRoom(code: currentQR.roomCode, completion: {room, err in
-                    if (room != nil) {
-                        //currentSong = room?.currSong
-                        
-                        sharedSpotify.getTrackInfo(track_uri: room!.currSong) { (track) in
-                            var title = ""
-                            var artist = ""
-                            var imageUrl = ""
-                            
-                            if track != nil{
-                                
-                                for art in track!.artists! {
-                                    artist += art.name + " "
-                                }
-                                title = track!.name
-                                imageUrl = track?.album?.images?[0].url ?? ""
-                            }
-                            
-                            currentSongTitle = title
-                            currentSongArtists = artist
-                            currentSongImageURL = imageUrl
-                        }
-                    }
-                })
-              }
-              isTiming = true
-            }*/
-                  
+
           })
     }
   }
@@ -112,16 +81,14 @@ struct NowPlayingViewUserMinimized: View {
         Favorites the current song in the Spotify Queue
      */
     func favoriteSong(){
-      if(sharedSpotify.currentlyPlaying != nil){
-        if(!sharedSpotify.isSongFavorited(songID: sharedSpotify.currentlyPlaying?.id ?? "")){
-            sharedSpotify.likeSong(id: sharedSpotify.currentlyPlaying!.id)
+        if(!sharedSpotify.isSongFavorited(songID: currentSongID)){
+            sharedSpotify.likeSong(id: currentSongID)
             isLiked = true
         }
         else{
-            sharedSpotify.unLikeSong(id: sharedSpotify.currentlyPlaying!.id)
+            sharedSpotify.unLikeSong(id: currentSongID)
             isLiked = false
         }
-      }
     }
 
     var body: some View {
@@ -176,6 +143,7 @@ struct NowPlayingViewUserMinimized: View {
                     var title = ""
                     var artist = ""
                     var imageUrl = ""
+                    var id = ""
                     
                     if track != nil{
                         
@@ -184,16 +152,18 @@ struct NowPlayingViewUserMinimized: View {
                         }
                         title = track!.name
                         imageUrl = track?.album?.images?[0].url ?? ""
+                        id = track?.id ?? ""
                     }
                     
                     currentSongTitle = title
                     currentSongArtists = artist
                     currentSongImageURL = imageUrl
+                    currentSongID = id
                 }
             }
         })
         
-        if(sharedSpotify.isSongFavorited(songID: sharedSpotify.currentlyPlaying?.id ?? "")){
+        if(sharedSpotify.isSongFavorited(songID: currentSongID)){
             isLiked = true
         } else {
             isLiked = false

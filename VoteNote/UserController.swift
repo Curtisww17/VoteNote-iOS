@@ -44,6 +44,7 @@ struct UserController: View {
                         var title = ""
                         var artist = ""
                         var imageUrl = ""
+                        var id = ""
                         
                         if track != nil{
                             
@@ -52,11 +53,13 @@ struct UserController: View {
                             }
                             title = track!.name
                             imageUrl = track?.album?.images?[0].url ?? ""
+                            id = track?.id ?? ""
                         }
                         
                         currentSongTitle = title
                         currentSongArtists = artist
                         currentSongImageURL = imageUrl
+                        currentSongID = id
                     }
                 }
             })
