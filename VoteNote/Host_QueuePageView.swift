@@ -52,18 +52,6 @@ struct Host_QueuePageView: View {
           .navigationBarHidden(true)
           .onAppear(perform: {
             songQueue.updateQueue()
-            //isTiming = true
-            /*if (!isTiming) {
-              let _ = Timer.scheduledTimer(withTimeInterval: 10.0, repeats: true) { timer in
-                songQueue.updateQueue()
-                songHistory.updateHistory()
-                if (isHost.boolValue) {
-                    setCurrSong(id: sharedSpotify.currentlyPlaying!.id)
-                }
-              }
-              isTiming = true
-            }*/
-                  
           }).partialSheet(isPresented: $showMaxNowPlaying, content: {
             ZStack {
                 NowPlayingViewHostMaximized(isPlaying: isPlaying, isHost: isHost, isMaximized: $showMaxNowPlaying)
@@ -72,6 +60,7 @@ struct Host_QueuePageView: View {
     }
   }
 }
+
 /**
     A class that stores a copy of a rooms music queue from the DB that can be accessed from the local device
  */
@@ -79,6 +68,9 @@ class MusicQueue: Identifiable, ObservableObject {
     var musicList: [song] = [song]()
   @Published var currentlyPlaying: song?
   
+    /**
+        Called when a song is skipped to update the Queue appropriatley
+     */
   public func skipSong() {
       if musicList.count > 0 {
         sharedSpotify.enqueue(songID: self.musicList[0].id) {
@@ -99,11 +91,13 @@ class MusicQueue: Identifiable, ObservableObject {
           dequeue(id: currSongID)
         }
       } else {
-        //sharedSpotify.skip()
         print("no Song to play :(")
       }
   }
   
+    /**
+        Updates the song Queue on the device to be what is on the DB
+     */
     func updateQueue() {
     var numUsersInRoom = 1
     getUsers(completion: { (users, err) in
@@ -168,13 +162,15 @@ class MusicQueue: Identifiable, ObservableObject {
             }
         } else if(sharedSpotify.currentlyPlayingPercent ?? 0 > 0.50 ){
             print("no music to add")
-            //self.currentlyPlaying = nil
         }
     }
     
     voteList.refreshList()
   }
   
+    /**
+        Adds the selected songs to the music queue both locally and on the DB
+     */
     public func addMusic(songs: [song]){
     
     //set the first song if nothing is playing
@@ -187,9 +183,6 @@ class MusicQueue: Identifiable, ObservableObject {
     addsong(id: songs[0].id) {
       dequeue(id: songs[0].id)
     }
-      //sharedSpotify.skip() //need to clear out queue still before playing, clears out one song for now
-      //sharedSpotify.pause()
-      //songs.remove(at: 0)
     
     for i in songs.dropFirst() {
         print("Added")
@@ -206,7 +199,9 @@ class MusicQueue: Identifiable, ObservableObject {
   }
   }
     
-
+    /**
+        Used to update the song history list with what is on the DB
+     */
     func updateHistory() {
         getHistory(){(songs, err) in
             if songs != nil {
@@ -226,9 +221,15 @@ class MusicQueue: Identifiable, ObservableObject {
     
 }
 
+/**
+    A class that stores all of the current users votes, primarily for voting validation
+ */
 class VoteList: Identifiable, ObservableObject {
     var votes: [String : Int] = [:]
     
+    /**
+        Refreshes the vote list with what is on the DB
+     */
     func refreshList() {
         getVotes(completion: { (userVotes, err) in
           if err == nil && userVotes != nil {
@@ -255,6 +256,9 @@ class VoteList: Identifiable, ObservableObject {
         
     }
     
+    /**
+        Returns whether a song has been upvoted by  the current user or not
+     */
     func hasBeenUpvoted(songID: String) -> Bool {
         if (votes[songID] == 1) {
             return true;
@@ -263,6 +267,9 @@ class VoteList: Identifiable, ObservableObject {
         }
     }
     
+    /**
+        Returns whether a song has been downvoted by  the current user or not
+     */
     func hasBeenDownvoted(songID: String) -> Bool {
         if (votes[songID] == -1) {
             return true;
@@ -359,6 +366,9 @@ struct QueueEntry: View {
         }
     }
     
+    /**
+        Returns the approrpiate color for the views upvote button
+     */
     func getUpvoteColor() -> Color {
         if (hasBeenUpvoted) {
             return Color.green
@@ -367,6 +377,9 @@ struct QueueEntry: View {
         }
     }
     
+    /**
+        Returns the approrpiate color for the views downvote button
+     */
     func getDownvoteColor() -> Color {
         if (hasBeenDownvoted) {
             return Color.red
@@ -485,17 +498,11 @@ struct QueueEntry: View {
                 if err == nil {
                     
                     if(autoVote!){
-                        
-                            /*var hasBeenUpvoted = voteList.hasBeenUpvoted(songID: song.id)
-                            var hasBeenDownvoted = voteList.hasBeenDownvoted(songID: song.id)
-                            print(hasBeenUpvoted)*/
-                        print("comp vote")
-                            if(sharedSpotify.isSongFavorited(songID: curSong.id)){
-                                if(!hasBeenUpvoted && !hasBeenDownvoted){
-                                        upVoteSong()
-                                    }
-                                }
-                            
+                        if(sharedSpotify.isSongFavorited(songID: curSong.id)){
+                            if(!hasBeenUpvoted && !hasBeenDownvoted){
+                                upVoteSong()
+                            }
+                        }
                     }
                 }
             })
@@ -602,13 +609,13 @@ struct NowPlayingViewHostMaximized: View {
     func favoriteSong(){
       if(sharedSpotify.currentlyPlaying != nil){
         if(!sharedSpotify.isSongFavorited(songID: sharedSpotify.currentlyPlaying?.id ?? "")){
-                    sharedSpotify.likeSong(id: sharedSpotify.currentlyPlaying!.id)
-                    isLiked = true
-                    }
-                else{
-                    sharedSpotify.unLikeSong(id: sharedSpotify.currentlyPlaying!.id)
-                    isLiked = false
-                }
+            sharedSpotify.likeSong(id: sharedSpotify.currentlyPlaying!.id)
+            isLiked = true
+        }
+        else{
+            sharedSpotify.unLikeSong(id: sharedSpotify.currentlyPlaying!.id)
+            isLiked = false
+        }
       }
     }
 

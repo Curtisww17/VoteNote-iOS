@@ -42,8 +42,6 @@ struct User_RoomPageView: View {
                         .fontWeight(.bold)
                         .foregroundColor(Color.black)
                         .padding(.top)) {
-                //Other Buttons will be added here
-                
               }
               
               Section() {
@@ -115,7 +113,6 @@ struct User_RoomPageView: View {
                     HStack{
                       Text("Genres Allowed")
                       Spacer()
-                        //Text("\(sharedSpotify.PlaylistBase?.name ?? "no base")")
                     }
                   })
                 

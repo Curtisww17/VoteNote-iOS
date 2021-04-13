@@ -8,6 +8,9 @@
 import Foundation
 import SwiftUI
 
+/**
+    The UI view of the Room Code View
+ */
 struct RoomCodeView: View {
   
   var body: some View {
@@ -32,13 +35,6 @@ struct RoomCodeView: View {
         })
       }
     }
-//    }.onAppear(perform: {
-//      getCurrRoom(completion: {code, err in
-//        if err == nil {
-//          self.currentRoom.update(roomCode: code)
-//        }
-//      })
-//    })
   }
   
   func actionSheet() {

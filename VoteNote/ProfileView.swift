@@ -8,7 +8,9 @@
 import Foundation
 import SwiftUI
 
-
+/**
+    The UI view for the Profile View
+ */
 struct ProfileView: View {
   @ObservedObject var spotify: Spotify = sharedSpotify
   @State var isAnon: Bool = sharedSpotify.isAnon

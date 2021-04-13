@@ -101,20 +101,27 @@ struct User_QueuePageView: View {
 }
 
 /**
-    The UI for the now playing bar on the Queue page
+    The UI for the now playing bar on the Queue page for users
  */
 struct NowPlayingViewUserMinimized: View {
     @State var isPlaying: Bool
     @State var saved: Bool = false
+    @State var isLiked = false
 
     /**
         Favorites the current song in the Spotify Queue
      */
     func favoriteSong(){
       if(sharedSpotify.currentlyPlaying != nil){
-        sharedSpotify.likeSong(id: sharedSpotify.currentlyPlaying!.id)
-            saved = !saved
+        if(!sharedSpotify.isSongFavorited(songID: sharedSpotify.currentlyPlaying?.id ?? "")){
+            sharedSpotify.likeSong(id: sharedSpotify.currentlyPlaying!.id)
+            isLiked = true
         }
+        else{
+            sharedSpotify.unLikeSong(id: sharedSpotify.currentlyPlaying!.id)
+            isLiked = false
+        }
+      }
     }
 
     var body: some View {
@@ -127,12 +134,14 @@ struct NowPlayingViewUserMinimized: View {
                 Spacer()
                 Spacer()
                 Spacer()
-              if (currentSongImageURL != nil && currentSongImageURL != "") {
-                RemoteImage(url: currentSongImageURL)
-                  .frame(width: 40, height: 40)
-              } else {
-                Image(systemName: "person.crop.square.fill").resizable().frame(width: 40.0, height: 40.0)
-              }
+                
+                if (currentSongImageURL != nil && currentSongImageURL != "") {
+                    RemoteImage(url: currentSongImageURL)
+                        .frame(width: 40, height: 40)
+                } else {
+                    Image(systemName: "person.crop.square.fill").resizable().frame(width: 40.0, height: 40.0)
+                }
+                
                 VStack {
                     HStack {
                         Text(currentSongTitle).padding(.leading)
@@ -145,15 +154,24 @@ struct NowPlayingViewUserMinimized: View {
                     }
                 }
                 Spacer()
-                Spacer()
+                
+                Button(action: {favoriteSong()}) {
+                   if(!isLiked){
+                   Image(systemName: "heart")
+                       .foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
+                   } else {
+                       Image(systemName: "heart.fill")
+                           .foregroundColor(/*@START_MENU_TOKEN@*/.black/*@END_MENU_TOKEN@*/)
+                   }
+                   
+                }
+                .padding(.trailing)
             }
             .padding(.vertical)
         }
       }.onAppear(perform: {
         getRoom(code: currentQR.roomCode, completion: {room, err in
             if (room != nil) {
-                //currentSong = room?.currSong
-                
                 sharedSpotify.getTrackInfo(track_uri: room!.currSong) { (track) in
                     var title = ""
                     var artist = ""
@@ -174,6 +192,12 @@ struct NowPlayingViewUserMinimized: View {
                 }
             }
         })
+        
+        if(sharedSpotify.isSongFavorited(songID: sharedSpotify.currentlyPlaying?.id ?? "")){
+            isLiked = true
+        } else {
+            isLiked = false
+        }
       })
     }
 }

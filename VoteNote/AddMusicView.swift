@@ -28,10 +28,6 @@ struct AddMusicView: View {
   
   @Environment(\.presentationMode) var presentationMode
     
-  
-    /**
-        Adds the selected songs to the music queue both locally and on the DB
-     */
     var body: some View {
         //NavigationView {
           ZStack{
@@ -177,7 +173,9 @@ struct AddMusicView: View {
     
 }
 
-//view users locally saved playlists
+/**
+    View for users locally saved playlists
+ */
 struct playListView: View {
     @State var myPlaylists: [Playlist]
     @ObservedObject var currentSearch: ObservableString = ObservableString(stringValue: "")
@@ -238,7 +236,9 @@ struct playListView: View {
     }
 }
 
-//view recommened songs to add to the queue
+/**
+    View for recommened songs to add to the queue
+ */
 struct recomendedView: View{
     @State private var isEditing = false
     @Environment(\.presentationMode) var presentationMode
@@ -372,7 +372,9 @@ struct recomendedView: View{
     
 }
 
-//view songs (spotify) liked by the user to add them to the queue
+/**
+    View for songs (spotify) liked by the user to add them to the queue
+ */
 struct likedSongsView: View{
     
     @State private var isEditing = false
@@ -504,10 +506,11 @@ struct likedSongsView: View{
     }
 }
 
-//view songs in a playlist to add to a queue
+/**
+    View for songs in a playlist to add to a queue
+ */
 struct uniquePlaylistView: View{
     
-    //@State var myPlaylist: uniquePlaylist
     @State var playlistInfo: Playlist
     @State private var isEditing = false
     @Environment(\.presentationMode) var presentationMode
@@ -601,45 +604,13 @@ struct uniquePlaylistView: View{
                 
             sharedSpotify.playlistSongs(completion: {playlistSongs in sharedSpotify.currentPlaylist = playlistSongs}, id: playlistInfo.id)
             })
-            
-            //filtering for allowed genres
-            /*if (genres.count != 126 && genres.count != 0) {
-                var count = 0
-                
-                if (sharedSpotify.currentPlaylist?.tracks?.items != nil) {
-                    while (count < (sharedSpotify.currentPlaylist?.tracks?.items.count)) {
-                        var found = false
-                        
-                        sharedSpotify.getSongGenre(artistID: (sharedSpotify.currentPlaylist?.tracks?.items[count].track.artists![0].id)!, completion: { currentGenres in
-                            sharedSpotify.songGenres = currentGenres
-                        })
-                        
-                        genres.forEach { currentGenre in
-                            
-                            sharedSpotify.songGenres?.artists[0].genres?.forEach { curGenre in
-                                
-                                if (currentGenre.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() == curGenre.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()) {
-                                    found = true
-                                    print("Did match")
-                                }
-                            }
-                        }
-                        
-                        if (!found) {
-                            sharedSpotify.currentPlaylist?.tracks?.items.remove(at: count)
-                        } else {
-                            count = count + 1
-                        }
-                    }
-                }
-            }
-            
-            print("Ending Len: \(sharedSpotify.recommendedSongs?.tracks.count)")*/
         }
     }
 }
 
-//formatting for displaying songs in user playlists
+/**
+    UI view for formatting songs in user playlists
+ */
 struct playlistEntry: View{
     
     @State var playlistName: String
@@ -697,6 +668,9 @@ struct SearchEntry: View {
     
   @State var hasHitMaxSongs: Bool = false
   
+    /**
+        Function for selecting a song to add to the Queue from the search list
+     */
   func selectSong() {
     hasHitMaxSongs = false
     

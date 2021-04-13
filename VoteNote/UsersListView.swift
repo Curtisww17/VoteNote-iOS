@@ -8,6 +8,9 @@
 import Foundation
 import SwiftUI
 
+/**
+    The UI view for the User List View
+ */
 struct UsersListView: View {
   @State var users: [user]?
   @State var isHost: Bool
@@ -40,6 +43,9 @@ struct UsersListView: View {
   }
 }
 
+/**
+    The template for a an entry in the list of users
+ */
 struct UserListItem: View {
   let user: user
   let width : CGFloat = 60
