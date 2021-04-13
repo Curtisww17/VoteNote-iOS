@@ -265,7 +265,7 @@ class Spotify: ObservableObject {
     // prepare json data
 
     let json: [String: Any] = [
-      "name": "VoteNote Playlist",
+      "name": RoomName+" Playlist",
       "description": "Made by VoteNote",
       "public": false
     ]
