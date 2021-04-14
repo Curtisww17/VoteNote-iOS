@@ -253,8 +253,7 @@ func joinRoom(code: String, completion:@escaping (room?, String?) -> Void){
         if let err = err{
             print("err gerring documents \(err)")
             completion(nil, err.localizedDescription)
-        }
-        else{
+        } else {
             //put the user in the room
             db.collection("users").document(usr!.uid).updateData(["currentRoom": upperCode])
             //increase count of people in room
@@ -262,18 +261,23 @@ func joinRoom(code: String, completion:@escaping (room?, String?) -> Void){
             //if joining a nonexistent room this will crash rn
             //TODO: fix this crash
             let rm = doc?.data()
+          
+          if let rm = rm {
             
             //check if banned
-            for u in (rm?["bannedUsers"] as? [String] ?? []){
+            for u in (rm["bannedUsers"] as? [String] ?? []){
                 if u == usr?.uid {
                     //tell them they cannot join the room
                     completion(nil, "You are banned from this room")
                 }
             }
-            if (rm?["closed"] as? Bool ?? false){
+            if (rm["closed"] as? Bool ?? false){
                 completion(nil, "This room is closed")
             }
-            completion(room(rm: rm!), nil)
+            completion(room(rm: rm), nil)
+          } else {
+            completion(nil, "there is no room with that code")
+}
         }
         
     })
