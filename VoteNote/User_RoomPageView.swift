@@ -20,6 +20,7 @@ struct User_RoomPageView: View {
   
   @Binding var showNav: Bool
   let isHost = false
+    @Binding var isInRoom: Bool
     
     /**
         Causes the current user to leave the room
@@ -28,6 +29,7 @@ struct User_RoomPageView: View {
       leaveRoom()
       isTiming = false
       notExited = true
+      isInRoom = false
   }
   
   

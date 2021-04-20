@@ -20,6 +20,7 @@ struct Host_RoomPageView: View {
     @State var autoLike: Bool = false
     @Binding var autoVote: Bool
   let isHost = true
+    @Binding var isInRoom: Bool
 
   @Binding var genres: [String]
   
@@ -31,6 +32,7 @@ struct Host_RoomPageView: View {
     leaveRoom()
     isTiming = false
     notExited = true
+    isInRoom = false
   }
   
   var body: some View {

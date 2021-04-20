@@ -106,7 +106,7 @@ struct HostController: View {
           .animation(.default)
           .transition(.move(edge: .leading))
       } else {
-        Host_RoomPageView(showNav: $showNav, notExited: $notExited, isTiming: $isTiming, autoVote: $autoVote, genres: $genres)
+        Host_RoomPageView(showNav: $showNav, notExited: $notExited, isTiming: $isTiming, autoVote: $autoVote, isInRoom: $isInRoom, genres: $genres)
           .animation(.default)
           .transition(.move(edge: .trailing))
         

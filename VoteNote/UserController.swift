@@ -152,7 +152,7 @@ struct UserController: View {
             })
           }
       } else {
-        User_RoomPageView(isTiming: $isTiming, notExited: $notExited, genres: $genres, showNav: $showNav)
+        User_RoomPageView(isTiming: $isTiming, notExited: $notExited, genres: $genres, showNav: $showNav, isInRoom: $isInRoom)
           .animation(.default)
           .transition(.move(edge: .trailing))
         
