@@ -21,11 +21,13 @@ struct PreviouslyHostedRoomsView: View {
   @Binding var isInRoom: Bool
   @State var genres: [String] = []
   
-  
+  @State var showingCouldNotJoinAlert: Bool = false
+  @State var backToLanding: Bool = false
+    
   func join(c: String) {
     joinRoom(code: c){ (ret, message) in
       if message != nil {
-        //TODO: popup that they cannot join the room
+        showingCouldNotJoinAlert = true
       }else{
         self.joined = true
         if ret != nil {
@@ -60,6 +62,22 @@ struct PreviouslyHostedRoomsView: View {
         })
         .frame(alignment: .leading)
         Spacer()
+        
+        /*ZStack {
+            HStack {
+              Image(systemName: "chevron.left")
+                .resizable()
+                .frame(width: 15, height: 20)
+                .padding(.leading)
+              Text("Back")
+            }
+              .foregroundColor(Color.blue)
+          NavigationLink(destination: LandingPageView())  {
+                EmptyView()
+            }.hidden()
+        }
+        .padding(.vertical)
+        Spacer()*/
       }
       Form {
         ForEach(previousRooms, id: \.code) {currRoom in
@@ -82,6 +100,11 @@ struct PreviouslyHostedRoomsView: View {
                   })
         }
       }
-    })
+    }).alert(isPresented: $showingCouldNotJoinAlert) {
+        Alert(title: Text("Host Room"), message: Text("Could not Host Room"), dismissButton: .default(Text("Ok")) {
+            showingCouldNotJoinAlert = false
+            backToLanding = true
+        })
+      }.navigate(to: LandingPageView(), when: $backToLanding)
   }
 }

@@ -18,6 +18,7 @@ struct PreviouslyJoinedRoomsView: View {
   @State var genres: [String] = []
     
   @State var showingCouldNotJoinAlert: Bool = false
+  @State var backToLanding: Bool = false
   
   
   func join(c: String) {
@@ -89,7 +90,8 @@ struct PreviouslyJoinedRoomsView: View {
     }).alert(isPresented: $showingCouldNotJoinAlert) {
         Alert(title: Text("Joining Room"), message: Text("Could not Join Room"), dismissButton: .default(Text("Ok")) {
             showingCouldNotJoinAlert = false
+            backToLanding = true
         })
-      }
+      }.navigate(to: LandingPageView(), when: $backToLanding)
   }
 }

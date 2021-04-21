@@ -20,7 +20,7 @@ struct User_RoomPageView: View {
   
   @Binding var showNav: Bool
   let isHost = false
-  @Binding var isInRoom: Bool
+  //@Binding var isInRoom: Bool
     
     /**
         Causes the current user to leave the room
@@ -29,7 +29,7 @@ struct User_RoomPageView: View {
       leaveRoom()
       isTiming = false
       notExited = true
-      isInRoom = false
+      //isInRoom = false
   }
   
   
@@ -146,16 +146,16 @@ struct User_RoomPageView: View {
               }
               
               Section() {
-                Button(action: {
+                ZStack {
+                  Text("Leave Room")
+                      .foregroundColor(Color.red)
+                  NavigationLink(destination: LandingPageView().onAppear(perform: {
                     exitRoom()
-                }, label: {
-                  HStack {
-                    Spacer()
-                    Text("Leave Room")
-                        .foregroundColor(Color.red)
-                    Spacer()
-                  }
-                })
+                    print("Did the exit stuff")
+                }))  {
+                        EmptyView()
+                    }.hidden()
+                }
                 .padding(.vertical)
               }
             }

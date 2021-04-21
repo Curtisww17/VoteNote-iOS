@@ -64,8 +64,8 @@ struct CreateRoomView: View {
       RoomCapacity = userCapacity
       SongsPerUser = songsPerUser
       ExplicitSongsAllowed = explicitSongsAllowed
-      
-      self.presentationMode.wrappedValue.dismiss()
+        
+      //self.presentationMode.wrappedValue.dismiss()
     } else {
       alertMsg = "Must be a premium member to host a room"
       showingAlert = true
@@ -182,7 +182,7 @@ struct CreateRoomView: View {
         }
       })
     }).onDisappear(perform: {
-        madeRoom = false
+        //self.madeRoom.boolValue = false
     })
     .navigationViewStyle(StackNavigationViewStyle())
   }

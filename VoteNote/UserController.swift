@@ -152,7 +152,7 @@ struct UserController: View {
             })
           }
       } else {
-        User_RoomPageView(isTiming: $isTiming, notExited: $notExited, genres: $genres, showNav: $showNav, isInRoom: $isInRoom)
+        User_RoomPageView(isTiming: $isTiming, notExited: $notExited, genres: $genres, showNav: $showNav)
           .animation(.default)
           .transition(.move(edge: .trailing))
         
@@ -171,7 +171,7 @@ struct UserController: View {
             
         }
 
-    }).navigate(to: LandingPageView(), when: $notExited).navigationViewStyle(StackNavigationViewStyle())
+    })
     }
   }
 }

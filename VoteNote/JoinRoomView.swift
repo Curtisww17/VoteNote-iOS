@@ -124,10 +124,7 @@ struct JoinRoomView: View {
     }
     .navigate(to: UserController(isInRoom: $isInRoom, genres: genres), when: $joined)
     .onAppear(perform: {
-    }).onDisappear(perform: {
-      joined = false
-    })
-    .navigationViewStyle(StackNavigationViewStyle())
+    }).navigationViewStyle(StackNavigationViewStyle())
   }
   
   /**

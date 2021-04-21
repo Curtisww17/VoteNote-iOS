@@ -106,7 +106,7 @@ struct HostController: View {
           .animation(.default)
           .transition(.move(edge: .leading))
       } else {
-        Host_RoomPageView(showNav: $showNav, notExited: $notExited, isTiming: $isTiming, autoVote: $autoVote, isInRoom: $isInRoom, genres: $genres)
+        Host_RoomPageView(showNav: $showNav, notExited: $notExited, isTiming: $isTiming, autoVote: $autoVote, genres: $genres)
           .animation(.default)
           .transition(.move(edge: .trailing))
         
@@ -117,6 +117,6 @@ struct HostController: View {
       IsHost = true
       notExited = false
       isTiming = true
-    }).navigate(to: LandingPageView(), when: $notExited).navigationViewStyle(StackNavigationViewStyle())
+    })
   }
 }

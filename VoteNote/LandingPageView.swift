@@ -70,7 +70,7 @@ struct LandingPageView: View {
                 print(setting)
             }
         }
-    })
+    }).navigationBarHidden(true)
     .navigationViewStyle(StackNavigationViewStyle())
   }
 }

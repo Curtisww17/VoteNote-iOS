@@ -20,7 +20,7 @@ struct Host_RoomPageView: View {
   @State var autoLike: Bool = false
   @Binding var autoVote: Bool
   let isHost = true
-  @Binding var isInRoom: Bool
+  //@Binding var isInRoom: Bool
 
   @Binding var genres: [String]
   
@@ -32,7 +32,7 @@ struct Host_RoomPageView: View {
     leaveRoom()
     isTiming = false
     notExited = true
-    isInRoom = false
+    //isInRoom = false
   }
   
   var body: some View {
@@ -155,17 +155,18 @@ struct Host_RoomPageView: View {
             }
           }
           Section() {
-            Button(action: {
+            
+            ZStack {
+              Text("Close Room")
+                  .foregroundColor(Color.red)
+              NavigationLink(destination: LandingPageView().onAppear(perform: {
                 exitRoom()
-              }, label: {
-                HStack {
-                  Spacer()
-                  Text("Close Room")
-                    .foregroundColor(Color.red)
-                  Spacer()
-                }
-              })
-              .padding(.vertical)
+                print("Did the exit stuff")
+            }))  {
+                    EmptyView()
+                }.hidden()
+            }
+            .padding(.vertical)
           }
         }
       }
