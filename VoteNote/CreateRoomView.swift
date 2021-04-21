@@ -181,6 +181,8 @@ struct CreateRoomView: View {
           prevHostedRooms = codes ?? []
         }
       })
+    }).onDisappear(perform: {
+        madeRoom = false
     })
     .navigationViewStyle(StackNavigationViewStyle())
   }
