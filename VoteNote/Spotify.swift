@@ -104,7 +104,7 @@ class Spotify: ObservableObject {
 //
 //      }
 //    })
-    self.currentlyPlayingPercent = (Float)(self.currentlyPlayingPos ?? 0) / (Float)(self.currentlyPlaying?.duration_ms ?? 100000)
+    self.currentlyPlayingPercent = (Float)(self.currentlyPlayingPos ?? 0) / (Float)(self.currentlyPlaying!.duration_ms ?? 100000)
   }
   
   //pauses spotify player
