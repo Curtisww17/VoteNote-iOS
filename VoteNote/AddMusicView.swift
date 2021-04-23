@@ -25,6 +25,7 @@ struct AddMusicView: View {
   }
   @State private var isEditing = false
   @State var genres: [String]
+  @State var hasSelectedSongs: Bool = false
   
   @Environment(\.presentationMode) var presentationMode
     
@@ -108,6 +109,7 @@ struct AddMusicView: View {
                   Button(action: {
                     self.isEditing = false
                     self.currentSearch = ""
+                    //selectedSongs.removeAll()
                     
                     // Dismiss the keyboard
                     UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
@@ -119,13 +121,15 @@ struct AddMusicView: View {
                   .animation(.default)
                 }
                 
-                Button(action: {songQueue.addMusic(songs: selectedSongs)
-                  selectedSongs.removeAll()
-                  presentationMode.wrappedValue.dismiss()
-                }) {
-                  Text("Add Songs")
+                Button(action: {if selectedSongs.count > 0 {
+                    songQueue.addMusic(songs: selectedSongs)
+                      selectedSongs.removeAll()
+                      presentationMode.wrappedValue.dismiss()
                 }
-                .padding(.trailing)
+                }) {
+                    Text("Add Songs").foregroundColor(hasSelectedSongs ? .blue : .gray)
+                }
+                .padding(.trailing).disabled(!hasSelectedSongs)
               }
               
               List {
@@ -147,12 +151,12 @@ struct AddMusicView: View {
                     
                     if (song.album?.images?.count ?? 0 > 0) {
                         if (!ExplicitSongsAllowed && !song.explicit!) || ExplicitSongsAllowed {
-                            SearchEntry(songTitle: song.name, songArtist: (song.artists?[0].name)!, songID: song.id, imageURL: (song.album?.images?[0].url) ?? nil, isExplicit: song.explicit!)
+                            SearchEntry(songTitle: song.name, songArtist: (song.artists?[0].name)!, songID: song.id, imageURL: (song.album?.images?[0].url) ?? nil, isExplicit: song.explicit!, hasSelectedSongs: $hasSelectedSongs)
                         }
                     }
                     else {
                         if (!ExplicitSongsAllowed && !song.explicit!) || ExplicitSongsAllowed {
-                            SearchEntry(songTitle: song.name, songArtist: (song.artists?[0].name)!, songID: song.id, imageURL: nil, isExplicit: song.explicit!)
+                            SearchEntry(songTitle: song.name, songArtist: (song.artists?[0].name)!, songID: song.id, imageURL: nil, isExplicit: song.explicit!, hasSelectedSongs: $hasSelectedSongs)
                         }
                     }
                   }
@@ -168,7 +172,16 @@ struct AddMusicView: View {
             
             
             
-          }).navigationViewStyle(StackNavigationViewStyle())
+          }).navigationBarBackButtonHidden(true)
+          .navigationBarItems(leading:
+          Button(action : {
+              self.presentationMode.wrappedValue.dismiss()
+          }){
+            HStack {
+                Image(systemName: "chevron.left").resizable().frame(width: 12.5, height: 18.5)
+                Text("Cancel").font(.body)
+            }
+      }).navigationViewStyle(StackNavigationViewStyle())
       }
     
 }
@@ -245,6 +258,7 @@ struct recomendedView: View{
     @ObservedObject var currentSearch: ObservableString = ObservableString(stringValue: "")
     @State var searchStr: String = ""
     @State var genres: [String]
+    @State var hasSelectedSongs: Bool = false
     
     var body: some View{
         ZStack{
@@ -285,6 +299,7 @@ struct recomendedView: View{
                     if isEditing {
                         Button(action: {
                             self.isEditing = false
+                            //selectedSongs.removeAll()
                             
                             // Dismiss the keyboard
                             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
@@ -298,13 +313,15 @@ struct recomendedView: View{
                     
                     Spacer()
                     
-                    Button(action: {songQueue.addMusic(songs: selectedSongs)
-                    selectedSongs.removeAll()
-                    presentationMode.wrappedValue.dismiss()
-                  }) {
-                        Text("Add Songs")
+                    Button(action: { if selectedSongs.count > 0 {
+                        songQueue.addMusic(songs: selectedSongs)
+                        selectedSongs.removeAll()
+                        presentationMode.wrappedValue.dismiss()
                     }
-                    .padding(.trailing)
+                  }) {
+                        Text("Add Songs").foregroundColor(hasSelectedSongs ? .blue : .gray)
+                    }
+                    .padding(.trailing).disabled(!hasSelectedSongs)
                 }
                 
                 List{
@@ -313,13 +330,13 @@ struct recomendedView: View{
                         if (songs.name.lowercased().contains("\(currentSearch.stringValue.lowercased())") || currentSearch.stringValue == "") {
                             if (songs.album?.images?.count ?? 0 > 0) {
                                 if (!ExplicitSongsAllowed && !songs.explicit!) || ExplicitSongsAllowed {
-                                    SearchEntry(songTitle: songs.name, songArtist: (songs.artists?[0].name)!, songID: songs.id, imageURL: (songs.album?.images?[0].url) ?? nil, isExplicit: songs.explicit!)
+                                    SearchEntry(songTitle: songs.name, songArtist: (songs.artists?[0].name)!, songID: songs.id, imageURL: (songs.album?.images?[0].url) ?? nil, isExplicit: songs.explicit!, hasSelectedSongs: $hasSelectedSongs)
                                 }
                             }
                             else {
                                 if (songs.explicit != nil) {
                                     if (!ExplicitSongsAllowed && !songs.explicit!) || ExplicitSongsAllowed {
-                                        SearchEntry(songTitle: songs.name, songArtist: (songs.artists?[0].name)!, songID: songs.id, imageURL: nil, isExplicit: songs.explicit!)
+                                        SearchEntry(songTitle: songs.name, songArtist: (songs.artists?[0].name)!, songID: songs.id, imageURL: nil, isExplicit: songs.explicit!, hasSelectedSongs: $hasSelectedSongs)
                                     }
                                 }
                             }
@@ -367,7 +384,16 @@ struct recomendedView: View{
             }
             
             print("Ending Len: \(sharedSpotify.recommendedSongs?.tracks.count)")
-        })
+        }).navigationBarBackButtonHidden(true)
+        .navigationBarItems(leading:
+        Button(action : {
+            self.presentationMode.wrappedValue.dismiss()
+        }){
+          HStack {
+              Image(systemName: "chevron.left").resizable().frame(width: 12.5, height: 18.5)
+              Text("Cancel").font(.body)
+          }
+    })
     }
     
 }
@@ -382,6 +408,7 @@ struct likedSongsView: View{
     @ObservedObject var currentSearch: ObservableString = ObservableString(stringValue: "")
     @State var searchStr: String = ""
     @State var genres: [String]
+    @State var hasSelectedSongs: Bool = false
     
     var body: some View{
         ZStack{
@@ -422,6 +449,7 @@ struct likedSongsView: View{
                     if isEditing {
                         Button(action: {
                             self.isEditing = false
+                            //selectedSongs.removeAll()
                             
                             // Dismiss the keyboard
                             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
@@ -435,13 +463,15 @@ struct likedSongsView: View{
                     
                     Spacer()
                     
-                    Button(action: {songQueue.addMusic(songs: selectedSongs)
-                    selectedSongs.removeAll()
-                    presentationMode.wrappedValue.dismiss()
-                  }) {
-                        Text("Add Songs")
+                    Button(action: { if selectedSongs.count > 0 {
+                        songQueue.addMusic(songs: selectedSongs)
+                        selectedSongs.removeAll()
+                        presentationMode.wrappedValue.dismiss()
                     }
-                    .padding(.trailing)
+                  }) {
+                        Text("Add Songs").foregroundColor(hasSelectedSongs ? .blue : .gray)
+                    }
+                    .padding(.trailing).disabled(!hasSelectedSongs)
                 }
                 
                 List{
@@ -450,13 +480,13 @@ struct likedSongsView: View{
                         if (songs.track.name.lowercased().contains("\(currentSearch.stringValue.lowercased())") || currentSearch.stringValue == "") {
                             if (songs.track.album?.images?.count ?? 0 > 0) {
                                 if (!ExplicitSongsAllowed && !songs.track.explicit!) || ExplicitSongsAllowed {
-                                    SearchEntry(songTitle: songs.track.name, songArtist: (songs.track.artists?[0].name)!, songID: songs.track.id, imageURL: (songs.track.album?.images?[0].url) ?? nil, isExplicit: songs.track.explicit!)
+                                    SearchEntry(songTitle: songs.track.name, songArtist: (songs.track.artists?[0].name)!, songID: songs.track.id, imageURL: (songs.track.album?.images?[0].url) ?? nil, isExplicit: songs.track.explicit!, hasSelectedSongs: $hasSelectedSongs)
                                 }
                             }
                             else {
                                 if (songs.track.explicit != nil) {
                                     if (!ExplicitSongsAllowed && !songs.track.explicit!) || ExplicitSongsAllowed {
-                                        SearchEntry(songTitle: songs.track.name, songArtist: (songs.track.artists?[0].name)!, songID: songs.track.id, imageURL: nil, isExplicit: songs.track.explicit!)
+                                        SearchEntry(songTitle: songs.track.name, songArtist: (songs.track.artists?[0].name)!, songID: songs.track.id, imageURL: nil, isExplicit: songs.track.explicit!, hasSelectedSongs: $hasSelectedSongs)
                                     }
                                 }
                             }
@@ -502,7 +532,16 @@ struct likedSongsView: View{
             }
             
             print("Ending Len: \(sharedSpotify.recommendedSongs?.tracks.count)")
-        })
+        }).navigationBarBackButtonHidden(true)
+        .navigationBarItems(leading:
+        Button(action : {
+            self.presentationMode.wrappedValue.dismiss()
+        }){
+          HStack {
+              Image(systemName: "chevron.left").resizable().frame(width: 12.5, height: 18.5)
+              Text("Cancel").font(.body)
+          }
+    })
     }
 }
 
@@ -517,6 +556,7 @@ struct uniquePlaylistView: View{
     @ObservedObject var currentSearch: ObservableString = ObservableString(stringValue: "")
     @State var searchStr: String = ""
     @State var genres: [String]
+    @State var hasSelectedSongs: Bool = false
   
     
     var body: some View{
@@ -558,6 +598,7 @@ struct uniquePlaylistView: View{
                     if isEditing {
                         Button(action: {
                             self.isEditing = false
+                            //selectedSongs.removeAll()
                             
                             // Dismiss the keyboard
                             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
@@ -571,13 +612,15 @@ struct uniquePlaylistView: View{
                     
                     Spacer()
                     
-                    Button(action: {songQueue.addMusic(songs: selectedSongs)
-                    selectedSongs.removeAll()
-                    presentationMode.wrappedValue.dismiss()
-                  }) {
-                        Text("Add Songs")
+                    Button(action: { if selectedSongs.count > 0 {
+                        songQueue.addMusic(songs: selectedSongs)
+                        selectedSongs.removeAll()
+                        presentationMode.wrappedValue.dismiss()
                     }
-                    .padding(.trailing)
+                  }) {
+                        Text("Add Songs").foregroundColor(hasSelectedSongs ? .blue : .gray)
+                    }
+                    .padding(.trailing).disabled(!hasSelectedSongs)
                 }
                 
                 List{
@@ -586,13 +629,15 @@ struct uniquePlaylistView: View{
                         if (songs.track.name.lowercased().contains("\(currentSearch.stringValue.lowercased())") || currentSearch.stringValue == "") {
                             if (songs.track.album?.images?.count ?? 0 > 0) {
                                 if (!ExplicitSongsAllowed && !songs.track.explicit!) || ExplicitSongsAllowed {
-                                    SearchEntry(songTitle: songs.track.name, songArtist: (songs.track.artists?[0].name)!, songID: songs.track.id, imageURL: (songs.track.album?.images?[0].url) ?? nil, isExplicit: songs.track.explicit!)
+                                    SearchEntry(songTitle: songs.track.name, songArtist: (songs.track.artists?[0].name)!, songID: songs.track.id, imageURL: (songs.track.album?.images?[0].url) ?? nil, isExplicit: songs.track.explicit!, hasSelectedSongs: $hasSelectedSongs)
                                 }
                             }
                             else {
                                 if (songs.track.explicit != nil) {
                                     if (!ExplicitSongsAllowed && !songs.track.explicit!) || ExplicitSongsAllowed {
-                                        SearchEntry(songTitle: songs.track.name, songArtist: (songs.track.artists?[0].name)!, songID: songs.track.id, imageURL: nil, isExplicit: songs.track.explicit!)
+                                        //Button(action: {canAdd = hasSelectedSongs}) {
+                                        SearchEntry(songTitle: songs.track.name, songArtist: (songs.track.artists?[0].name)!, songID: songs.track.id, imageURL: nil, isExplicit: songs.track.explicit!, hasSelectedSongs: $hasSelectedSongs)
+                                        //}
                                     }
                                 }
                             }
@@ -604,7 +649,16 @@ struct uniquePlaylistView: View{
                 
             sharedSpotify.playlistSongs(completion: {playlistSongs in sharedSpotify.currentPlaylist = playlistSongs}, id: playlistInfo.id)
             })
-        }
+        }.navigationBarBackButtonHidden(true)
+        .navigationBarItems(leading:
+        Button(action : {
+            self.presentationMode.wrappedValue.dismiss()
+        }){
+          HStack {
+              Image(systemName: "chevron.left").resizable().frame(width: 12.5, height: 18.5)
+              Text("Cancel").font(.body)
+          }
+    })
     }
 }
 
@@ -667,7 +721,8 @@ struct SearchEntry: View {
   @State var isExplicit: Bool
     
   @State var hasHitMaxSongs: Bool = false
-  
+  @Binding var hasSelectedSongs: Bool
+    
     /**
         Function for selecting a song to add to the Queue from the search list
      */
@@ -708,6 +763,8 @@ struct SearchEntry: View {
             songIndex = songIndex + 1
           }
         }
+        
+        hasSelectedSongs = selectedSongs.count > 0
     }
   }
   
