@@ -175,6 +175,7 @@ struct AddMusicView: View {
           }).navigationBarBackButtonHidden(true)
           .navigationBarItems(leading:
           Button(action : {
+              selectedSongs.removeAll()
               self.presentationMode.wrappedValue.dismiss()
           }){
             HStack {
@@ -387,6 +388,7 @@ struct recomendedView: View{
         }).navigationBarBackButtonHidden(true)
         .navigationBarItems(leading:
         Button(action : {
+            selectedSongs.removeAll()
             self.presentationMode.wrappedValue.dismiss()
         }){
           HStack {
@@ -535,6 +537,7 @@ struct likedSongsView: View{
         }).navigationBarBackButtonHidden(true)
         .navigationBarItems(leading:
         Button(action : {
+            selectedSongs.removeAll()
             self.presentationMode.wrappedValue.dismiss()
         }){
           HStack {
@@ -652,6 +655,7 @@ struct uniquePlaylistView: View{
         }.navigationBarBackButtonHidden(true)
         .navigationBarItems(leading:
         Button(action : {
+            selectedSongs.removeAll()
             self.presentationMode.wrappedValue.dismiss()
         }){
           HStack {
