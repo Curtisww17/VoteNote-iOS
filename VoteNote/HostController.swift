@@ -116,7 +116,15 @@ struct HostController: View {
     .navigationBarHidden(true).onAppear(perform: {
       IsHost = true
       notExited = false
-      isTiming = true
+      if (!isTiming) {
+        let _ = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+          if (!(sharedSpotify.isPaused ?? false)) {
+            sharedSpotify.currentlyPlayingPos = (sharedSpotify.currentlyPlayingPos ?? 0) + 1000
+            sharedSpotify.updateCurrentlyPlayingPosition()
+          }
+        }
+        isTiming = true
+      }
     })
   }
 }
