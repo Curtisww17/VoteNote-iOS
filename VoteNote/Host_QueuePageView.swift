@@ -77,9 +77,10 @@ class MusicQueue: Identifiable, ObservableObject {
           currentVotes = self.musicList[0].numVotes ?? 0
           sharedSpotify.skip()
           
-          dequeue(id: self.musicList[0].id)
+          dequeue(id: self.musicList[0].id) {
+            self.updateQueue()
+          }
         }
-        updateQueue()
         isPlaying = false
       }
       else if(sharedSpotify.PlaylistBase != nil){
@@ -88,10 +89,13 @@ class MusicQueue: Identifiable, ObservableObject {
         sharedSpotify.enqueue(songID: currSongID) {
           currentVotes = 0
           sharedSpotify.skip()
-          dequeue(id: currSongID)
+          dequeue(id: currSongID) {
+            self.updateQueue()
+          }
         }
       } else {
         print("no Song to play :(")
+        sharedSpotify.skip()
       }
   }
   
@@ -100,19 +104,39 @@ class MusicQueue: Identifiable, ObservableObject {
      */
     func updateQueue() {
     var numUsersInRoom = 1
-    getUsers(completion: { (users, err) in
-      if err != nil {
-        numUsersInRoom = users!.count
+      
+      
+      if (IsHost) {
+          if(self.musicList.count > 0){
+              if((sharedSpotify.currentlyPlayingPercent ?? 0) > 0.50 && currSongID != sharedSpotify.currentlyPlaying?.id ?? "notPlaying"){
+                  currSongID = sharedSpotify.currentlyPlaying?.id ?? ""
+                  sharedSpotify.enqueue(songID: self.musicList[0].id) {
+                    currentVotes = self.musicList[0].numVotes ?? 0
+                    dequeue(id: self.musicList[0].id) {}
+                  }
+              }
+          } else if(sharedSpotify.PlaylistBase != nil) {
+              if((sharedSpotify.currentlyPlayingPercent ?? 0) > 0.50 && currSongID != sharedSpotify.currentlyPlaying?.id ?? "notPlaying"){
+                  var pos = Int.random(in: 0..<(sharedSpotify.PlaylistBase?.tracks?.items?.count ?? 1))
+                  currSongID = sharedSpotify.PlaylistBase?.tracks?.items?[pos].track.id ?? ""
+                  sharedSpotify.enqueue(songID: sharedSpotify.PlaylistBase?.tracks?.items?[pos].track.id ?? "") {
+                    currentVotes = 0
+                    dequeue(id: sharedSpotify.PlaylistBase?.tracks?.items?[pos].track.id ?? "") {}
+                  }
+              }
+          } else if(sharedSpotify.currentlyPlayingPercent ?? 0 > 0.50 ){
+              print("no music to add")
+          }
       }
-    })
+      
     getUsers(completion: { (users, err) in
       if err == nil {
         numUsersInRoom = users!.count
       } else {
-        print(err as Any)
+        print("error with getting users\(err as Any)")
       }
     })
-      getQueue(){(songs, err) in
+      getQueue() {(songs, err) in
           if songs != nil {
               if songs!.count > 0 {
                 self.musicList.removeAll()
@@ -127,6 +151,8 @@ class MusicQueue: Identifiable, ObservableObject {
                           }
                       }
                   
+              } else {
+                self.musicList.removeAll()
               }
             
             //automatically veto any song with over half of the room downvoting it
@@ -139,31 +165,11 @@ class MusicQueue: Identifiable, ObservableObject {
                 }
               }
             }
+          } else {
+            self.musicList.removeAll()
           }
       }
     
-    if (IsHost) {
-        if(self.musicList.count > 0){
-            if((sharedSpotify.currentlyPlayingPercent ?? 0) > 0.50 && currSongID != sharedSpotify.currentlyPlaying?.id ?? "notPlaying"){
-                currSongID = sharedSpotify.currentlyPlaying?.id ?? ""
-                sharedSpotify.enqueue(songID: self.musicList[0].id) {
-                  currentVotes = self.musicList[0].numVotes ?? 0
-                  dequeue(id: self.musicList[0].id)
-                }
-            }
-        } else if(sharedSpotify.PlaylistBase != nil) {
-            if((sharedSpotify.currentlyPlayingPercent ?? 0) > 0.50 && currSongID != sharedSpotify.currentlyPlaying?.id ?? "notPlaying"){
-                var pos = Int.random(in: 0..<(sharedSpotify.PlaylistBase?.tracks?.items?.count ?? 1))
-                currSongID = sharedSpotify.PlaylistBase?.tracks?.items?[pos].track.id ?? ""
-                sharedSpotify.enqueue(songID: sharedSpotify.PlaylistBase?.tracks?.items?[pos].track.id ?? "") {
-                  currentVotes = 0
-                  dequeue(id: sharedSpotify.PlaylistBase?.tracks?.items?[pos].track.id ?? "")
-                }
-            }
-        } else if(sharedSpotify.currentlyPlayingPercent ?? 0 > 0.50 ){
-            print("no music to add")
-        }
-    }
     
     voteList.refreshList()
   }
@@ -181,7 +187,8 @@ class MusicQueue: Identifiable, ObservableObject {
       sharedSpotify.skip()
     }
     addsong(id: songs[0].id) {
-      dequeue(id: songs[0].id)
+      self.updateQueue()
+      //dequeue(id: songs[0].id)
     }
     
     for i in songs.dropFirst() {
