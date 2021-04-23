@@ -749,7 +749,7 @@ func addsong(id: String, completion: @escaping () -> () ){
  
  - parameter id: the id of the song to be dequeued
  */
-func dequeue(id: String){
+func dequeue(id: String, completion: @escaping () -> ()){
     
     //first we get the song in doc form
     getCurrRoom { (currRoom, err) in
@@ -761,7 +761,7 @@ func dequeue(id: String){
         //grab the song from the queue
         rm.collection("queue").document(id).getDocument { (doc, err) in
             //confirm we got a document
-            if let err = err, !(doc?.exists ?? false){
+            if !(doc?.exists ?? false){
                 print("error finding queue in dequeue \(err)")
             } else {
                 //store the song
@@ -775,6 +775,7 @@ func dequeue(id: String){
                 rm.collection("history").document(id).setData(sng)
             }
         }//end queue
+      completion()
     }//end getCurrRoom
 }
 
