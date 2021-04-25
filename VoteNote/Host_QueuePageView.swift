@@ -185,10 +185,6 @@ class MusicQueue: Identifiable, ObservableObject {
                 currentVotes = 0
                 sharedSpotify.skip()
             }
-            
-            addsong(id: songs[0].id) {
-                self.updateQueue()
-            }
         
             for i in songs.dropFirst() {
                 print("Added")
