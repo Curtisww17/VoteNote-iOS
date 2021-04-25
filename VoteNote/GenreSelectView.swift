@@ -230,8 +230,8 @@ struct GenreView: View {
       }
     }
   }
+    
   }
-  
 }
 
 /*

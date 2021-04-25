@@ -60,17 +60,15 @@ struct PreviouslyHostedRoomsView: View {
         Button(action: {
           presentationMode.wrappedValue.dismiss()
         }, label: {
-          HStack {
-            Image(systemName: "chevron.left")
-              .resizable()
-              .frame(width: 15, height: 20)
-              .padding(.leading)
-            Text("Back")
-          }
+            HStack {
+                Image(systemName: "chevron.left").resizable().frame(width: 12.5, height: 18.5)
+                Text("Back").font(.body)
+            }
         })
         .frame(alignment: .leading)
         Spacer()
       }
+      .padding(.leading)
       Form {
         ForEach(previousRooms, id: \.code) {currRoom in
           Button(action: {

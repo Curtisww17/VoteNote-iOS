@@ -16,23 +16,6 @@ struct QueueHistoryView: View {
     @State var currentSearch: String = ""
     @State var searchStr: String = ""
     @State var showingCreatePlaylistAlert: Bool = false
-
-    /**
-        Creates a Spotify playlist using the songs in history
-     */
-    func createPlaylist() {
-        sharedSpotify.createPlaylist(id: sharedSpotify.currentUser?.id ?? "")
-        RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
-        sharedSpotify.userPlaylists(completion: {playlist in sharedSpotify.userPlaylists = playlist}, limit: "10")
-        RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
-        sharedSpotify.playlistSongs(completion: {playlistSongs in sharedSpotify.savePlaylist = playlistSongs}, id: sharedSpotify.userPlaylists?.items?[0].id ?? "")
-        
-        RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
-        
-        sharedSpotify.addSongsToPlaylist(Playlist: sharedSpotify.savePlaylist?.id ?? "", songs: songHistory.musicList)
-        
-        showingCreatePlaylistAlert = true
-    }
     
     var body: some View{
         GeometryReader { geo in
@@ -81,7 +64,7 @@ struct QueueHistoryView: View {
                           }
                         }
                         Button("Create Playlist") {
-                            createPlaylist()
+                            showingCreatePlaylistAlert = createPlaylist()
                         }.padding(.trailing)
                     }
                     
@@ -104,4 +87,21 @@ struct QueueHistoryView: View {
             }
         }
     }
+}
+
+/**
+    Creates a Spotify playlist using the songs in history
+ */
+func createPlaylist() -> Bool {
+    sharedSpotify.createPlaylist(id: sharedSpotify.currentUser?.id ?? "")
+    RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+    sharedSpotify.userPlaylists(completion: {playlist in sharedSpotify.userPlaylists = playlist}, limit: "10")
+    RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+    sharedSpotify.playlistSongs(completion: {playlistSongs in sharedSpotify.savePlaylist = playlistSongs}, id: sharedSpotify.userPlaylists?.items?[0].id ?? "")
+    
+    RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+    
+    sharedSpotify.addSongsToPlaylist(Playlist: sharedSpotify.savePlaylist?.id ?? "", songs: songHistory.musicList)
+    
+    return true
 }

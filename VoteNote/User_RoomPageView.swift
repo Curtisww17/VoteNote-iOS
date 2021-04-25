@@ -20,6 +20,7 @@ struct User_RoomPageView: View {
   
   @Binding var showNav: Bool
   let isHost = false
+  @State var showingCreatePlaylistAlert: Bool = false
     
     /**
         Causes the current user to leave the room
@@ -142,6 +143,19 @@ struct User_RoomPageView: View {
                     }
                 }
               }
+                
+                Section() {
+                    ZStack {
+                        Button(action: {showingCreatePlaylistAlert = createPlaylist()}) {
+                            HStack {
+                                Spacer()
+                                Text("Create Playlist from Queue History")
+                                Spacer()
+                            }
+                        }.padding(.trailing)
+                    }
+                    .padding(.vertical)
+                }
               
               Section() {
                 ZStack {
@@ -177,7 +191,11 @@ struct User_RoomPageView: View {
                 }
             })
           })
-          .navigationBarHidden(true).navigationViewStyle(StackNavigationViewStyle())
+          .navigationBarHidden(true).navigationViewStyle(StackNavigationViewStyle()).alert(isPresented: $showingCreatePlaylistAlert) {
+            Alert(title: Text("Playlist Creation"), message: Text("Playlist Created Successfully!"), dismissButton: .default(Text("Ok")) {
+                showingCreatePlaylistAlert = false
+            })
+          }
 
         }.frame(height: geo.size.height)
     }

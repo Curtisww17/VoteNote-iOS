@@ -20,6 +20,7 @@ struct Host_RoomPageView: View {
   @State var autoLike: Bool = false
   @Binding var autoVote: Bool
   let isHost = true
+  @State var showingCreatePlaylistAlert: Bool = false
 
   @Binding var genres: [String]
   
@@ -46,9 +47,7 @@ struct Host_RoomPageView: View {
                     .padding(.top)) {
           }
           
-          Section(footer: NavigationLink(destination: EditRoomView(isInRoom: $inRoom, genres: $genres, genreSet: Set(genres))) {
-                Text("Edit").foregroundColor(Color.blue)
-            }) {
+          Section() {
             NavigationLink(destination: QueueHistoryView().navigationTitle("History")
                             .onAppear(perform: {
                               showNav = false
@@ -93,7 +92,21 @@ struct Host_RoomPageView: View {
                             })
           }
           
-          Section(header: Text("Room Settings")) {
+            Section(header:
+                VStack {
+                    HStack {
+                        Text("Room Settings")
+                        Spacer()
+                    }
+                    
+                    HStack {
+                        NavigationLink(destination: EditRoomView(isInRoom: $inRoom, genres: $genres, genreSet: Set(genres))) {
+                            Text("Edit").font(.caption2).foregroundColor(Color.blue)
+                          }
+                        Spacer()
+                    }
+                    .padding(.vertical, 1.0)
+            }) {
             if RoomDescription == "" {
                 Text("A VoteNote room")
             } else {
@@ -152,6 +165,20 @@ struct Host_RoomPageView: View {
                 }
             }
           }
+            
+            Section() {
+                ZStack {
+                    Button(action: {showingCreatePlaylistAlert = createPlaylist()}) {
+                        HStack {
+                            Spacer()
+                            Text("Create Playlist from Queue History")
+                            Spacer()
+                        }
+                    }.padding(.trailing)
+                }
+                .padding(.vertical)
+            }
+            
           Section() {
             
             ZStack {
@@ -169,7 +196,11 @@ struct Host_RoomPageView: View {
         }
       }
       .navigationTitle("Room")
-      .navigationBarHidden(true).navigationViewStyle(StackNavigationViewStyle())
+      .navigationBarHidden(true).navigationViewStyle(StackNavigationViewStyle()).alert(isPresented: $showingCreatePlaylistAlert) {
+        Alert(title: Text("Playlist Creation"), message: Text("Playlist Created Successfully!"), dismissButton: .default(Text("Ok")) {
+            showingCreatePlaylistAlert = false
+        })
+      }
         
     }
     .frame(height: geo.size.height).navigationViewStyle(StackNavigationViewStyle())
