@@ -8,6 +8,9 @@
 import Foundation
 import SwiftUI
 
+/**
+    The UI for the list of previously joined rooms
+ */
 struct PreviouslyJoinedRoomsView: View {
   @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
   @State var codes: [String]
@@ -20,11 +23,14 @@ struct PreviouslyJoinedRoomsView: View {
   @State var showingCouldNotJoinAlert: Bool = false
   @State var backToLanding: Bool = false
   
-  
+    /**
+        The function for joining a previously joined VoteNote room
+     */
   func join(c: String) {
     joinRoom(code: c){ (ret, message) in
       if message != nil {
         showingCouldNotJoinAlert = true
+        presentationMode.wrappedValue.dismiss()
       }else{
         self.joined = true
         if ret != nil {
@@ -36,7 +42,6 @@ struct PreviouslyJoinedRoomsView: View {
           ExplicitSongsAllowed = ret!.explicit
           AnonUsr = ret!.anonUsr
           genres = ret!.genres
-          //songsPerUser = ret. //not in db room object
           self.joined = true        }
       }
     }

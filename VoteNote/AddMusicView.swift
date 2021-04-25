@@ -23,6 +23,7 @@ struct AddMusicView: View {
       }
     }
   }
+    
   @State private var isEditing = false
   @State var genres: [String]
   @State var hasSelectedSongs: Bool = false
@@ -30,161 +31,158 @@ struct AddMusicView: View {
   @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
-        //NavigationView {
-          ZStack{
-            VStack {
-              
-              HStack {
-                TextField("Search Music", text: $currentSearch).onChange(of: self.currentSearch, perform: { value in
-                  sharedSpotify.searchSong(completion: { search in
-                    sharedSpotify.recentSearch = search
-                    
-                    print("Starting Len: \(sharedSpotify.recentSearch?.tracks?.items?.count)")
-                    
-                    //filtering for allowed genres
-                    if (genres.count != 126 && genres.count != 0) {
-                        var count = 0
-                        
-                        if (sharedSpotify.recentSearch?.tracks?.items! != nil) {
-                            while (count < (sharedSpotify.recentSearch?.tracks?.items!.count)!) {
-                                var found = false
-                                
-                                sharedSpotify.getSongGenre(artistID: (sharedSpotify.recentSearch?.tracks?.items![count].artists![0].id)!, completion: { currentGenres in
-                                    sharedSpotify.songGenres = currentGenres
-                                })
-                                
-                                genres.forEach { currentGenre in
-                                    
-                                    sharedSpotify.songGenres?.artists[0].genres?.forEach { curGenre in
-                                        
-                                        if (currentGenre.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() == curGenre.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()) {
-                                            found = true
-                                            print("Did match")
-                                        }
-                                    }
-                                }
-                                
-                                if (!found) {
-                                    sharedSpotify.recentSearch?.tracks?.items!.remove(at: count)
-                                } else {
-                                    count = count + 1
-                                }
-                            }
-                        }
-                    }
-                    
-                    print("Ending Len: \(sharedSpotify.recentSearch?.tracks?.items?.count)")
-                    
-                  },Query: currentSearch, limit: "30", offset: "0")
-                })
-                .padding(7)
-                .padding(.horizontal, 25)
-                .background(Color(.systemGray6))
-                .cornerRadius(8)
-                .overlay(
-                  HStack {
-                    Image(systemName: "magnifyingglass")
-                      .foregroundColor(.gray)
-                      .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
-                      .padding(.leading, 8)
-                    
-                    if isEditing {
-                      Button(action: {
-                        self.currentSearch = ""
-                        
-                      }) {
-                        Image(systemName: "multiply.circle.fill")
-                          .foregroundColor(.gray)
-                          .padding(.trailing, 8)
-                      }
-                    }
-                  }
-                )
-                .padding(.horizontal, 10)
-                .onTapGesture {
-                  self.isEditing = true
-                }
-                
-                if isEditing {
-                  Button(action: {
-                    self.isEditing = false
-                    self.currentSearch = ""
-                    //selectedSongs.removeAll()
-                    
-                    // Dismiss the keyboard
-                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-                  }) {
-                    Text("Cancel")
-                  }
-                  .padding(.trailing, 10)
-                  .transition(.move(edge: .trailing))
-                  .animation(.default)
-                }
-                
-                Button(action: {if selectedSongs.count > 0 {
-                    songQueue.addMusic(songs: selectedSongs)
-                      selectedSongs.removeAll()
-                      presentationMode.wrappedValue.dismiss()
-                }
-                }) {
-                    Text("Add Songs").foregroundColor(hasSelectedSongs ? .blue : .gray)
-                }
-                .padding(.trailing).disabled(!hasSelectedSongs)
-              }
-              
-              List {
-                //if you havent searched anything display options to see songs
-                if( currentSearch == ""){
-                    NavigationLink(destination: playListView(myPlaylists: sharedSpotify.userPlaylists?.items ?? [Playlist(id: "")], genres: genres).navigationBarTitle("Playlists")) {
-                           Text("View My Playlists")
-                       }
-                    NavigationLink(destination: likedSongsView(genres: genres).navigationBarTitle("Liked Songs")){
-                     Text("Liked Songs")
-                     }
-                    NavigationLink(destination: recomendedView(genres: genres).navigationBarTitle("Recommended Songs")){
-                        Text("Recommended")
-                    }
-                }
-                //if you have searched something display search results
-                if currentSearch != "" {
-                  ForEach((sharedSpotify.recentSearch?.tracks?.items ?? [SpotifyTrack(album: SpotifyAlbum(id: "", images: []), artists: [SpotifyArtist(id: "", name: "", uri: "", type: "")], available_markets: nil, disc_number: 0, duration_ms: 0, explicit: false, href: "", id: "", name: "Searching...", popularity: 0, preview_url: "", track_number: 0, type: "", uri: "")])) { song in
-                    
-                    if (song.album?.images?.count ?? 0 > 0) {
-                        if (!ExplicitSongsAllowed && !song.explicit!) || ExplicitSongsAllowed {
-                            SearchEntry(songTitle: song.name, songArtist: (song.artists?[0].name)!, songID: song.id, imageURL: (song.album?.images?[0].url) ?? nil, isExplicit: song.explicit!, hasSelectedSongs: $hasSelectedSongs)
-                        }
-                    }
-                    else {
-                        if (!ExplicitSongsAllowed && !song.explicit!) || ExplicitSongsAllowed {
-                            SearchEntry(songTitle: song.name, songArtist: (song.artists?[0].name)!, songID: song.id, imageURL: nil, isExplicit: song.explicit!, hasSelectedSongs: $hasSelectedSongs)
-                        }
-                    }
-                  }
-                }
-              }
-            }
+        ZStack{
+          VStack {
             
-          }.onAppear(perform: {
-            sharedSpotify.userPlaylists(completion: {playlist in sharedSpotify.userPlaylists = playlist}, limit: "10")
-          selectedSongs.removeAll()
-          }).onDisappear(perform: {
-            songQueue.updateQueue()
-            
-            
-            
-          }).navigationBarBackButtonHidden(true)
-          .navigationBarItems(leading:
-          Button(action : {
-              selectedSongs.removeAll()
-              self.presentationMode.wrappedValue.dismiss()
-          }){
             HStack {
-                Image(systemName: "chevron.left").resizable().frame(width: 12.5, height: 18.5)
-                Text("Cancel").font(.body)
+              TextField("Search Music", text: $currentSearch).onChange(of: self.currentSearch, perform: { value in
+                sharedSpotify.searchSong(completion: { search in
+                  sharedSpotify.recentSearch = search
+                  
+                  print("Starting Len: \(sharedSpotify.recentSearch?.tracks?.items?.count)")
+                  
+                  //filtering for allowed genres
+                  if (genres.count != 126 && genres.count != 0) {
+                      var count = 0
+                      
+                      if (sharedSpotify.recentSearch?.tracks?.items! != nil) {
+                          while (count < (sharedSpotify.recentSearch?.tracks?.items!.count)!) {
+                              var found = false
+                              
+                              sharedSpotify.getSongGenre(artistID: (sharedSpotify.recentSearch?.tracks?.items![count].artists![0].id)!, completion: { currentGenres in
+                                  sharedSpotify.songGenres = currentGenres
+                              })
+                              
+                              genres.forEach { currentGenre in
+                                  
+                                  sharedSpotify.songGenres?.artists[0].genres?.forEach { curGenre in
+                                      
+                                      if (currentGenre.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() == curGenre.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()) {
+                                          found = true
+                                          print("Did match")
+                                      }
+                                  }
+                              }
+                              
+                              if (!found) {
+                                  sharedSpotify.recentSearch?.tracks?.items!.remove(at: count)
+                              } else {
+                                  count = count + 1
+                              }
+                          }
+                      }
+                  }
+                  
+                  print("Ending Len: \(sharedSpotify.recentSearch?.tracks?.items?.count)")
+                  
+                },Query: currentSearch, limit: "30", offset: "0")
+              })
+              .padding(7)
+              .padding(.horizontal, 25)
+              .background(Color(.systemGray6))
+              .cornerRadius(8)
+              .overlay(
+                HStack {
+                  Image(systemName: "magnifyingglass")
+                    .foregroundColor(.gray)
+                    .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+                    .padding(.leading, 8)
+                  
+                  if isEditing {
+                    Button(action: {
+                      self.currentSearch = ""
+                      
+                    }) {
+                      Image(systemName: "multiply.circle.fill")
+                        .foregroundColor(.gray)
+                        .padding(.trailing, 8)
+                    }
+                  }
+                }
+              )
+              .padding(.horizontal, 10)
+              .onTapGesture {
+                self.isEditing = true
+              }
+              
+              if isEditing {
+                Button(action: {
+                  self.isEditing = false
+                  self.currentSearch = ""
+                  
+                  // Dismiss the keyboard
+                  UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                }) {
+                  Text("Cancel")
+                }
+                .padding(.trailing, 10)
+                .transition(.move(edge: .trailing))
+                .animation(.default)
+              }
+              
+              Button(action: {if selectedSongs.count > 0 {
+                  songQueue.addMusic(songs: selectedSongs)
+                    selectedSongs.removeAll()
+                    presentationMode.wrappedValue.dismiss()
+              }
+              }) {
+                  Text("Add Songs").foregroundColor(hasSelectedSongs ? .blue : .gray)
+              }
+              .padding(.trailing).disabled(!hasSelectedSongs)
             }
-      }).navigationViewStyle(StackNavigationViewStyle())
-      }
-    
+            
+            List {
+              //if you havent searched anything display options to see songs
+              if( currentSearch == ""){
+                  NavigationLink(destination: playListView(myPlaylists: sharedSpotify.userPlaylists?.items ?? [Playlist(id: "")], genres: genres).navigationBarTitle("Playlists")) {
+                         Text("View My Playlists")
+                     }
+                  NavigationLink(destination: likedSongsView(genres: genres).navigationBarTitle("Liked Songs")){
+                   Text("Liked Songs")
+                   }
+                  NavigationLink(destination: recomendedView(genres: genres).navigationBarTitle("Recommended Songs")){
+                      Text("Recommended")
+                  }
+              }
+              //if you have searched something display search results
+              if currentSearch != "" {
+                ForEach((sharedSpotify.recentSearch?.tracks?.items ?? [SpotifyTrack(album: SpotifyAlbum(id: "", images: []), artists: [SpotifyArtist(id: "", name: "", uri: "", type: "")], available_markets: nil, disc_number: 0, duration_ms: 0, explicit: false, href: "", id: "", name: "Searching...", popularity: 0, preview_url: "", track_number: 0, type: "", uri: "")])) { song in
+                  
+                  if (song.album?.images?.count ?? 0 > 0) {
+                      if (!ExplicitSongsAllowed && !song.explicit!) || ExplicitSongsAllowed {
+                          SearchEntry(songTitle: song.name, songArtist: (song.artists?[0].name)!, songID: song.id, imageURL: (song.album?.images?[0].url) ?? nil, isExplicit: song.explicit!, hasSelectedSongs: $hasSelectedSongs)
+                      }
+                  }
+                  else {
+                      if (!ExplicitSongsAllowed && !song.explicit!) || ExplicitSongsAllowed {
+                          SearchEntry(songTitle: song.name, songArtist: (song.artists?[0].name)!, songID: song.id, imageURL: nil, isExplicit: song.explicit!, hasSelectedSongs: $hasSelectedSongs)
+                      }
+                  }
+                }
+              }
+            }
+          }
+          
+        }.onAppear(perform: {
+          sharedSpotify.userPlaylists(completion: {playlist in sharedSpotify.userPlaylists = playlist}, limit: "10")
+        selectedSongs.removeAll()
+        }).onDisappear(perform: {
+          songQueue.updateQueue()
+          
+          
+          
+        }).navigationBarBackButtonHidden(true)
+        .navigationBarItems(leading:
+        Button(action : {
+            selectedSongs.removeAll()
+            self.presentationMode.wrappedValue.dismiss()
+        }){
+          HStack {
+              Image(systemName: "chevron.left").resizable().frame(width: 12.5, height: 18.5)
+              Text("Cancel").font(.body)
+          }
+    }).navigationViewStyle(StackNavigationViewStyle())
+    }
 }
 
 /**
@@ -241,9 +239,7 @@ struct playListView: View {
                                 Text(playlistEntry(playlistName: list.name!, playlistID: list.id, playlistDesc: list.description!).playlistName)
                             }
                         }
-                        //myPlaylist: sharedSpotify.currentPlaylist ?? uniquePlaylist(id: "" ),
                     }
-                    //[playlistStub(items: [Playlist(collaborative: false, description: "", id: "", images: nil, name: "", type: "", uri: "")])]
                 }
             }
         }
@@ -300,7 +296,6 @@ struct recomendedView: View{
                     if isEditing {
                         Button(action: {
                             self.isEditing = false
-                            //selectedSongs.removeAll()
                             
                             // Dismiss the keyboard
                             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
@@ -395,9 +390,8 @@ struct recomendedView: View{
               Image(systemName: "chevron.left").resizable().frame(width: 12.5, height: 18.5)
               Text("Cancel").font(.body)
           }
-    })
+        })
     }
-    
 }
 
 /**
@@ -451,7 +445,6 @@ struct likedSongsView: View{
                     if isEditing {
                         Button(action: {
                             self.isEditing = false
-                            //selectedSongs.removeAll()
                             
                             // Dismiss the keyboard
                             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
@@ -544,7 +537,7 @@ struct likedSongsView: View{
               Image(systemName: "chevron.left").resizable().frame(width: 12.5, height: 18.5)
               Text("Cancel").font(.body)
           }
-    })
+        })
     }
 }
 
@@ -601,7 +594,6 @@ struct uniquePlaylistView: View{
                     if isEditing {
                         Button(action: {
                             self.isEditing = false
-                            //selectedSongs.removeAll()
                             
                             // Dismiss the keyboard
                             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
@@ -638,9 +630,7 @@ struct uniquePlaylistView: View{
                             else {
                                 if (songs.track.explicit != nil) {
                                     if (!ExplicitSongsAllowed && !songs.track.explicit!) || ExplicitSongsAllowed {
-                                        //Button(action: {canAdd = hasSelectedSongs}) {
                                         SearchEntry(songTitle: songs.track.name, songArtist: (songs.track.artists?[0].name)!, songID: songs.track.id, imageURL: nil, isExplicit: songs.track.explicit!, hasSelectedSongs: $hasSelectedSongs)
-                                        //}
                                     }
                                 }
                             }
@@ -701,10 +691,8 @@ struct playlistEntry: View{
                     Spacer()
                 }
             }
-            
         }
     }
-    
 }
 
 /**

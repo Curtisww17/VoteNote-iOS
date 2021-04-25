@@ -45,8 +45,8 @@ struct JoinRoomView: View {
           ExplicitSongsAllowed = ret!.explicit
           AnonUsr = ret!.anonUsr
           genres = ret!.genres
-          //songsPerUser = ret. //not in db room object
-          self.joined = true        }
+          self.joined = true
+        }
       }
     }
   }
@@ -132,7 +132,6 @@ struct JoinRoomView: View {
    */
   func handleScan(result: Result<String, CodeScannerView.ScanError>) {
     self.isShowingScanner = false
-    // Handle the scan
     
     switch result {
     case .success(let code):

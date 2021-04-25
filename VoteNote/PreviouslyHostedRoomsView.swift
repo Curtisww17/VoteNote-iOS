@@ -9,8 +9,8 @@ import Foundation
 import SwiftUI
 
 
-/*
- view to see rooms that the user has previously hosted
+/**
+    The UI for the list of previously hosted rooms
  */
 struct PreviouslyHostedRoomsView: View {
   @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
@@ -22,13 +22,21 @@ struct PreviouslyHostedRoomsView: View {
   @State var genres: [String] = []
   
   @State var showingCouldNotJoinAlert: Bool = false
+    @State var showingCouldNotJoinAlertPremium: Bool = false
   @State var backToLanding: Bool = false
     
+    /**
+        The function for joining a previously hosted VoteNote room
+     */
   func join(c: String) {
     joinRoom(code: c){ (ret, message) in
       if message != nil {
         showingCouldNotJoinAlert = true
-      }else{
+        presentationMode.wrappedValue.dismiss()
+      } else if !(sharedSpotify.currentUser?.product ?? "" == "premium") {
+        showingCouldNotJoinAlertPremium = true
+        presentationMode.wrappedValue.dismiss()
+      } else {
         self.joined = true
         if ret != nil {
           RoomName = ret!.name
@@ -62,22 +70,6 @@ struct PreviouslyHostedRoomsView: View {
         })
         .frame(alignment: .leading)
         Spacer()
-        
-        /*ZStack {
-            HStack {
-              Image(systemName: "chevron.left")
-                .resizable()
-                .frame(width: 15, height: 20)
-                .padding(.leading)
-              Text("Back")
-            }
-              .foregroundColor(Color.blue)
-          NavigationLink(destination: LandingPageView())  {
-                EmptyView()
-            }.hidden()
-        }
-        .padding(.vertical)
-        Spacer()*/
       }
       Form {
         ForEach(previousRooms, id: \.code) {currRoom in
@@ -103,6 +95,11 @@ struct PreviouslyHostedRoomsView: View {
     }).alert(isPresented: $showingCouldNotJoinAlert) {
         Alert(title: Text("Host Room"), message: Text("Could not Host Room"), dismissButton: .default(Text("Ok")) {
             showingCouldNotJoinAlert = false
+            backToLanding = true
+        })
+      }.alert(isPresented: $showingCouldNotJoinAlertPremium) {
+        Alert(title: Text("Host Room"), message: Text("Must be a Premium User to Host a Room"), dismissButton: .default(Text("Ok")) {
+            showingCouldNotJoinAlertPremium = false
             backToLanding = true
         })
       }.navigate(to: LandingPageView(), when: $backToLanding)

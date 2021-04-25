@@ -27,44 +27,44 @@ struct User_QueuePageView: View {
     
   var body: some View {
     GeometryReader { geo in
-          VStack {
-            Form {
-                List {
-                    ForEach(songQueue.musicList) { song in
-                        QueueEntry(curSong: song, isDetailView: false, isUserQueue: true, isHistoryView: false, localVotes: ObservableInteger(intValue: song.numVotes!))
-                    }
-                }
-            }
-            
-            NowPlayingViewUserMinimized(isPlaying: isPlaying)
-                .padding(.bottom)
-
+        VStack {
+          Form {
+              List {
+                  ForEach(songQueue.musicList) { song in
+                      QueueEntry(curSong: song, isDetailView: false, isUserQueue: true, isHistoryView: false, localVotes: ObservableInteger(intValue: song.numVotes!))
+                  }
+              }
           }
-          .frame(width: geo.size.width, height: geo.size.height)
-          .navigationBarHidden(true)
-          .onAppear(perform: {
-            
-            sharedSpotify.pause()
-            var curRoom: room = room(name: "", anonUsr: false, capacity: 0, explicit: false, voting: true)
-            getRoom(code: currentQR.roomCode, completion: {room, err in
-                if (room != nil) {
-                
-                  curRoom = room!
-                    
-                  RoomName = curRoom.name
-                  RoomDescription = curRoom.desc!
-                  VotingEnabled = curRoom.voting
-                  AnonUsr = curRoom.anonUsr
-                  SongsPerUser = curRoom.spu
-                  RoomCapacity = curRoom.capacity
-                  ExplicitSongsAllowed = curRoom.explicit
-                  genres = curRoom.genres
-                }
-            })
-            
-            songQueue.updateQueue()
+          
+          NowPlayingViewUserMinimized(isPlaying: isPlaying)
+              .padding(.bottom)
 
+        }
+        .frame(width: geo.size.width, height: geo.size.height)
+        .navigationBarHidden(true)
+        .onAppear(perform: {
+          
+          sharedSpotify.pause()
+          var curRoom: room = room(name: "", anonUsr: false, capacity: 0, explicit: false, voting: true)
+          getRoom(code: currentQR.roomCode, completion: {room, err in
+              if (room != nil) {
+              
+                curRoom = room!
+                  
+                RoomName = curRoom.name
+                RoomDescription = curRoom.desc!
+                VotingEnabled = curRoom.voting
+                AnonUsr = curRoom.anonUsr
+                SongsPerUser = curRoom.spu
+                RoomCapacity = curRoom.capacity
+                ExplicitSongsAllowed = curRoom.explicit
+                genres = curRoom.genres
+              }
           })
+          
+          songQueue.updateQueue()
+
+        })
     }
   }
 }

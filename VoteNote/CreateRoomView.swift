@@ -29,6 +29,8 @@ struct CreateRoomView: View {
     didSet {
       if songsPerUser < 1 {
         songsPerUser = 1
+      } else if songsPerUser > 10 {
+        songsPerUser = 10
       }
     }
   }
@@ -65,7 +67,6 @@ struct CreateRoomView: View {
       SongsPerUser = songsPerUser
       ExplicitSongsAllowed = explicitSongsAllowed
         
-      //self.presentationMode.wrappedValue.dismiss()
     } else {
       alertMsg = "Must be a premium member to host a room"
       showingAlert = true
@@ -181,10 +182,7 @@ struct CreateRoomView: View {
           prevHostedRooms = codes ?? []
         }
       })
-    }).onDisappear(perform: {
-        //self.madeRoom.boolValue = false
-    })
-    .navigationViewStyle(StackNavigationViewStyle())
+    }).navigationViewStyle(StackNavigationViewStyle())
   }
 }
 

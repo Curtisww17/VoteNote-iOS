@@ -30,17 +30,19 @@ struct EditRoomView: View {
     didSet {
       if songsPerUser < 1 {
         songsPerUser = 1
+      } else if songsPerUser > 10 {
+        songsPerUser = 10
       }
     }
   }
   
-    @State var roomName: String = RoomName
-    @State var roomDescription = RoomDescription
-    @State var votingEnabled: Bool = VotingEnabled
-    @State var madeRoom: Bool = false
-    @State var anonUsr: Bool = AnonUsr
-    @State var explicitSongsAllowed: Bool = ExplicitSongsAllowed
-    @Binding var genres: [String]
+  @State var roomName: String = RoomName
+  @State var roomDescription = RoomDescription
+  @State var votingEnabled: Bool = VotingEnabled
+  @State var madeRoom: Bool = false
+  @State var anonUsr: Bool = AnonUsr
+  @State var explicitSongsAllowed: Bool = ExplicitSongsAllowed
+  @Binding var genres: [String]
   @State var genreSet: Set<String>
   
     /**
@@ -119,9 +121,7 @@ struct EditRoomView: View {
               }
             }
             .padding(.trailing)
-            
           }
-          
         }
         
         if self.roomName != "" {

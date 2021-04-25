@@ -168,9 +168,7 @@ struct UserController: View {
                 self.autoVote = setting!
                 print(setting)
             }
-            
         }
-
     })
     }
   }

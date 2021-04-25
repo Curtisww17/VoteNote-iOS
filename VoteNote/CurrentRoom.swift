@@ -25,9 +25,7 @@ class CurrentRoom: ObservableObject {
   }
   
   func update(roomCode: String) {
-        self.roomCode = roomCode
-        //self.roomQR = generateQRCode(from: roomCode)
-     self.roomQR = resizeImage(image: generateQRCode(from: roomCode), targetSize: CGSize(width: 200.0, height: 200.0))
-    
+    self.roomCode = roomCode
+    self.roomQR = resizeImage(image: generateQRCode(from: roomCode), targetSize: CGSize(width: 200.0, height: 200.0))
   }
 }

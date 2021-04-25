@@ -40,6 +40,9 @@ struct LoginWithSpotifyView: View {
   }
 }
 
+/**
+    A class for having versions of booleans that are observable
+ */
 class ObservableBoolean: ObservableObject {
     var boolValue: Bool
     
@@ -48,6 +51,9 @@ class ObservableBoolean: ObservableObject {
     }
 }
 
+/**
+    A class for having versions of integers that are observable
+ */
 class ObservableInteger: ObservableObject {
     var intValue: Int
     
@@ -56,6 +62,9 @@ class ObservableInteger: ObservableObject {
     }
 }
 
+/**
+    A class for having versions of strings that are observable
+ */
 class ObservableString: ObservableObject {
     var stringValue: String
     

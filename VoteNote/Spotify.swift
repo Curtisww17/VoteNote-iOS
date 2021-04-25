@@ -94,16 +94,6 @@ class Spotify: ObservableObject {
   }
   
   func updateCurrentlyPlayingPosition() {
-//    self.appRemote?.playerAPI?.getPlayerState( { (playStateMaybe, err) in
-//      if err != nil {
-//        if let playState = playStateMaybe as? SPTAppRemotePlayerState {
-//          self.currentlyPlayingPos = playState.playbackPosition
-//          self.currentlyPlayingPercent = (Float)(self.currentlyPlayingPos!) / (Float)(self.currentlyPlaying!.duration_ms ?? 100000)
-//        }
-//
-//
-//      }
-//    })
     self.currentlyPlayingPercent = (Float)(self.currentlyPlayingPos ?? 0) / (Float)(self.currentlyPlaying!.duration_ms ?? 100000)
   }
   
