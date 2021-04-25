@@ -295,6 +295,8 @@ class Spotify: ObservableObject {
         fatalError("bad response \(response.description)")
       }
     }
+    RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+    sharedSpotify.savedSongs(completion: {playlistSongs in sharedSpotify.usersSavedSongs = playlistSongs})
   }
   func unLikeSong(id: String){
       self.httpRequester.headerDELETE(url: "https://api.spotify.com/v1/me/tracks?ids=\(id)",header: [ "Authorization": "Bearer \(self.appRemote?.connectionParameters.accessToken ?? ""))" ]).onFinish = {
@@ -305,6 +307,8 @@ class Spotify: ObservableObject {
           fatalError("bad response \(response.description)")
         }
       }
+    RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+    sharedSpotify.savedSongs(completion: {playlistSongs in sharedSpotify.usersSavedSongs = playlistSongs})
     }
   func isSongFavorited(songID: String) -> Bool{
       if(self.usersSavedSongs == nil){

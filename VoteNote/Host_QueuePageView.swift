@@ -607,11 +607,9 @@ struct NowPlayingViewHostMaximized: View {
       if(sharedSpotify.currentlyPlaying != nil){
         if(!sharedSpotify.isSongFavorited(songID: sharedSpotify.currentlyPlaying?.id ?? "")){
             sharedSpotify.likeSong(id: sharedSpotify.currentlyPlaying!.id)
-            RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
         }
         else{
             sharedSpotify.unLikeSong(id: sharedSpotify.currentlyPlaying!.id)
-            RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
         }
       }
         
