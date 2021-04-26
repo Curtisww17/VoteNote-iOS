@@ -246,21 +246,19 @@ struct playListBaseView: View {
     var body: some View {
         ZStack{
             VStack{
-                HStack{
-                    Button(action: {
-                      presentationMode.wrappedValue.dismiss()
-                    }, label: {
+                HStack {
+                  Button(action: {
+                    presentationMode.wrappedValue.dismiss()
+                  }, label: {
                       HStack {
-                        Image(systemName: "chevron.left")
-                          .resizable()
-                          .frame(width: 15, height: 20)
-                          .padding(.leading)
-                        Text("Back")
+                          Image(systemName: "chevron.left").resizable().frame(width: 12.5, height: 18.5)
+                          Text("Back").font(.body)
                       }
-                    })
-                    .frame(alignment: .leading)
-                    Spacer()
+                  })
+                  .frame(alignment: .leading)
+                  Spacer()
                 }
+                .padding(.leading)
                 Form {
                     List{
                         ForEach(((sharedSpotify.userPlaylists?.items ?? [Playlist(description: "", id: "", images: nil, name: "", type: "", uri: "")]))) { list in

@@ -81,14 +81,20 @@ struct NowPlayingViewUserMinimized: View {
         Favorites the current song in the Spotify Queue
      */
     func favoriteSong(){
-        if(!sharedSpotify.isSongFavorited(songID: currentSongID)){
-            sharedSpotify.likeSong(id: currentSongID)
-            isLiked = true
+        if(sharedSpotify.currentlyPlaying != nil){
+          if(!sharedSpotify.isSongFavorited(songID: currentSongID)){
+              sharedSpotify.likeSong(id: currentSongID)
+          }
+          else{
+              sharedSpotify.unLikeSong(id: currentSongID)
+          }
         }
-        else{
-            sharedSpotify.unLikeSong(id: currentSongID)
-            isLiked = false
-        }
+          
+          if(sharedSpotify.isSongFavorited(songID: currentSongID)){
+              isLiked = true
+          } else {
+              isLiked = false
+          }
     }
 
     var body: some View {

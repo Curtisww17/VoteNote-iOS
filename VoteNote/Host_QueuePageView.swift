@@ -546,6 +546,9 @@ struct NowPlayingViewHostMaximized: View {
     @State var saved: Bool = false
     @Binding var isMaximized: Bool //should start as true
     @State var isLiked = false
+    @State var songTitle = sharedSpotify.currentlyPlaying!.name
+    @State var artists = sharedSpotify.currentlyPlaying!.artists!.first!.name
+    @State var imageURL = sharedSpotify.currentlyPlaying!.album!.images![0].url
     
     /**
         Resumes the current song in the Spotify Queue
@@ -589,6 +592,10 @@ struct NowPlayingViewHostMaximized: View {
         } else {
             isLiked = false
         }
+        
+        songTitle = sharedSpotify.currentlyPlaying!.name
+        artists = sharedSpotify.currentlyPlaying!.artists!.first!.name
+        imageURL = sharedSpotify.currentlyPlaying!.album!.images![0].url
     }
     
     /**
@@ -638,7 +645,7 @@ struct NowPlayingViewHostMaximized: View {
             }, label: {
                 VStack {
                   if (sharedSpotify.currentlyPlaying != nil) {
-                    RemoteImage(url: sharedSpotify.currentlyPlaying!.album!.images![0].url)
+                    RemoteImage(url: imageURL)
                       .frame(width: 160, height: 160)
                   } else {
                     Image(systemName: "person.crop.square.fill").resizable().frame(width: 160.0, height: 160.0)
@@ -647,26 +654,31 @@ struct NowPlayingViewHostMaximized: View {
                         Spacer()
                       if sharedSpotify.currentlyPlaying == nil {
                             Text("None Selected")
-                                .padding(.leading)
                         } else {
-                          Text(sharedSpotify.currentlyPlaying!.name)
-                                .padding(.leading)
+                          Text(songTitle)
                         }
                         Spacer()
                     }
                     
-                  if sharedSpotify.currentlyPlaying != nil {
-                    Text(sharedSpotify.currentlyPlaying!.artists!.first!.name)
-                            .font(.caption)
+                    HStack {
+                        Spacer()
+                        if sharedSpotify.currentlyPlaying != nil {
+                          Text(artists)
+                                  .font(.caption)
+                          }
+                        Spacer()
                     }
                     
                     HStack {
-                        if (currentVotes > 1) {
+                        if (currentVotes > 0) {
                             Text("+\(currentVotes)")
+                                .foregroundColor(Color.green)
+                        } else if (currentVotes == 0) {
+                            Text("\(currentVotes)")
                                 .foregroundColor(Color.black)
                         } else {
                             Text("\(currentVotes)")
-                                .foregroundColor(Color.black)
+                                .foregroundColor(Color.red)
                         }
                         
                         Spacer()
@@ -736,20 +748,10 @@ struct NowPlayingViewHostMinimized: View {
     @State var saved: Bool = false
     @Binding var isMaximized: Bool //should start as true
     let sheetManager: PartialSheetManager
-    
-    /**
-        Favorites the current song in the Spotify Queue
-     */
-    func favoriteSong(){
-      if(sharedSpotify.currentlyPlaying != nil){
-        sharedSpotify.likeSong(id: sharedSpotify.currentlyPlaying!.id)
-            saved = !saved
-        }
-    }
 
     var body: some View {
       VStack {
-        if (isHost.boolValue) {
+        if (isHost.boolValue && sharedSpotify.currentlyPlaying != nil) {
           HStack {
             Color.green
               .frame(width: UIScreen.main.bounds.width * CGFloat(sharedSpotify.currentlyPlayingPercent ?? 0), alignment: .leading)

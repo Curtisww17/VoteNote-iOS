@@ -98,6 +98,17 @@ struct EditRoomView: View {
             
             HStack{
                 NavigationLink(
+                    destination: playListBaseView(songsPerUser: songsPerUser, myPlaylists: sharedSpotify.userPlaylists?.items ?? [Playlist(id: "")])
+                    .navigationBarBackButtonHidden(true).navigationBarHidden(true),
+                  label: {
+                    Text("Base Room Off Playlist")
+                  }).onAppear(perform: {
+                    sharedSpotify.userPlaylists(completion: {playlist in sharedSpotify.userPlaylists = playlist}, limit: "10")
+                  })
+            }
+            
+            HStack{
+                NavigationLink(
                     destination: GenreSelectView(genres: $genreSet)
                     .navigationBarBackButtonHidden(true).navigationBarHidden(true),
                   label: {
@@ -115,6 +126,14 @@ struct EditRoomView: View {
             .padding(.trailing)
             
             HStack {
+              Text("Anonymous Users")
+              Toggle(isOn: $anonUsr) {
+                Text("")
+              }
+            }
+            .padding(.trailing)
+            
+            HStack {
               Text("Voting Enabled")
               Toggle(isOn: $votingEnabled) {
                 Text("")
@@ -126,7 +145,7 @@ struct EditRoomView: View {
         
         if self.roomName != "" {
           Button(action: {editRoom()}) {
-            Text("Save Room Edits")
+            Text("Save Changes")
             
           }.padding()
         }

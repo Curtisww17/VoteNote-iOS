@@ -94,7 +94,9 @@ class Spotify: ObservableObject {
   }
   
   func updateCurrentlyPlayingPosition() {
-    self.currentlyPlayingPercent = (Float)(self.currentlyPlayingPos ?? 0) / (Float)(self.currentlyPlaying!.duration_ms ?? 100000)
+    if (self.currentlyPlaying != nil) {
+      self.currentlyPlayingPercent = (Float)(self.currentlyPlayingPos ?? 0) / (Float)(self.currentlyPlaying!.duration_ms ?? 100000)
+    }
   }
   
   //pauses spotify player
